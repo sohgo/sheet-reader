@@ -1,0 +1,41 @@
+bin_PROGRAMS = sheetreader
+
+sheetreader_SOURCES =\
+	cco_srAnalyzer.c\
+	cco_srAnalyzer.h\
+	cco_vSrPattern.c\
+	cco_vSrPattern.h\
+	cco_srDb.c\
+	cco_srDb.h\
+	cco_srOcr.c\
+	cco_srOcr.h\
+	cco_srOcrOpencv.c\
+	cco_srOcrOpencv.h\
+	cco_srOcrGocr.c\
+	cco_srOcrGocr.h\
+	cco_srOcrNhocr.c\
+	cco_srOcrNhocr.h\
+	cco_srConf.c\
+	cco_srConf.h\
+	cco_srMl.c\
+	cco_srMl.h\
+	cco_srMlSheet.c\
+	cco_srMlSheet.h\
+	utility.c\
+	utility.h\
+	sheetreader.c\
+	sheetreader.h
+	
+sheetreader_LDADD = @LINKLIBS@
+
+sheetreader_LDFLAGS =\
+	-L/usr/local/lib
+
+INCLUDES =\
+	-I/usr/local/include\
+	-I/usr/local/cluscore\
+	-I/usr/include/libxml2\
+	-I/usr/include/opencv\
+	-I$(top_srcdir)/include
+	
+	

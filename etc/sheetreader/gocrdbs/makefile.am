@@ -1,0 +1,8 @@
+SUBDIRS = handwrite_09db handwrite_mbsdb handwritedb iddb idocrbdb
+confdir =\
+	$(sysconfdir)/gocrdb/handwrite_09db\
+	$(sysconfdir)/gocrdb/handwrite_mbsdb\
+	$(sysconfdir)/gocrdb/handwritedb\
+	$(sysconfdir)/gocrdb/iddb\
+	$(sysconfdir)/gocrdb/idocrbdb
+	

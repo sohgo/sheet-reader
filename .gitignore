@@ -1,0 +1,9 @@
+*.o
+src/sheetreader
+makefile
+include/config.h
+config.log
+config.status
+.cproject
+.project
+.deps

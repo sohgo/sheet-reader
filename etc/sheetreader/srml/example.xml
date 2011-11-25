@@ -1,0 +1,46 @@
+<srMl>
+	<sheet>
+		<id>00000</id>
+		<blockWidth>20</blockWidth>
+		<blockHeight>12</blockHeight>
+		<properties>
+			<blockOcr name="small_star" x="2" y="9" colspan="2" option="number"/>
+			<blockOcr name="white_star" x="4" y="9" colspan="2" option="number"/>
+			<blockOcr name="no_white_star" x="6" y="9" colspan="2" option="number"/>
+			<blockOcr name="small_nut" x="8" y="9" colspan="2" option="number"/>
+			<blockOcr name="other_nut" x="10" y="9" colspan="2" option="number"/>
+			<blockOcr name="accept_star" x="12" y="9" colspan="2" option="rating"/>
+			<blockOcr name="controled_star" x="14" y="9" colspan="2" option="number"/>
+			<blockImg name="small_star" x="2" y="9" colspan="2"/>
+			<blockImg name="white_star" x="4" y="9" colspan="2"/>
+			<blockImg name="no_white_star" x="6" y="9" colspan="2"/>
+			<blockImg name="small_nut" x="8" y="9" colspan="2"/>
+			<blockImg name="other_nut" x="10" y="9" colspan="2"/>
+			<blockImg name="accept_star" x="12" y="9" colspan="2"/>
+			<blockImg name="controled_star" x="14" y="9" colspan="2"/>
+			<blockImg name="remarks" x="16" y="9" colspan="4"/>
+		</properties>
+	</sheet>
+	<sheet>
+		<id>00001</id>
+		<blockWidth>20</blockWidth>
+		<blockHeight>12</blockHeight>
+		<properties>
+			<blockOcr name="small_star" x="2" y="9" colspan="2" option="number"/>
+			<blockOcr name="white_star" x="4" y="9" colspan="2" option="number"/>
+			<blockOcr name="no_white_star" x="6" y="9" colspan="2" option="number"/>
+			<blockOcr name="small_nut" x="8" y="9" colspan="2" option="number"/>
+			<blockOcr name="other_nut" x="10" y="9" colspan="2" option="number"/>
+			<blockOcr name="accept_star" x="12" y="9" colspan="2" option="rating"/>
+			<blockOcr name="controled_star" x="14" y="9" colspan="2" option="number"/>
+			<blockImg name="small_star" x="2" y="9" colspan="2"/>
+			<blockImg name="white_star" x="4" y="9" colspan="2"/>
+			<blockImg name="no_white_star" x="6" y="9" colspan="2"/>
+			<blockImg name="small_nut" x="8" y="9" colspan="2"/>
+			<blockImg name="other_nut" x="10" y="9" colspan="2"/>
+			<blockImg name="accept_star" x="12" y="9" colspan="2"/>
+			<blockImg name="controled_star" x="14" y="9" colspan="2"/>
+			<blockImg name="remarks" x="16" y="9" colspan="4"/>
+		</properties>
+	</sheet>
+</srMl>

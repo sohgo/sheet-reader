@@ -1,0 +1,2 @@
+confdir = $(sysconfdir)/sheetreader/srml
+conf_DATA = example.xml

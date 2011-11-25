@@ -1,0 +1,4 @@
+confdir = $(sysconfdir)/sheetreader/gocrdbs/handwrite_mbsdb
+conf_DATA = *.pbm db.lst
+
+

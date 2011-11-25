@@ -1,0 +1,3 @@
+SUBDIRS = srml gocrdbs
+confdir = $(sysconfdir)/sheetreader
+conf_DATA = config.xml
