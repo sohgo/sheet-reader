@@ -959,7 +959,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 	int smooth;
 
 	do {
+#ifdef KOCR
 		ocr = (cco_srOcr *) cco_srOcrKocr_new();
+#else
+		ocr = (cco_srOcr *) cco_srOcrGocr_new();
+#endif
 		width = (upperleft->vSrPattern_width + bottomleft->vSrPattern_width
 				+ upperright->vSrPattern_width) / 3.0;
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
@@ -1167,7 +1171,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				{
 					ocr = (cco_srOcr *) cco_srOcrGocr_new();
 				} else {
+#ifdef KOCR
 					ocr = (cco_srOcr *) cco_srOcrKocr_new();
+#else
+					ocr = (cco_srOcr *) cco_srOcrGocr_new();
+#endif
 				}
 				ocr->srOcr_setImage(ocr, tmp_cstring);
 				if (xml_attr_option != NULL)

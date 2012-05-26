@@ -40,8 +40,6 @@ extern char *ocrdb_dir;
 #define DB_FILE_MBS "list-mbs.db"
 #define DB_FILE_OCRB "list-ocrb.db"
 
-#endif
-
 /*
 char recognize(feature_db *a, char *b)
 {
@@ -438,3 +436,6 @@ void cco_srOcrKocr_getRecognizeString_currn(void *obj, char*cstring)
 	}
 	return;
 }
+
+#endif
+
