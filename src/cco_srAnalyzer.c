@@ -34,7 +34,11 @@
 #include <cluscore/cco_vString.h>
 #include <cluscore/cco_vXml.h>
 #include "cco_srAnalyzer.h"
-#include "cco_srOcrNhocr.h"
+
+#include "cco_srOcr.h"
+
+// #include "cco_srOcrNhocr.h"
+
 #include "cco_vSrPattern.h"
 #include "cco_srMl.h"
 #include "cco_srMlSheet.h"
@@ -88,7 +92,11 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 	o->srAnalyzer_receiver = cco_vString_new("");
 	o->srAnalyzer_save_prefix = cco_vString_new("");
 	o->srAnalyzer_backup_image = cco_vString_new("");
-	o->srAnalyzer_ocr = cco_vString_new("nhocr");
+#ifdef KOCR
+	o->srAnalyzer_ocr = cco_vString_new("kocr"); // nhocr
+#else
+	o->srAnalyzer_ocr = cco_vString_new("gocr");
+#endif
 	time(&time_val);
 	localtime_r(&time_val, &tm_val);
     strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", &tm_val);
@@ -886,7 +894,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getIdFromImage(cco_srAnalyzer *obj, cco_vSrP
 
 	do {
 		ocr = (cco_srOcr *) cco_srOcrGocr_new();
-
 		width = (upperleft->vSrPattern_width + bottomleft->vSrPattern_width
 				+ upperright->vSrPattern_width) / 3.0;
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
@@ -952,8 +959,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 	int smooth;
 
 	do {
-		ocr = (cco_srOcr *) cco_srOcrGocr_new();
-
+		ocr = (cco_srOcr *) cco_srOcrKocr_new();
 		width = (upperleft->vSrPattern_width + bottomleft->vSrPattern_width
 				+ upperright->vSrPattern_width) / 3.0;
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
@@ -1161,7 +1167,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				{
 					ocr = (cco_srOcr *) cco_srOcrGocr_new();
 				} else {
-					ocr = (cco_srOcr *) cco_srOcrNhocr_new();
+					ocr = (cco_srOcr *) cco_srOcrKocr_new();
 				}
 				ocr->srOcr_setImage(ocr, tmp_cstring);
 				if (xml_attr_option != NULL)
@@ -1418,7 +1424,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_backupImage(cco_srAnalyzer *obj)
 	do
 	{
 		tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
-				obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+				obj->srAnalyzer_save_prefix,
+				obj->srAnalyzer_sender,
+				obj->srAnalyzer_receiver,
 				obj->srAnalyzer_date_string);
 		tmp_cstring = tmp_string->v_getCstring(tmp_string);
 		utility_mkdir(tmp_cstring);

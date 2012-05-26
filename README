@@ -1,0 +1,6 @@
+
+ - Sheetreader requires kocr, an opensource OCR engine.
+ - get kocr package, execute the following command.
+
+$ git clone https://code.google.com/p/kocr/
+

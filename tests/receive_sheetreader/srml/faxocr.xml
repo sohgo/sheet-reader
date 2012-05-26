@@ -1,0 +1,214 @@
+<srMl>
+  <sheet>
+    <id>00000</id>
+    <blockWidth>20</blockWidth>
+    <blockHeight>12</blockHeight>
+    <properties>
+      <blockOcr name="echo_request_and_send_analyzed_data" x="20" y="12" colspan="1" option="rating"/>
+      <blockOcr name="accept_child" x="12" y="9" colspan="2" option="rating"/>
+      <blockImg name="accept_child" x="12" y="9" colspan="2" margin="15"/>
+      <blockOcr name="flu_adult" x="8" y="9" colspan="2" option="number"/>
+      <blockImg name="flu_adult" x="8" y="9" colspan="2" margin="15"/>
+      <blockOcr name="no_ventilator_child" x="6" y="9" colspan="2" option="number"/>
+      <blockImg name="no_ventilator_child" x="6" y="9" colspan="2" margin="15"/>
+      <blockImg name="remarks" x="16" y="9" colspan="4" margin="15"/>
+      <blockOcr name="controled_child" x="14" y="9" colspan="2" option="number"/>
+      <blockImg name="controled_child" x="14" y="9" colspan="2" margin="15"/>
+      <blockOcr name="flu_child" x="2" y="9" colspan="2" option="number"/>
+      <blockImg name="flu_child" x="2" y="9" colspan="2" margin="15"/>
+      <blockOcr name="other_adult" x="10" y="9" colspan="2" option="number"/>
+      <blockImg name="other_adult" x="10" y="9" colspan="2" margin="15"/>
+      <blockOcr name="ventilator_child" x="4" y="9" colspan="2" option="number"/>
+      <blockImg name="ventilator_child" x="4" y="9" colspan="2" margin="15"/>
+    </properties>
+  </sheet>
+  <sheet>
+    <id>00004</id>
+    <blockWidth>20</blockWidth>
+    <blockHeight>12</blockHeight>
+    <properties>
+      <blockOcr name="echo_request_and_send_analyzed_data" x="20" y="12" colspan="1" option="rating"/>
+      <blockOcr name="accept_child" x="10" y="8" colspan="2" option="rating"/>
+      <blockImg name="accept_child" x="10" y="8" colspan="2" margin="15"/>
+      <blockOcr name="flu_adult" x="6" y="8" colspan="2" option="number"/>
+      <blockImg name="flu_adult" x="6" y="8" colspan="2" margin="15"/>
+      <blockOcr name="no_ventilator_child" x="4" y="8" colspan="2" option="number"/>
+      <blockImg name="no_ventilator_child" x="4" y="8" colspan="2" margin="15"/>
+      <blockImg name="remarks" x="14" y="8" colspan="6" margin="15"/>
+      <blockOcr name="controled_child" x="12" y="8" colspan="2" option="number"/>
+      <blockImg name="controled_child" x="12" y="8" colspan="2" margin="15"/>
+      <blockOcr name="flu_child" x="0" y="8" colspan="2" option="number"/>
+      <blockImg name="flu_child" x="0" y="8" colspan="2" margin="15"/>
+      <blockOcr name="other_adult" x="8" y="8" colspan="2" option="number"/>
+      <blockImg name="other_adult" x="8" y="8" colspan="2" margin="15"/>
+      <blockOcr name="ventilator_child" x="2" y="8" colspan="2" option="number"/>
+      <blockImg name="ventilator_child" x="2" y="8" colspan="2" margin="15"/>
+    </properties>
+  </sheet>
+  <sheet>
+    <id>10002</id>
+    <blockWidth>21</blockWidth>
+    <blockHeight>14</blockHeight>
+    <properties>
+      <blockOcr name="echo_request_and_send_analyzed_data" x="21" y="14" colspan="1" option="rating"/>
+      <blockOcr name="num11" x="1" y="6" colspan="1" option="number"/>
+      <blockImg name="num11" x="1" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num21" x="3" y="6" colspan="1" option="number"/>
+      <blockImg name="num21" x="3" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num31" x="5" y="6" colspan="1" option="number"/>
+      <blockImg name="num31" x="5" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num41" x="7" y="6" colspan="1" option="number"/>
+      <blockImg name="num41" x="7" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num51" x="9" y="6" colspan="1" option="number"/>
+      <blockImg name="num51" x="9" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num61" x="11" y="6" colspan="1" option="number"/>
+      <blockImg name="num61" x="11" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num71" x="13" y="6" colspan="1" option="number"/>
+      <blockImg name="num71" x="13" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num81" x="15" y="6" colspan="1" option="number"/>
+      <blockImg name="num81" x="15" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num91" x="17" y="6" colspan="1" option="number"/>
+      <blockImg name="num91" x="17" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num01" x="19" y="6" colspan="1" option="number"/>
+      <blockImg name="num01" x="19" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num12" x="1" y="8" colspan="1" option="number"/>
+      <blockImg name="num12" x="1" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num22" x="3" y="8" colspan="1" option="number"/>
+      <blockImg name="num22" x="3" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num32" x="5" y="8" colspan="1" option="number"/>
+      <blockImg name="num32" x="5" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num42" x="7" y="8" colspan="1" option="number"/>
+      <blockImg name="num42" x="7" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num52" x="9" y="8" colspan="1" option="number"/>
+      <blockImg name="num52" x="9" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num62" x="11" y="8" colspan="1" option="number"/>
+      <blockImg name="num62" x="11" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num72" x="13" y="8" colspan="1" option="number"/>
+      <blockImg name="num72" x="13" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num82" x="15" y="8" colspan="1" option="number"/>
+      <blockImg name="num82" x="15" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num92" x="17" y="8" colspan="1" option="number"/>
+      <blockImg name="num92" x="17" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num02" x="19" y="8" colspan="1" option="number"/>
+      <blockImg name="num02" x="19" y="8" colspan="1" margin="15"/>
+      <blockOcr name="circle1" x="1" y="10" colspan="1" option="rating"/>
+      <blockImg name="circle1" x="1" y="10" colspan="1" margin="15"/>
+      <blockOcr name="triangle1" x="3" y="10" colspan="1" option="rating"/>
+      <blockImg name="triangle1" x="3" y="10" colspan="1" margin="15"/>
+      <blockOcr name="x1" x="5" y="10" colspan="1" option="rating"/>
+      <blockImg name="x1" x="5" y="10" colspan="1" margin="15"/>
+      <blockOcr name="circle2" x="1" y="12" colspan="1" option="rating"/>
+      <blockImg name="circle2" x="1" y="12" colspan="1" margin="15"/>
+      <blockOcr name="triangle2" x="3" y="12" colspan="1" option="rating"/>
+      <blockImg name="triangle2" x="3" y="12" colspan="1" margin="15"/>
+      <blockOcr name="x2" x="5" y="12" colspan="1" option="rating"/>
+      <blockImg name="x2" x="5" y="12" colspan="1" margin="15"/>
+    </properties>
+  </sheet>
+  <sheet>
+    <id>10003</id>
+    <blockWidth>21</blockWidth>
+    <blockHeight>14</blockHeight>
+    <properties>
+      <blockOcr name="echo_request_and_send_analyzed_data" x="21" y="14" colspan="1" option="rating"/>
+      <blockImg name="chk1" x="7" y="10" colspan="1" margin="15"/>
+      <blockImg name="chk2" x="7" y="12" colspan="1" margin="15"/>
+      <blockOcr name="circle1" x="1" y="10" colspan="1" option="rating"/>
+      <blockImg name="circle1" x="1" y="10" colspan="1" margin="15"/>
+      <blockOcr name="circle2" x="1" y="12" colspan="1" option="rating"/>
+      <blockImg name="circle2" x="1" y="12" colspan="1" margin="15"/>
+      <blockOcr name="num01" x="19" y="6" colspan="1" option="number"/>
+      <blockImg name="num01" x="19" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num02" x="19" y="8" colspan="1" option="number"/>
+      <blockImg name="num02" x="19" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num11" x="1" y="6" colspan="1" option="number"/>
+      <blockImg name="num11" x="1" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num12" x="1" y="8" colspan="1" option="number"/>
+      <blockImg name="num12" x="1" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num21" x="3" y="6" colspan="1" option="number"/>
+      <blockImg name="num21" x="3" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num22" x="3" y="8" colspan="1" option="number"/>
+      <blockImg name="num22" x="3" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num31" x="5" y="6" colspan="1" option="number"/>
+      <blockImg name="num31" x="5" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num32" x="5" y="8" colspan="1" option="number"/>
+      <blockImg name="num32" x="5" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num41" x="7" y="6" colspan="1" option="number"/>
+      <blockImg name="num41" x="7" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num42" x="7" y="8" colspan="1" option="number"/>
+      <blockImg name="num42" x="7" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num51" x="9" y="6" colspan="1" option="number"/>
+      <blockImg name="num51" x="9" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num52" x="9" y="8" colspan="1" option="number"/>
+      <blockImg name="num52" x="9" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num61" x="11" y="6" colspan="1" option="number"/>
+      <blockImg name="num61" x="11" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num62" x="11" y="8" colspan="1" option="number"/>
+      <blockImg name="num62" x="11" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num71" x="13" y="6" colspan="1" option="number"/>
+      <blockImg name="num71" x="13" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num72" x="13" y="8" colspan="1" option="number"/>
+      <blockImg name="num72" x="13" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num81" x="15" y="6" colspan="1" option="number"/>
+      <blockImg name="num81" x="15" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num82" x="15" y="8" colspan="1" option="number"/>
+      <blockImg name="num82" x="15" y="8" colspan="1" margin="15"/>
+      <blockOcr name="num91" x="17" y="6" colspan="1" option="number"/>
+      <blockImg name="num91" x="17" y="6" colspan="1" margin="15"/>
+      <blockOcr name="num92" x="17" y="8" colspan="1" option="number"/>
+      <blockImg name="num92" x="17" y="8" colspan="1" margin="15"/>
+      <blockOcr name="triangle1" x="3" y="10" colspan="1" option="rating"/>
+      <blockImg name="triangle1" x="3" y="10" colspan="1" margin="15"/>
+      <blockOcr name="triangle2" x="3" y="12" colspan="1" option="rating"/>
+      <blockImg name="triangle2" x="3" y="12" colspan="1" margin="15"/>
+      <blockOcr name="x1" x="5" y="10" colspan="1" option="rating"/>
+      <blockImg name="x1" x="5" y="10" colspan="1" margin="15"/>
+      <blockOcr name="x2" x="5" y="12" colspan="1" option="rating"/>
+      <blockImg name="x2" x="5" y="12" colspan="1" margin="15"/>
+    </properties>
+  </sheet>
+  <sheet>
+    <id>13</id>
+    <blockWidth>16</blockWidth>
+    <blockHeight>10</blockHeight>
+    <properties>
+      <blockOcr name="echo_request_and_send_analyzed_data" x="16" y="10" colspan="1" option="rating"/>
+      <blockOcr name="0-11-1" x="1" y="11" colspan="1" option="number"/>
+      <blockImg name="0-11-1" x="1" y="11" colspan="1" margin="15"/>
+      <blockOcr name="0-11-3" x="3" y="11" colspan="1" option="number"/>
+      <blockImg name="0-11-3" x="3" y="11" colspan="1" margin="15"/>
+      <blockOcr name="0-11-5" x="5" y="11" colspan="1" option="number"/>
+      <blockImg name="0-11-5" x="5" y="11" colspan="1" margin="15"/>
+      <blockOcr name="0-13-1" x="1" y="13" colspan="1" option="number"/>
+      <blockImg name="0-13-1" x="1" y="13" colspan="1" margin="15"/>
+      <blockOcr name="0-13-3" x="3" y="13" colspan="1" option="number"/>
+      <blockImg name="0-13-3" x="3" y="13" colspan="1" margin="15"/>
+      <blockOcr name="0-13-5" x="5" y="13" colspan="1" option="number"/>
+      <blockImg name="0-13-5" x="5" y="13" colspan="1" margin="15"/>
+      <blockOcr name="0-7-11" x="11" y="7" colspan="1" option="number"/>
+      <blockImg name="0-7-11" x="11" y="7" colspan="1" margin="15"/>
+      <blockOcr name="0-7-5" x="5" y="7" colspan="1" option="number"/>
+      <blockImg name="0-7-5" x="5" y="7" colspan="1" margin="15"/>
+      <blockOcr name="0-7-7" x="7" y="7" colspan="1" option="number"/>
+      <blockImg name="0-7-7" x="7" y="7" colspan="1" margin="15"/>
+      <blockOcr name="0-7-9" x="9" y="7" colspan="1" option="number"/>
+      <blockImg name="0-7-9" x="9" y="7" colspan="1" margin="15"/>
+      <blockOcr name="0-9-1" x="1" y="9" colspan="1" option="number"/>
+      <blockImg name="0-9-1" x="1" y="9" colspan="1" margin="15"/>
+      <blockOcr name="0-9-11" x="11" y="9" colspan="1" option="number"/>
+      <blockImg name="0-9-11" x="11" y="9" colspan="1" margin="15"/>
+      <blockOcr name="0-9-3" x="3" y="9" colspan="1" option="number"/>
+      <blockImg name="0-9-3" x="3" y="9" colspan="1" margin="15"/>
+      <blockOcr name="0-9-5" x="5" y="9" colspan="1" option="number"/>
+      <blockImg name="0-9-5" x="5" y="9" colspan="1" margin="15"/>
+      <blockOcr name="0-9-7" x="7" y="9" colspan="1" option="number"/>
+      <blockImg name="0-9-7" x="7" y="9" colspan="1" margin="15"/>
+      <blockOcr name="0-9-9" x="9" y="9" colspan="1" option="number"/>
+      <blockImg name="0-9-9" x="9" y="9" colspan="1" margin="15"/>
+      <blockOcr name="test" x="1" y="7" colspan="1" option="number"/>
+      <blockImg name="test" x="1" y="7" colspan="1" margin="15"/>
+      <blockOcr name="test2" x="3" y="7" colspan="1" option="rating"/>
+      <blockImg name="test2" x="3" y="7" colspan="1" margin="15"/>
+    </properties>
+  </sheet>
+</srMl>

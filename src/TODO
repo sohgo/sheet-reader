@@ -1,0 +1,16 @@
+
+*** *** ***
+
+ x libkocr.aのリンク処理
+   -> kocr/srcを参照する (下記でOK?)
+   -L./kocr/src/ -lkocr libkocr.a
+
+ x *.db filesの処理
+   -> ~faxocr/etc/等においたものを参照できるよう
+
+ x srtestのマージ
+   -> sheet-reader/srtestに置く
+
+ x sheetreaderにkocr db dirオプションを付ける
+ x trailing "/"を付ける
+

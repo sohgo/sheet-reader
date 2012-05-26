@@ -13,8 +13,8 @@ sheetreader_SOURCES =\
 	cco_srOcrOpencv.h\
 	cco_srOcrGocr.c\
 	cco_srOcrGocr.h\
-	cco_srOcrNhocr.c\
-	cco_srOcrNhocr.h\
+	cco_srOcrKocr.c\
+	cco_srOcrKocr.h\
 	cco_srConf.c\
 	cco_srConf.h\
 	cco_srMl.c\
@@ -29,13 +29,15 @@ sheetreader_SOURCES =\
 sheetreader_LDADD = @LINKLIBS@
 
 sheetreader_LDFLAGS =\
-	-L/usr/local/lib
+	-L/usr/local/lib\
+	-L$(top_srcdir)/../kocr/src
 
 INCLUDES =\
 	-I/usr/local/include\
 	-I/usr/local/cluscore\
 	-I/usr/include/libxml2\
 	-I/usr/include/opencv\
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include\
+	-I$(top_srcdir)/../kocr/src
 	
 	

@@ -42,13 +42,13 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([gettimeofday localtime_r memset mkdir regcomp socket strdup strerror])
 
 # Set for define
-CFLAGS="-g"
+CFLAGS="-g -DKOCR"
 AC_ARG_ENABLE(opt, [  --ebable-nogdbinfo      trun off gdbinfo])
 if test "$enable_nogdbinfo" = "yes"; then
 	CFLAGS=""
 fi
 
-LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lz -lpthread -lssl -lcrypt -lcluscore"
+LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lcluscore -lkocr"
 CFLAGS="-DPREFIX=\"\\\"\${prefix}\\\"\" $CFLAGS"
 LINKLIBS="$LINKLIBS $MYSQL_LIBS"
 

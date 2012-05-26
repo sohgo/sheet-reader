@@ -105,6 +105,8 @@ int cco_srAnalyzer_showShrinkedImageNow_withImage(cco_srAnalyzer *obj, char* win
 int cco_srAnalyzer_showImageNow(cco_srAnalyzer *cco_srAnalyzer, char* windowname);
 int cco_srAnalyzer_showShrinkedImageNow(cco_srAnalyzer *obj, char* windowname, int shrink);
 
+#define cvSaveImage(x, y) cvSaveImage(x, y, 0)
+
 /* Don't touch following comment.
 CCOINHERITANCE:CCO_PROPERTIES
 CCOINHERITANCE:CCO_SRANALYZER_PROPERTIES

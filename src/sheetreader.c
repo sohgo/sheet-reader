@@ -31,6 +31,10 @@
 #include "cco_srMl.h"
 #include "config.h"
 
+#ifdef KOCR
+char *ocrdb_dir = NULL;
+#endif
+
 /**
  * This function should be print usage of this program.
  */
@@ -44,6 +48,7 @@ void sheetreader_usage()
 	printf(" -p set prefix of directory to save images.\n");
 	printf(" -u force set user-id.\n");
 	printf(" -i force set sheet-id.\n");
+	printf(" -l KOCR character database {list-num.db, list-mbs.db, list-ocrb.db} dir.\n");
 }
 
 
@@ -94,12 +99,16 @@ int main(int argc, char *argv[])
 	cco_vString *saveprefix_string = cco_vString_new("");
 	cco_vString *sheetid_string = cco_vString_new("");
 	cco_vString *userid_string = cco_vString_new("");
+#ifdef KOCR
+	cco_vString *ocr_string = cco_vString_new("kocr");
+#else
 	cco_vString *ocr_string = cco_vString_new("gocr");
+#endif
 	char sr_result[64];
 
 	do {
 		/* Checks options. */
-		while ((optval = getopt(argc, argv, "o:u:i:p:s:r:d:m:c:v?")) != -1) {
+		while ((optval = getopt(argc, argv, "l:o:u:i:p:s:r:d:m:c:v?")) != -1) {
 			switch (optval) {
 			case 'd':
 				debug = atoi(optarg);
@@ -138,6 +147,11 @@ int main(int argc, char *argv[])
 			case 'v':
 				help = 1;
 				break;
+#ifdef KOCR
+			case 'l':
+				ocrdb_dir = strdup(optarg);
+				break;
+#endif
 			}
 			optarg = NULL;
 		}
@@ -222,6 +236,7 @@ int main(int argc, char *argv[])
 		snprintf(sr_result, sizeof(sr_result), "%d", result);
 		cco_srAnalyzer_resultPrint(srAnalyzer, mode, sr_result);
 	} while (0);
+
 	if (configdir != NULL) free(configdir);
 	cco_safeRelease(ocr_string);
 	cco_safeRelease(userid_string);

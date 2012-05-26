@@ -26,6 +26,8 @@
 #include <opencv/highgui.h>
 #include <opencv/cv.h>
 
+#define cvSaveImage(x, y) cvSaveImage(x, y, 0)
+
 cco_defineClass(cco_srOcrGocr);
 
 cco_srOcrGocr *cco_srOcrGocr_baseNew(int size)
