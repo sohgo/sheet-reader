@@ -1,6 +1,20 @@
+#
+# README / sheetreader
+#
 
- - Sheetreader requires kocr, an opensource OCR engine.
- - get kocr package, execute the following command.
+ - Sheetreaderは、文字認識エンジンとして、GNU GOCRかKOCRを利用できます
+   	- GOCRでコンパイルするには、configureファイルを修正する必要が
+	  あります。
+
+ - KOCRは、オープンソースのOCRエンジンです。sheetreaderが置いてある
+   ディレクトリにおいて下記のコマンドを実行し、コンパイルして下さい
+   これで、必要なライブラリ libkocr.a が作成されます
 
 $ git clone https://code.google.com/p/kocr/
+$ cd kocr/src
+$ make library
 
+ - 次に、sheetreaderをコンパイルします
+
+$./configure
+$./make

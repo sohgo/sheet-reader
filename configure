@@ -4904,7 +4904,7 @@ done
 
 
 # Set for define
-CFLAGS="-g -DKOCR"
+CFLAGS="-O3 -DKOCR"
 # Check whether --enable-opt was given.
 if test "${enable_opt+set}" = set; then :
   enableval=$enable_opt;

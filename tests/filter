@@ -20,7 +20,7 @@ while(<>){
     }
 
     if (/circle/) {
-	if (/circle(\d)''○'/) {
+	if (/circle(\d)','○'/) {
 	    print "(circle) -> ○\tOK\n";
 	} else {
 	    print "(circle) -> .\tNG\n";
@@ -28,7 +28,7 @@ while(<>){
     }
 
     if (/triangle/) {
-	if (/triangle(\d)''△'/) {
+	if (/triangle(\d)','△'/) {
 	    print "(triangle) -> △\tOK\n";
 	} else {
 	    print "(triangle) -> .\tNG\n";
@@ -36,7 +36,7 @@ while(<>){
     }
 
     if (/'x(\d)'/) {
-	if (/'x(\d)'''×'/) {
+	if (/'x(\d)','×'/) {
 	    print "(checked) -> ×\tOK\n";
 	} else {
 	    print "(checked) -> .\tNG\n";

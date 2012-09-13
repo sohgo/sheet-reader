@@ -31,9 +31,8 @@
 #include "cco_srMl.h"
 #include "config.h"
 
-#ifdef KOCR
+/* KOCR */
 char *ocrdb_dir = NULL;
-#endif
 
 /**
  * This function should be print usage of this program.
@@ -136,11 +135,11 @@ int main(int argc, char *argv[])
 				ocr_string = cco_vString_new(optarg);
 				break;
 			case 'u':
-				cco_safeRelease(saveprefix_string);
+				cco_safeRelease(userid_string);
 				userid_string = cco_vString_new(optarg);
 				break;
 			case 'i':
-				cco_safeRelease(saveprefix_string);
+				cco_safeRelease(sheetid_string);
 				sheetid_string = cco_vString_new(optarg);
 				break;
 			case '?':
@@ -148,6 +147,10 @@ int main(int argc, char *argv[])
 				help = 1;
 				break;
 #ifdef KOCR
+			case 'l':
+				ocrdb_dir = strdup(optarg);
+				break;
+#else
 			case 'l':
 				ocrdb_dir = strdup(optarg);
 				break;
@@ -167,13 +170,18 @@ int main(int argc, char *argv[])
 		cco_safeRelease(srAnalyzer->srAnalyzer_save_prefix);
 		srAnalyzer->srAnalyzer_save_prefix = cco_get(saveprefix_string);
 		cco_safeRelease(srAnalyzer->srAnalyzer_sender);
-		cco_safeRelease(srAnalyzer->srAnalyzer_receiver);
 		srAnalyzer->srAnalyzer_sender = cco_get(sender_string);
+
+		cco_safeRelease(srAnalyzer->srAnalyzer_receiver);
 		srAnalyzer->srAnalyzer_receiver = cco_get(receiver_string);
+
 		cco_safeRelease(srAnalyzer->srAnalyzer_uid);
-		cco_safeRelease(srAnalyzer->srAnalyzer_sid);
 		srAnalyzer->srAnalyzer_uid = cco_get(userid_string);
+
+		cco_safeRelease(srAnalyzer->srAnalyzer_sid);
 		srAnalyzer->srAnalyzer_sid = cco_get(sheetid_string);
+
+		cco_safeRelease(srAnalyzer->srAnalyzer_ocr);
 		srAnalyzer->srAnalyzer_ocr = cco_get(ocr_string);
 
 		if (configdir == NULL)

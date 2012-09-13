@@ -10,3 +10,4 @@ Test cases for KOCR-enabled sheetreader
 
  $ make
 
+3) see analyzedimage/ directory for target images
