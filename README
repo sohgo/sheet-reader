@@ -2,10 +2,6 @@
 # README / sheetreader
 #
 
- - Sheetreaderは、文字認識エンジンとして、GNU GOCRかKOCRを利用できます
-   	- GOCRでコンパイルするには、configureファイルを修正する必要が
-	  あります。
-
  - KOCRは、オープンソースのOCRエンジンです。sheetreaderが置いてある
    ディレクトリにおいて下記のコマンドを実行し、コンパイルして下さい
    これで、必要なライブラリ libkocr.a が作成されます
@@ -18,3 +14,15 @@ $ make library
 
 $./configure
 $./make
+
+ - Sheetreaderは、文字認識エンジンとして、GNU GOCRかKOCRを利用できます
+   もし、GOCRを利用する場合には、configureファイルを修正したうえで、
+   再コンパイルが必要です。
+
+   configure中に含まれる下記の行をそれぞれ変更して下さい。
+
+(KOCR) CFLAGS="-O3 -DKOCR"
+(GOCR) CFLAGS="-O3"
+
+(KOCR) LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lcluscore -lkocr"
+(GOCR) LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lcluscore"
