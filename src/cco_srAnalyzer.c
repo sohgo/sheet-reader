@@ -195,10 +195,25 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_readImage(cco_srAnalyzer *obj, char *file)
 
 int cco_srAnalyzer_writeImage(cco_srAnalyzer *obj, char *file)
 {
+#ifdef COMPRESSION
+	static int params[] = {CV_IMWRITE_PNG_COMPRESSION, 9, -1};
+#else
+	char conv_str[4096];
+	sprintf(conv_str, "convert %s -quality 9 %s", file, file);
+#endif
+
+
 	int result = -1;
 	if (obj->srAnalyzer_img != NULL)
 	{
+#ifdef COMPRESSION
+		cvSaveImage(file, obj->srAnalyzer_img, params);
+#else
 		cvSaveImage(file, obj->srAnalyzer_img);
+
+		/* XXX: a dirty workaround to reduce image size */
+		system(conv_str);
+#endif
 		result = 0;
 	}
 	return result;
