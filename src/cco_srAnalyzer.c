@@ -199,7 +199,7 @@ int cco_srAnalyzer_writeImage(cco_srAnalyzer *obj, char *file)
 	static int params[] = {CV_IMWRITE_PNG_COMPRESSION, 9, -1};
 #else
 	char conv_str[4096];
-	sprintf(conv_str, "convert %s -quality 9 %s", file, file);
+	sprintf(conv_str, "convert %s -quality 80 %s", file, file);
 #endif
 
 
