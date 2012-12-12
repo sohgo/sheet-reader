@@ -4914,7 +4914,7 @@ if test "$enable_nogdbinfo" = "yes"; then
 	CFLAGS=""
 fi
 
-LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lcluscore -lkocr"
+LINKLIBS="`pkg-config --libs opencv` -lcluscore -lkocr -lxml2"
 CFLAGS="-DPREFIX=\"\\\"\${prefix}\\\"\" $CFLAGS"
 LINKLIBS="$LINKLIBS $MYSQL_LIBS"
 
