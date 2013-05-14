@@ -172,7 +172,7 @@ CCOSROCR_STATUS cco_srOcrOpencv_findLetter(cco_srOcrOpencv *obj, IplImage *image
 		{
 			cco_srOcrOpencv_showImageNow_withImage(obj, "findPatterns: found patterns", img_tmp);
 		}
-    } while(0);
+    } while (0);
 	cvReleaseImage(&img_tmp);
 	cvReleaseImage(&img_prebinarized);
 	cvReleaseImage(&img_binarized);

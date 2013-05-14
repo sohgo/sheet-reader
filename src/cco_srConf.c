@@ -109,7 +109,7 @@ CCOSRCONF_STATUS cco_srConf_examineXml(cco_srConf *xml)
 			xml->srConf_outPropertyCode = cco_vXml_getContent(headxml);
 		}
 		cco_safeRelease(headxml);
-	} while(0);
+	} while (0);
 	cco_release(headxml);
 	return result;
 }
@@ -160,7 +160,7 @@ CCOSRCONF_STATUS cco_srConf_setCurrentMode(cco_srConf *xml, char *mode)
 		xml->srConf_outCode = cco_vXml_getContent(codexml);
 		xml->srConf_outPropertyCode = cco_vXml_getContent(propxml);
 
-	} while(0);
+	} while (0);
 	cco_safeRelease(codexml);
 	cco_safeRelease(propxml);
 	return result;

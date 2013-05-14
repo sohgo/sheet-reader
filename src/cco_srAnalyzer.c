@@ -952,7 +952,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getIdFromImage(cco_srAnalyzer *obj, cco_vSrP
 		}
 		remove(tmpfiletif);
 		remove(tmpfile);
-	} while(0);
+	} while (0);
 	cco_safeRelease(ocr);
 	cco_safeRelease(tmp_string);
 	return result;
@@ -1026,7 +1026,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 		}
 		remove(tmpfiletif);
 		remove(tmpfile);
-	} while(0);
+	} while (0);
 	cco_safeRelease(ocr);
 	cco_safeRelease(tmp_string);
 	return result;
@@ -1149,7 +1149,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				cco_arraylist_setCursorAtFront(list_candidate_pattern);
 				pattern_x = (offset_x + matrix_width * attr_x + matrix_width * index_colspan + matrix_width * 0.5);
 				pattern_y = (offset_y + matrix_height * attr_y + matrix_width * 0.5);
-				while(pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
+				while (pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
 				{
 					if (pattern->vSrPattern_x < pattern_x
 							&& (pattern->vSrPattern_x + pattern->vSrPattern_width) > pattern_x
@@ -1760,7 +1760,7 @@ void cco_srAnalyzer_resultPrint(cco_srAnalyzer *obj, char *mode, char *sr_result
 			break;
 		}
 		cco_srAnalyzer_out(obj, sr_result);
-	} while(0);
+	} while (0);
 	return;
 }
 

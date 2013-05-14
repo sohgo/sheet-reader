@@ -111,7 +111,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 		cco_safeRelease(curxml);
 		list = cco_vXml_getElements(xml->srMl_xml, "srMl/sheet");
 		cco_arraylist_setCursorAtFront(list);
-		while(curxml = (cco_vXml *)cco_arraylist_getAtCursor(list))
+		while (curxml = (cco_vXml *)cco_arraylist_getAtCursor(list))
 		{
 			sheet = cco_srMlSheet_new();
 			elexml = cco_vXml_getElementAtFront(curxml, "id");
@@ -136,7 +136,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 			cco_arraylist_setCursorAtNext(list);
 		}
 		cco_safeRelease(list);
-	} while(0);
+	} while (0);
 	cco_safeRelease(curxml);
 	return result;
 }
@@ -176,7 +176,7 @@ int cco_srMl_readDirectory(cco_srMl *obj, char *directorynaame, int depth)
 		fprintf(stderr, "cannot open directory %s in cco_srMl_readDirectory.", directorynaame);
 		return -1;
 	}
-	while((entry = readdir(dp)) != NULL) {
+	while ((entry = readdir(dp)) != NULL) {
 		if (*entry->d_name != '/') {
 			currentdirectory_string = cco_vString_newWithFormat("%s/%s", directorynaame, entry->d_name);
 			if (currentdirectory_string == NULL) {

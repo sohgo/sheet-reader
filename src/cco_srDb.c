@@ -139,7 +139,7 @@ CCOSRANALYZER_STATUS cco_srDb_connect(cco_srDb *obj)
 			fprintf(stderr, "Error %u: %s\n", mysql_errno(obj->cco_srDb_mysql), mysql_error(obj->cco_srDb_mysql));
 			break;
 		}
-	} while(0);
+	} while (0);
 	return result;
 }
 

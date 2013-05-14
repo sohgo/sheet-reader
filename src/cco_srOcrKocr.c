@@ -388,7 +388,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 		*recognizedString = cco_vString_getReplacedStringWithCstring(tmp1_string, " ", "");
 		cco_release(tmp1_string);
 #endif
-	} while(0);
+	} while (0);
 	if (tmp1_cstring != NULL)
 	{
 		free(tmp1_cstring);

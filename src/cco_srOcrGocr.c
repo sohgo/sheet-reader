@@ -273,7 +273,7 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 		//*recognizedString = cco_vString_getReplacedStringWithCstring(tmp2_string, "[ijflI]", "1");
 		cco_release(tmp1_string);
 		//cco_release(tmp2_string);
-	} while(0);
+	} while (0);
 	if (tmp1_cstring != NULL)
 	{
 		free(tmp1_cstring);
