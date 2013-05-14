@@ -427,7 +427,7 @@ void cco_srOcrKocr_getRecognizeString_currn(void *obj, char*cstring)
 		len = strlen(cstring);
 		for (i = 0; i < len; i++)
 		{
-			if(cstring[i] == '\n' || cstring[i] == '\r')
+			if (cstring[i] == '\n' || cstring[i] == '\r')
 			{
 				cstring[i] = 0;
 				break;

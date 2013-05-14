@@ -192,15 +192,15 @@ int cco_srMl_readDirectory(cco_srMl *obj, char *directorynaame, int depth)
 		}
 		currentdirectory_cstring = currentdirectory_string->v_getCstring(currentdirectory_string);
 		stat(currentdirectory_cstring, &statbuf);
-		if(S_ISDIR(statbuf.st_mode)) {
-			if(strcmp(".",entry->d_name) == 0 || strcmp("..",entry->d_name) == 0) {
+		if (S_ISDIR(statbuf.st_mode)) {
+			if (strcmp(".",entry->d_name) == 0 || strcmp("..",entry->d_name) == 0) {
 				free(currentdirectory_cstring);
 				currentdirectory_cstring = NULL;
 				cco_safeRelease(currentdirectory_string);
 				continue;
 			}
-			if(depth > 0) {
-				if(cco_srMl_readDirectory(obj, currentdirectory_cstring, depth - 1) < 0) {
+			if (depth > 0) {
+				if (cco_srMl_readDirectory(obj, currentdirectory_cstring, depth - 1) < 0) {
 					free(currentdirectory_cstring);
 					currentdirectory_cstring = NULL;
 					cco_safeRelease(currentdirectory_string);
@@ -209,7 +209,7 @@ int cco_srMl_readDirectory(cco_srMl *obj, char *directorynaame, int depth)
 			}
 		} else {
 			regcomp(&preg, ".xml$", REG_EXTENDED);
-			if(regexec(&preg, entry->d_name, 0, pmatch, 0) == 0){
+			if (regexec(&preg, entry->d_name, 0, pmatch, 0) == 0){
 				cco_srMl_readFile(obj, currentdirectory_cstring);
 			}
 			regfree(&preg);
