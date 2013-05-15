@@ -142,13 +142,13 @@ CCOSROCR_STATUS cco_srOcrOpencv_findLetter(cco_srOcrOpencv *obj, IplImage *image
 			cco_srOcrOpencv_showImageNow_withImage(obj, "findPatterns: smooth", img_binarized);
 		}
 
-		/* Examines a image to find contours. */
+		/* Examines an image to find contours. */
 		obj->srOcrOpencv_conturs = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint), obj->srOcrOpencv_strage);
 		cvFindContours(img_binarized, obj->srOcrOpencv_strage, &obj->srOcrOpencv_conturs, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE,
 				cvPoint(0, 0));
 		cvReleaseImage(&img_tmp);
 
-		/* Examines a image to find square patterns. */
+		/* Examines an image to find square patterns. */
 		img_tmp = cvCloneImage(image);
 		for (seq_cursor = obj->srOcrOpencv_conturs; seq_cursor != NULL; seq_cursor = seq_cursor->h_next)
 		{

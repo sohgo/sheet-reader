@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 					PREFIX);
 			result = SHEETREADER_STATUS_HAVE_NO_SRMLS;
 		}
-		/* Analyzes a image. */
+		/* Analyzes an image. */
 		analyzer_result = cco_srAnalyzer_readImage(srAnalyzer, argv[optind]);
 		if (analyzer_result != CCOSRANALYZER_STATUS_SUCCESS)
 		{

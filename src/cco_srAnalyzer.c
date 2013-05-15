@@ -527,14 +527,14 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 			cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "findPatterns: smooth",
 					img_binarized, 3);
 		}
-		/* Examines a image to find contours. */
+		/* Examines an image to find contours. */
 		seq_conturs = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),
 				strage_conturs);
 		cvFindContours(img_binarized, strage_conturs, &seq_conturs, sizeof(CvContour),
 				CV_RETR_LIST, CV_CHAIN_APPROX_NONE, cvPoint(0, 0));
 		cvReleaseImage(&img_tmp);
 
-		/* Examines a image to find square patterns. */
+		/* Examines an image to find square patterns. */
 		img_tmp = cvCloneImage(image);
 		pattern_parent = cco_vSrPattern_new();
 		pattern_child = cco_vSrPattern_new();
@@ -661,14 +661,14 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findBoxs(cco_srAnalyzer *obj, IplImage *imag
 			cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "findPatterns: TEST",
 					img_binarized, 3);
 		}
-		/* Examines a image to find contours. */
+		/* Examines an image to find contours. */
 		seq_conturs = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),
 				strage_conturs);
 		cvFindContours(img_binarized, strage_conturs, &seq_conturs, sizeof(CvContour),
 				CV_RETR_LIST, CV_CHAIN_APPROX_NONE, cvPoint(0, 0));
 		cvReleaseImage(&img_tmp);
 
-		/* Examines a image to find square patterns. */
+		/* Examines an image to find square patterns. */
 		img_tmp = cvCloneImage(image);
 		for (seq_conturs_parent = seq_conturs; seq_conturs_parent != NULL; seq_conturs_parent
 				= seq_conturs_parent->h_next)
