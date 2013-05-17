@@ -203,7 +203,7 @@ int cco_vSrPattern_isRectangle1to2(cco_vSrPattern *obj)
 	return result;
 }
 
-int cco_vSrPattern_isPattern(cco_vSrPattern *obj, cco_arraylist *insideboxs)
+int cco_vSrPattern_isPattern(cco_vSrPattern *obj, cco_arraylist *insideboxes)
 {
 	int result;
     int len_parent;
@@ -221,10 +221,10 @@ int cco_vSrPattern_isPattern(cco_vSrPattern *obj, cco_arraylist *insideboxs)
     len_parent_c1 = len_parent * (float)((float)2.0 / (float)3.0);
     len_parent_c2 = len_parent * (float)((float)1.0 / (float)3.0);
 
-    candidate_pattern = (cco_vSrPattern *)cco_arraylist_getAt(insideboxs, 0);
+    candidate_pattern = (cco_vSrPattern *)cco_arraylist_getAt(insideboxes, 0);
     len_child1 = candidate_pattern->vSrPattern_width + candidate_pattern->vSrPattern_height;
     cco_release(candidate_pattern);
-    candidate_pattern = (cco_vSrPattern *)cco_arraylist_getAt(insideboxs, 1);
+    candidate_pattern = (cco_vSrPattern *)cco_arraylist_getAt(insideboxes, 1);
     len_child2 = candidate_pattern->vSrPattern_width + candidate_pattern->vSrPattern_height;
     cco_release(candidate_pattern);
 

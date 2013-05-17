@@ -55,7 +55,7 @@ int cco_vSrPattern_setInInt(cco_vSrPattern *cco_vSrPattern, int x, int y, int wi
 int cco_vSrPattern_isInside(cco_vSrPattern *rect_parent, cco_vSrPattern *rect_child);
 int cco_vSrPattern_isSquare(cco_vSrPattern *obj);
 int cco_vSrPattern_isRectangle1to2(cco_vSrPattern *obj);
-int cco_vSrPattern_isPattern(cco_vSrPattern *obj, cco_arraylist *insideboxs);
+int cco_vSrPattern_isPattern(cco_vSrPattern *obj, cco_arraylist *insideboxes);
 
 /* Don't touch following comment.
 CCOINHERITANCE:CCO_PROPERTIES

@@ -621,7 +621,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 	return result;
 }
 
-CCOSRANALYZER_STATUS cco_srAnalyzer_findBoxs(cco_srAnalyzer *obj, IplImage *image,
+CCOSRANALYZER_STATUS cco_srAnalyzer_findBoxes(cco_srAnalyzer *obj, IplImage *image,
 		cco_arraylist *added_patternlist, double matrix_width, double matrix_height)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
@@ -700,7 +700,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findBoxs(cco_srAnalyzer *obj, IplImage *imag
 		/* Shows images. */
 		if (obj->srAnalyzer_debug >= 2)
 		{
-			cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "findbox: found boxs",
+			cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "findbox: found boxes",
 					img_tmp, 2);
 		}
 	} while (0);
@@ -1085,7 +1085,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 		matrix_height = (double) offset_height / (double) sheet->srMlSheet_blockHeight;
 
 		list_candidate_pattern = cco_arraylist_new();
-		result = cco_srAnalyzer_findBoxs(obj, obj->srAnalyzer_img, list_candidate_pattern, matrix_width, matrix_height);
+		result = cco_srAnalyzer_findBoxes(obj, obj->srAnalyzer_img, list_candidate_pattern, matrix_width, matrix_height);
 		if (result != CCOSRANALYZER_STATUS_SUCCESS)
 		{
 			break;
