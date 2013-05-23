@@ -1060,7 +1060,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	int attr_y;
 	int index_colspan;
 	cco_srOcr *ocr = NULL;
-	cco_vString *recgnized_string = NULL;
+	cco_vString *recognized_string = NULL;
 	char *ocrtype = NULL;
 	IplImage *img_tmp = NULL;
 
@@ -1135,7 +1135,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			} else {
 				attr_colspan = 1;
 			}
-			recgnized_string = cco_vString_new("");
+			recognized_string = cco_vString_new("");
 			for (index_colspan = 0; index_colspan < attr_colspan; index_colspan++)
 			{
 
@@ -1200,7 +1200,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					free(attr_option_cstring);
 				}
 				ocr->srOcr_getRecognizeString(ocr, &tmp_string);
-				cco_vString_catenate(recgnized_string, tmp_string);
+				cco_vString_catenate(recognized_string, tmp_string);
 				remove(tmp_cstring);
 				free(tmp_cstring);
 				cco_release(tmp_string);
@@ -1217,19 +1217,19 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				valuestree = cco_redblacktree_new();
 				cco_redblacktree_insert(keyval, (cco_v*) xml_attr_name, (cco*) valuestree);
 			}
-			cco_redblacktree_insert(valuestree, (cco_v*) valuekey, (cco*) recgnized_string);
+			cco_redblacktree_insert(valuestree, (cco_v*) valuekey, (cco*) recognized_string);
 			cco_safeRelease(valuestree);
 			cco_safeRelease(valuekey);
 			if (obj->srAnalyzer_debug >= 1)
 			{
-				tmp_string = cco_vString_newWithFormat("name:%@ x:%d y:%d colspan:%d recgnizedText:%@\n",
-						xml_attr_name, attr_x, attr_y, attr_colspan, recgnized_string);
+				tmp_string = cco_vString_newWithFormat("name:%@ x:%d y:%d colspan:%d recognizedText:%@\n",
+						xml_attr_name, attr_x, attr_y, attr_colspan, recognized_string);
 				tmp_cstring = tmp_string->v_getCstring(tmp_string);
 				printf("%s", tmp_cstring);
 				free(tmp_cstring);
 				cco_safeRelease(tmp_string);
 			}
-			cco_safeRelease(recgnized_string);
+			cco_safeRelease(recognized_string);
 			cco_safeRelease(xml_attr_name);
 			cco_safeRelease(xml_attr_colspan);
 			cco_safeRelease(xml_attr_x);
