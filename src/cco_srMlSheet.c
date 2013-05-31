@@ -58,13 +58,17 @@ void cco_srMlSheet_baseInitialize(cco_srMlSheet *o)
 	o->srMlSheet_id = NULL;
 	o->srMlSheet_blockWidth = 0;
 	o->srMlSheet_blockHeight = 0;
+	o->srMlSheet_cellWidth_list = cco_arraylist_new();
+	o->srMlSheet_cellHeight_list = cco_arraylist_new();
 	return;
 }
 
 void cco_srMlSheet_baseFinalize(cco_srMlSheet *o)
 {
 	cco_safeRelease(o->srMlSheet_xml);
-	cco_safeRelease(o->srMlSheet_id);
+	cco_safeRelease(o->srMlSheet_xml);
+	cco_arraylist_release(o->srMlSheet_cellWidth_list);
+	cco_arraylist_release(o->srMlSheet_cellHeight_list);
 	return;
 }
 
@@ -111,5 +115,17 @@ int cco_srMlSheet_setHeight(cco_srMlSheet *obj, cco_vString *str)
 	} else {
 		obj->srMlSheet_blockHeight = 0;
 	}
+	return 0;
+}
+
+int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *str, int index)
+{
+	cco_arraylist_addDynamicAt(obj->srMlSheet_cellWidth_list, str, index);
+	return 0;
+}
+
+int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *str, int index)
+{
+	cco_arraylist_addDynamicAt(obj->srMlSheet_cellHeight_list, str, index);
 	return 0;
 }

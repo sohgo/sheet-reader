@@ -93,12 +93,20 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 {
 	CCOSRML_STATUS result = CCOSRML_STATUS_SUCCESS;
 	cco_vXml *curxml = NULL;
+	cco_vXml *cursor_xmlCellWidth = NULL;
+	cco_vXml *cursor_xmlCellHeight = NULL;
 	cco_vXml *elexml = NULL;
 	cco_vString *id_string = NULL;
 	cco_vString *width_string = NULL;
 	cco_vString *height_string = NULL;
+	cco_vString *xml_attr_cell_number = NULL;
+	cco_vString *xml_attr_cell_length = NULL;
 	cco_arraylist *list = NULL;
 	cco_srMlSheet *sheet = NULL;
+	cco_arraylist *xml_cellWidths = NULL;
+	cco_arraylist *xml_cellHeights = NULL;
+	int cell_number = 0;
+	int cell_length = 0;
 
 	do {
 		curxml = cco_vXml_getElementAtFront(xml->srMl_xml, "srMl");
@@ -122,6 +130,73 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 			elexml = cco_vXml_getElementAtFront(curxml, "blockHeight");
 			height_string = (cco_vString *)cco_vXml_getContent(elexml);
 			cco_safeRelease(elexml);
+
+			xml_cellWidths = cco_vXml_getElements(curxml, "cellWidth/cellAttribute");
+			cco_arraylist_setCursorAtFront(xml_cellWidths);
+			while ((cursor_xmlCellWidth = (cco_vXml *) cco_arraylist_getAtCursor(xml_cellWidths)) != NULL)
+			{
+				int satisfied_flag = 1;
+
+				xml_attr_cell_number = cco_vXml_getAttribute(cursor_xmlCellWidth, "number");
+				xml_attr_cell_length = cco_vXml_getAttribute(cursor_xmlCellWidth, "length");
+
+				if (xml_attr_cell_number == NULL)
+				{
+					satisfied_flag = 0;
+				} else {
+					cell_number = cco_vString_toInt(xml_attr_cell_number);
+				}
+				if (xml_attr_cell_length == NULL)
+				{
+					satisfied_flag = 0;
+				}
+
+				if (satisfied_flag == 0) {
+					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was igrenored.\n");
+				} else {
+					cco_srMlSheet_setCellWidth(sheet, xml_attr_cell_length, cell_number);
+				}
+
+				cco_safeRelease(xml_attr_cell_number);
+				cco_safeRelease(xml_attr_cell_length);
+				cco_arraylist_setCursorAtNext(xml_cellWidths);
+
+			}
+			cco_safeRelease(xml_cellWidths);
+
+			xml_cellHeights = cco_vXml_getElements(curxml, "cellHeight/cellAttribute");
+			cco_arraylist_setCursorAtFront(xml_cellHeights);
+			while ((cursor_xmlCellHeight = (cco_vXml *) cco_arraylist_getAtCursor(xml_cellHeights)) != NULL)
+			{
+				int satisfied_flag = 1;
+
+				xml_attr_cell_number = cco_vXml_getAttribute(cursor_xmlCellHeight, "number");
+				xml_attr_cell_length = cco_vXml_getAttribute(cursor_xmlCellHeight, "length");
+
+				if (xml_attr_cell_number == NULL)
+				{
+					satisfied_flag = 0;
+				} else {
+					cell_number = cco_vString_toInt(xml_attr_cell_number);
+				}
+				if (xml_attr_cell_length == NULL)
+				{
+					satisfied_flag = 0;
+				}
+
+				if (satisfied_flag == 0) {
+					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was igrenored.\n");
+				} else {
+					cco_srMlSheet_setCellHeight(sheet, xml_attr_cell_length, cell_number);
+				}
+
+				cco_safeRelease(xml_attr_cell_number);
+				cco_safeRelease(xml_attr_cell_length);
+				cco_arraylist_setCursorAtNext(xml_cellHeights);
+
+			}
+			cco_safeRelease(xml_cellHeights);
+
 			cco_srMlSheet_setXml(sheet, curxml);
 			cco_srMlSheet_setId(sheet, id_string);
 			cco_srMlSheet_setWidth(sheet, width_string);
@@ -224,4 +299,3 @@ int cco_srMl_countSheets(cco_srMl *obj)
 {
 	return cco_redblacktree_count(obj->srMl_sheets);
 }
-

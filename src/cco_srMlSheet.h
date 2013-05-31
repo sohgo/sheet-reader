@@ -24,12 +24,15 @@
 
 #include <cluscore/cco.h>
 #include <cluscore/cco_vXml.h>
+#include <cluscore/cco_arraylist.h>
 
 #define CCO_SRMLSHEET_PROPERTIES \
 	cco_vXml *srMlSheet_xml;\
 	cco_vString *srMlSheet_id;\
 	int srMlSheet_blockWidth;\
-	int srMlSheet_blockHeight;
+	int srMlSheet_blockHeight;\
+	cco_arraylist *srMlSheet_cellWidth_list;\
+	cco_arraylist *srMlSheet_cellHeight_list;\
 
 typedef struct cco_srMlSheet cco_srMlSheet;
 
@@ -49,6 +52,8 @@ int cco_srMlSheet_setXml(cco_srMlSheet *obj, cco_vXml *xml);
 int cco_srMlSheet_setId(cco_srMlSheet *obj, cco_vString *str);
 int cco_srMlSheet_setWidth(cco_srMlSheet *obj, cco_vString *str);
 int cco_srMlSheet_setHeight(cco_srMlSheet *obj, cco_vString *str);
+int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *str, int index);
+int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *str, int index);
 
 /* Don't touch following comment.
 CCOINHERITANCE:CCO_PROPERTIES
