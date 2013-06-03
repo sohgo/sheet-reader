@@ -228,14 +228,14 @@ int main(int argc, char *argv[])
 			analyzer_result = cco_srAnalyzer_adjustImage(srAnalyzer);
 			if (analyzer_result != CCOSRANALYZER_STATUS_SUCCESS)
 			{
-				fprintf(stderr, "Error: Three patterns could not be retrieved in the inputed image.\n", argv[optind]);
+				fprintf(stderr, "Error: Three patterns could not be retrieved in the inputed image(%s).\n", argv[optind]);
 				result = SHEETREADER_STATUS_NOTFOUND_3PATTERNS;
 				break;
 			}
 			analyzer_result = cco_srAnalyzer_ocr(srAnalyzer);
 			if (analyzer_result != CCOSRANALYZER_STATUS_SUCCESS)
 			{
-				fprintf(stderr, "Error: The Sheet ID could not be retrieved in the inputed image.\n", argv[optind]);
+				fprintf(stderr, "Error: The Sheet ID could not be retrieved in the inputed image(%s).\n", argv[optind]);
 				result = SHEETREADER_STATUS_NOTFOUND_SID;
 				break;
 			}
