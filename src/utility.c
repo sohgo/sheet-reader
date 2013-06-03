@@ -73,12 +73,10 @@ char *utility_strctl_strdup(const char *fmt, ...)
 {
 	va_list		ap;
 	char *buf;
-	int alloc_buf;
 	int result = 0;
 	char tmpbuf[10];
 
 	buf = NULL;
-	alloc_buf = 0;
 
 	va_start(ap, fmt);
 	result = vsnprintf(tmpbuf, sizeof(tmpbuf), fmt, ap);

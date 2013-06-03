@@ -93,11 +93,9 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 	CCOSRML_STATUS result = CCOSRML_STATUS_SUCCESS;
 	cco_vXml *curxml = NULL;
 	cco_vXml *elexml = NULL;
-	cco_vString *tmp_string = NULL;
 	cco_vString *id_string = NULL;
 	cco_vString *width_string = NULL;
 	cco_vString *height_string = NULL;
-	char *tmp_cstring;
 	cco_arraylist *list = NULL;
 	cco_srMlSheet *sheet = NULL;
 

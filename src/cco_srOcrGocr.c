@@ -187,7 +187,6 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 	cco_vString *cmdppmtopgm_string = NULL;
 	cco_vString *cmdnhocr_string = NULL;
 	cco_vString *tmp1_string = NULL;
-	cco_vString *option_string = NULL;
 	char *tmp1_cstring;
 	IplImage *ppm_img = NULL;
 	FILE *fp = NULL;

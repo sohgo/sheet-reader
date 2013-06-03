@@ -631,9 +631,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findBoxes(cco_srAnalyzer *obj, IplImage *ima
 	CvMemStorage *strage_conturs = cvCreateMemStorage(0);
 	CvSeq *seq_conturs;
 	CvSeq *seq_conturs_parent;
-	CvSeq *seq_conturs_child;
 	CvRect rect_parent;
-	CvRect rect_child;
 	cco_vSrPattern *pattern_parent = NULL;
 	cco_arraylist *list_candidate_pattern = added_patternlist;
 
@@ -1664,8 +1662,6 @@ void cco_srAnalyzer_out_sub(cco *callbackobject, cco_v *key, cco *object)
 	cco_vString *ocrValue_string;
 	cco_vString *ocrImage_string;
 	cco_vString *outPropertyCode;
-	cco_vString *tmpCode1;
-	cco_vString *tmpCode2;
 	cco_srAnalyzer *obj = (cco_srAnalyzer *)callbackobject;
 	char *outCode_cstr;
 
@@ -1713,7 +1709,6 @@ void cco_srAnalyzer_out_sub(cco *callbackobject, cco_v *key, cco *object)
 CCOSRANALYZER_STATUS cco_srAnalyzer_out(cco_srAnalyzer *obj, char *sr_result)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
-	cco_vString *outCode;
 	char *outCode_cstr;
 
 	cco_safeRelease(obj->srAnalyzer_out);

@@ -84,8 +84,6 @@ CCOSRCONF_STATUS cco_srConf_examineXml(cco_srConf *xml)
 {
 	CCOSRCONF_STATUS result = CCOSRCONF_STATUS_SUCCESS;
 	cco_vXml *headxml;
-	cco_vString *tmp_string;
-	char *tmp_cstring;
 
 	do {
 		cco_release(xml->srConf_outCode);
