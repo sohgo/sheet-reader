@@ -42,6 +42,7 @@
 #include "cco_vSrPattern.h"
 #include "cco_srMl.h"
 #include "cco_srMlSheet.h"
+#include "cco_srConf.h"
 #include "utility.h"
 
 cco_defineClass(cco_srAnalyzer)

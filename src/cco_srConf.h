@@ -54,6 +54,7 @@ void cco_srConf_baseFinalize(cco_srConf *cco);
 cco_srConf *cco_srConf_new();
 void cco_srConf_release(void *cco);
 CCOSRCONF_STATUS cco_srConf_setCurrentMode(cco_srConf *xml, char *mode);
+CCOSRCONF_STATUS cco_srConf_read(cco_srConf *obj, char *filename);
 
 /* Don't touch following comment.
 CCOINHERITANCE:CCO_PROPERTIES

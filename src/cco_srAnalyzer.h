@@ -89,6 +89,7 @@ cco_srAnalyzer *cco_srAnalyzer_new();
 void cco_srAnalyzer_release(void *cco);
 
 int cco_srAnalyzer_countSheets(cco_srAnalyzer *obj);
+int cco_srAnalyzer_readSrconf(cco_srAnalyzer *obj, char *file);
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_readImage(cco_srAnalyzer *obj, char *file);
 CCOSRANALYZER_STATUS cco_srAnalyzer_adjustImage(cco_srAnalyzer *cco_srAnalyzer);
