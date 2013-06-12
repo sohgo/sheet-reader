@@ -1034,6 +1034,20 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 	return result;
 }
 
+double cco_srAnalyzer_vString_toDouble(cco_vString *string)
+{
+	char *cstring;
+	double result = -1;
+
+	if (string != NULL)
+	{
+		cstring = cco_vString_getCstring(string);
+		result = atof(cstring);
+		free(cstring);
+	}
+	return result;
+}
+
 /*
  * Get the position of top-left corner
  *
@@ -1045,7 +1059,7 @@ double cco_srAnalyzer_get_position_of_the_cell_withoutMarker(cco_arraylist *cell
 	int i;
 
 	for (i = 0; i < index; i++) {
-		position += cco_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
+		position += cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
 	}
 
 	return position;
@@ -1057,7 +1071,7 @@ double cco_srAnalyzer_get_position_of_the_cell_withoutMarker(cco_arraylist *cell
  */
 double cco_srAnalyzer_get_size_of_the_cell_withoutMarker(cco_arraylist *cell_size_list, int index)
 {
-	return cco_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list,  index + 1));
+	return cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list,  index + 1));
 }
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srMlSheet *sheet,
