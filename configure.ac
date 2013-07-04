@@ -18,6 +18,9 @@ MYSQL_CFLAGS=`mysql_config --libs`
 AC_SUBST(MYSQL_CFLAGS)
 MYSQL_LIBS=`mysql_config --libs`
 AC_SUBST(MYSQL_LIBS)
+PKG_CHECK_MODULES([OPENCV], [opencv])
+AC_CHECK_LIB([xml2], [xmlParserInputRead])
+
 
 # Checks for header files.
 AC_HEADER_DIRENT
@@ -48,7 +51,7 @@ if test "$enable_nogdbinfo" = "yes"; then
 	CFLAGS=""
 fi
 
-LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lcluscore -lkocr"
+LINKLIBS="-lcluscore -lkocr"
 CFLAGS="-DPREFIX=\"\\\"\${prefix}\\\"\" $CFLAGS"
 LINKLIBS="$LINKLIBS $MYSQL_LIBS"
 
