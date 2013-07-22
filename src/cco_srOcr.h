@@ -25,8 +25,6 @@
 #include <cluscore/cco.h>
 #include <cluscore/cco_vString.h>
 
-typedef enum CCOSROCR_STATUS CCOSROCR_STATUS;
-
 enum CCOSROCR_STATUS {
 	CCOSROCR_STATUS_SUCCESS = 0,
 	CCOSROCR_STATUS_EMPTYCLASS,
@@ -35,6 +33,8 @@ enum CCOSROCR_STATUS {
 	CCOSROCR_STATUS_DONOTFINDCHARACTER,
 	CCOSROCR_STATUS_DBDONOTEXIST
 };
+
+typedef enum CCOSROCR_STATUS CCOSROCR_STATUS;
 
 #define CCO_SROCR_PROPERTIES \
 	CCOSROCR_STATUS (*srOcr_initialize)(void *cco_srOcr, char *configfile);\

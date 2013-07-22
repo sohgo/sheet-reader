@@ -37,6 +37,8 @@
 
 #include "cco_srOcr.h"
 
+#include "cco_srOcrKocr.h"
+#include "cco_srOcrGocr.h"
 // #include "cco_srOcrNhocr.h"
 
 #include "cco_vSrPattern.h"
@@ -70,7 +72,7 @@ cco_srAnalyzer *cco_srAnalyzer_baseNew(int size)
 
 void cco_srAnalyzer_baseRelease(void *o)
 {
-	cco_srAnalyzer_baseFinalize(o);
+	cco_srAnalyzer_baseFinalize((cco_srAnalyzer *)o);
 	cco_baseRelease(o);
 }
 
@@ -191,7 +193,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_readImage(cco_srAnalyzer *obj, char *file)
 		cvResetImageROI(obj->srAnalyzer_img);
 	} while (0);
 	cvReleaseImage(&read_img);
-	return 0;
+	return CCOSRANALYZER_STATUS_SUCCESS;
 }
 
 int cco_srAnalyzer_writeImage(cco_srAnalyzer *obj, char *file)
@@ -258,7 +260,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToOcr(cco_srAnalyzer *obj
 		set_rect.width = width;
 		set_rect.height = height;
 		cvSetImageROI(obj->srAnalyzer_img, set_rect);
-		tmp_img = cvClone(obj->srAnalyzer_img);
+		tmp_img = (IplImage *)cvClone(obj->srAnalyzer_img);
 		cvSetImageROI(tmp_img, set_rect);
 		result = cco_srAnalyzer_ThresholdImageToOcr(obj, obj->srAnalyzer_img, tmp_img, smooth, threshold);
 

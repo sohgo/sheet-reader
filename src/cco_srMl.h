@@ -38,8 +38,6 @@ struct cco_srMl {
 	CCO_SRML_PROPERTIES
 };
 
-typedef enum CCOSRML_STATUS CCOSRML_STATUS;
-
 enum CCOSRML_STATUS {
 	CCOSRML_STATUS_SUCCESS = 0,
 	CCOSRML_STATUS_ERROR,
@@ -47,6 +45,8 @@ enum CCOSRML_STATUS {
 	CCOSRML_STATUS_NOTFOUNDUID,
 	CCOSRML_STATUS_NOTFOUNDSID
 };
+
+typedef enum CCOSRML_STATUS CCOSRML_STATUS;
 
 cco_srMl *cco_srMl_baseNew(int size);
 void cco_srMl_baseRelease(void *cco);
