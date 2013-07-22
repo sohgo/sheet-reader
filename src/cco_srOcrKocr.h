@@ -19,12 +19,12 @@
  *
  */
 
-#ifndef CCO_SROCRGOCR_H_
-#define CCO_SROCRGOCR_H_
+#ifndef CCO_SROCRKOCR_H_
+#define CCO_SROCRKOCR_H_
 
 #include "cco_srOcr.h"
 
-#define CCO_SROCRGOCR_PROPERTIES \
+#define CCO_SROCRKOCR_PROPERTIES \
 	char *srOcrKocr_filename;\
 	char *srOcrKocr_option;\
 	char *srOcrKocr_db;\
@@ -36,7 +36,7 @@ typedef struct cco_srOcrKocr cco_srOcrKocr;
 struct cco_srOcrKocr {
 	CCO_PROPERTIES
 	CCO_SROCR_PROPERTIES
-	CCO_SROCRGOCR_PROPERTIES
+	CCO_SROCRKOCR_PROPERTIES
 };
 
 cco_srOcrKocr *cco_srOcrKocr_baseNew(int size);
@@ -54,7 +54,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *cco_srOcr, cco_vString **
 /* Don't touch following comment.
 CCOINHERITANCE:CCO_PROPERTIES
 CCOINHERITANCE:CCO_SROCR_PROPERTIES
-CCOINHERITANCE:CCO_SROCRGOCR_PROPERTIES
+CCOINHERITANCE:CCO_SROCRKOCR_PROPERTIES
 */
 
-#endif /* CCO_SROCRGOCR_H_ */
+#endif /* CCO_SROCRKOCR_H_ */
