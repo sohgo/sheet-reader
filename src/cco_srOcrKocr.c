@@ -27,6 +27,21 @@
 
 #ifdef KOCR
 #include "cco_srOcrKocr.h"
+
+#ifdef USE_SVM
+extern void *kocr_svm_init(char *);			/* fake declaration: CvSVM* -> void* */
+extern char *kocr_recognize_image(void *, char *);	/* fake declaration: CvSVM* -> void* */
+
+void *db_num;
+void *db_mbs;
+void *db_ocrb;
+
+#define DB_FILE_NUM "list-num.xml"
+#define DB_FILE_MBS "list-mbs.xml"
+#define DB_FILE_OCRB "list-ocrb.xml"
+
+#else	/* USE_SVM */
+
 #include "kocr.h"
 #include "subr.h"
 
@@ -34,11 +49,13 @@ feature_db *db_num;
 feature_db *db_mbs;
 feature_db *db_ocrb;
 
-extern char *ocrdb_dir;
-
 #define DB_FILE_NUM "list-num.db"
 #define DB_FILE_MBS "list-mbs.db"
 #define DB_FILE_OCRB "list-ocrb.db"
+
+#endif	/* USE_SVM */
+
+extern char *ocrdb_dir;
 
 /*
 char recognize(feature_db *a, char *b)
@@ -157,13 +174,25 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 #ifdef KOCR
 	// load databases
 	if (db_num == NULL)
+#ifdef USE_SVM
+		db_num = kocr_svm_init(dircat(ocrdb_dir, DB_FILE_NUM));
+#else
 		db_num = kocr_init(dircat(ocrdb_dir, DB_FILE_NUM));
+#endif
 
 	if (db_mbs == NULL)
+#ifdef USE_SVM
+		db_mbs = kocr_svm_init(dircat(ocrdb_dir, DB_FILE_MBS));
+#else
 		db_mbs = kocr_init(dircat(ocrdb_dir, DB_FILE_MBS));
+#endif
 
 	if (db_ocrb == NULL)
+#ifdef USE_SVM
+		db_ocrb = kocr_svm_init(dircat(ocrdb_dir, DB_FILE_OCRB));
+#else
 		db_ocrb = kocr_init(dircat(ocrdb_dir, DB_FILE_OCRB));
+#endif
 
 	if (db_num == NULL || db_mbs == NULL || db_ocrb == NULL)
 		return CCOSROCR_STATUS_DBDONOTEXIST;
@@ -324,7 +353,11 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 #ifdef KOCR
 		{
 			char *fn = tmpbmp_string->v_getCstring(tmpbmp_string);
+#ifdef USE_SVM
+			char *rc = kocr_recognize_image(ocrobj->srOcrKocr_db, (char *) fn);
+#else
 			char *rc = kocr_recognize_image((feature_db *) ocrobj->srOcrKocr_db, (char *) fn);
+#endif
 			cco_release(*recognizedString); // needed?
 			if (rc) {
 				tmp1_string = cco_vString_new(rc);

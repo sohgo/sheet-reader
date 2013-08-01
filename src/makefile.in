@@ -192,7 +192,7 @@ sheetreader_SOURCES = \
 	sheetreader.c\
 	sheetreader.h
 
-sheetreader_LDADD = $(OPENCV_LIBS) @LINKLIBS@
+sheetreader_LDADD = @LINKLIBS@ $(OPENCV_LIBS)
 sheetreader_LDFLAGS = \
 	-L/usr/local/lib\
 	-L$(top_srcdir)/../kocr/src
