@@ -46,6 +46,13 @@ AC_CHECK_FUNCS([gettimeofday localtime_r memset mkdir regcomp socket strdup stre
 
 # Set for define
 CFLAGS="-g -DKOCR"
+AC_ARG_ENABLE([svm],
+	      AS_HELP_STRING([--disable-svm],
+	      		     [SVM method for KOCR]),
+		[ac_cv_use_svm=$enableval], [ac_cv_use_svm=yes])
+if test "$ac_cv_use_svm" = "yes" ; then
+	CFLAGS="$CFLAGS -DUSE_SVM"
+fi
 AC_ARG_ENABLE(opt, [  --ebable-nogdbinfo      trun off gdbinfo])
 if test "$enable_nogdbinfo" = "yes"; then
 	CFLAGS=""
