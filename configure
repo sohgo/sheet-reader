@@ -605,6 +605,8 @@ ac_includes_default="\
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+OCR_LIBS
+OCR_CFLAGS
 MTRACE_CFLAGS
 OPTIMIZATION_CFLAGS
 DEBUGINFO_CFLAGS
@@ -708,6 +710,7 @@ enable_svm
 enable_gdbinfo
 enable_opt
 enable_mtrace
+with_ocr
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1345,6 +1348,11 @@ Optional Features:
   --enable-gdbinfo        turn on gdbinfo (default is YES)
   --enable-opt            turn on optimization (default is NO)
   --enable-mtrace         turn on mtrace (default is NO)
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-ocr=OCR          type of OCR(kocr or gocr) (default is kocr)
 
 Some influential environment variables:
   CC          C compiler command
@@ -5367,6 +5375,126 @@ fi
 if test "$ac_cv_use_mtrace" = "yes"; then
 	MTRACE_CFLAGS="-DMTRACE"
 fi
+
+
+# Check whether --with-ocr was given.
+if test "${with_ocr+set}" = set; then :
+  withval=$with_ocr; ac_cv_use_ocr=$withval
+else
+  ac_cv_use_ocr=kocr
+fi
+
+case "$ac_cv_use_ocr" in
+kocr|yes)
+	OCR_CFLAGS="-DKOCR"
+	OCR_LIBS="-lkocr"
+	case "$ac_cv_use_svm" in
+	yes)
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for kocr_svm_init in -lkocr" >&5
+$as_echo_n "checking for kocr_svm_init in -lkocr... " >&6; }
+if ${ac_cv_lib_kocr_kocr_svm_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lkocr  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char kocr_svm_init ();
+int
+main ()
+{
+return kocr_svm_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_kocr_kocr_svm_init=yes
+else
+  ac_cv_lib_kocr_kocr_svm_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_kocr_kocr_svm_init" >&5
+$as_echo "$ac_cv_lib_kocr_kocr_svm_init" >&6; }
+if test "x$ac_cv_lib_kocr_kocr_svm_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBKOCR 1
+_ACEOF
+
+  LIBS="-lkocr $LIBS"
+
+fi
+
+		;;
+	*)
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for kocr_init in -lkocr" >&5
+$as_echo_n "checking for kocr_init in -lkocr... " >&6; }
+if ${ac_cv_lib_kocr_kocr_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lkocr  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char kocr_init ();
+int
+main ()
+{
+return kocr_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_kocr_kocr_init=yes
+else
+  ac_cv_lib_kocr_kocr_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_kocr_kocr_init" >&5
+$as_echo "$ac_cv_lib_kocr_kocr_init" >&6; }
+if test "x$ac_cv_lib_kocr_kocr_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBKOCR 1
+_ACEOF
+
+  LIBS="-lkocr $LIBS"
+
+fi
+
+		;;
+	esac
+	;;
+gocr|no)
+	OCR_CFLAGS=""
+	OCR_LIBS=""
+
+	ac_cv_use_svm=no
+	SVM_CFLAGS=""
+	;;
+esac
+
+
 
 
 

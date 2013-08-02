@@ -26,9 +26,9 @@ sheetreader_SOURCES =\
 	sheetreader.c\
 	sheetreader.h
 	
-sheetreader_CFLAGS = $(DEBUGINFO_CFLAGS) $(OPTIMIZATION_CFLAGS) $(MTRACE_CFLAGS) $(SVM_CFLAGS) -DKOCR -DPREFIX="\"${prefix}\""
+sheetreader_CFLAGS = $(DEBUGINFO_CFLAGS) $(OPTIMIZATION_CFLAGS) $(MTRACE_CFLAGS) $(SVM_CFLAGS) $(OCR_CFLAGS) -DPREFIX="\"${prefix}\""
 
-sheetreader_LDADD = -lcluscore -lkocr $(OPENCV_LIBS) $(MYSQL_LIBS)
+sheetreader_LDADD = -lcluscore $(OCR_LIBS) $(OPENCV_LIBS) $(MYSQL_LIBS)
 
 sheetreader_LDFLAGS =\
 	-L/usr/local/lib\

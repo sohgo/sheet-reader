@@ -79,10 +79,38 @@ if test "$ac_cv_use_mtrace" = "yes"; then
 	MTRACE_CFLAGS="-DMTRACE"
 fi
 
+AC_ARG_WITH([ocr],
+	      AS_HELP_STRING([--with-ocr=OCR],
+	      		     [type of OCR(kocr or gocr) (default is kocr)]),
+		[ac_cv_use_ocr=$withval], [ac_cv_use_ocr=kocr])
+case "$ac_cv_use_ocr" in
+kocr|yes)
+	OCR_CFLAGS="-DKOCR"
+	OCR_LIBS="-lkocr"
+	case "$ac_cv_use_svm" in
+	yes)
+		AC_CHECK_LIB([kocr], [kocr_svm_init])
+		;;
+	*)
+		AC_CHECK_LIB([kocr], [kocr_init])
+		;;
+	esac
+	;;
+gocr|no)
+	OCR_CFLAGS=""
+	OCR_LIBS=""
+
+	ac_cv_use_svm=no
+	SVM_CFLAGS=""
+	;;
+esac
+
 AC_SUBST([SVM_CFLAGS])
 AC_SUBST([DEBUGINFO_CFLAGS])
 AC_SUBST([OPTIMIZATION_CFLAGS])
 AC_SUBST([MTRACE_CFLAGS])
+AC_SUBST([OCR_CFLAGS])
+AC_SUBST([OCR_LIBS])
 
 AC_CONFIG_FILES([makefile
 		src/makefile
