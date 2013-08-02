@@ -14,6 +14,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AM_PROG_CC_C_O
 MYSQL_CFLAGS=`mysql_config --libs`
 AC_SUBST(MYSQL_CFLAGS)
 MYSQL_LIBS=`mysql_config --libs`
@@ -45,36 +46,46 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([gettimeofday localtime_r memset mkdir regcomp socket strdup strerror])
 
 # Set for define
-CFLAGS="-g -DKOCR"
 AC_ARG_ENABLE([svm],
 	      AS_HELP_STRING([--disable-svm],
 	      		     [SVM method for KOCR]),
 		[ac_cv_use_svm=$enableval], [ac_cv_use_svm=yes])
 if test "$ac_cv_use_svm" = "yes" ; then
-	CFLAGS="$CFLAGS -DUSE_SVM"
+	SVM_CFLAGS="-DUSE_SVM"
 fi
-AC_ARG_ENABLE(opt, [  --ebable-nogdbinfo      trun off gdbinfo])
-if test "$enable_nogdbinfo" = "yes"; then
-	CFLAGS=""
+AC_ARG_ENABLE([gdbinfo],
+	      AS_HELP_STRING([--enable-gdbinfo],
+	      		     [turn on gdbinfo (default is YES)]),
+		[ac_cv_use_gdbinfo=$enableval], [ac_cv_use_gdbinfo=yes])
+if test "$ac_cv_use_gdbinfo" = "yes"; then
+	DEBUGINFO_CFLAGS="-g"
+else
+	DEBUGINFO_CFLAGS=""
 fi
 
-LINKLIBS="-lcluscore -lkocr"
-CFLAGS="-DPREFIX=\"\\\"\${prefix}\\\"\" $CFLAGS"
-LINKLIBS="$LINKLIBS $MYSQL_LIBS"
+AC_ARG_ENABLE([opt],
+	      AS_HELP_STRING([--enable-opt],
+	      		     [turn on optimization (default is NO)]),
+		[ac_cv_use_opt=$enableval], [ac_cv_use_opt=no])
+if test "$ac_cv_use_opt" = "yes"; then
+	OPTIMIZATION_CFLAGS="-O4"
+fi
 
-AC_ARG_ENABLE(opt, [  --enable-opt            trun on optimization])
-if test "$enable_opt" = "yes"; then
-  CFLAGS="-O4 $CFLAGS"
+AC_ARG_ENABLE([mtrace],
+	      AS_HELP_STRING([--enable-mtrace],
+	      		     [turn on mtrace (default is NO)]),
+		[ac_cv_use_mtrace=$enableval], [ac_cv_use_mtrace=no])
+if test "$ac_cv_use_mtrace" = "yes"; then
+	MTRACE_CFLAGS="-DMTRACE"
 fi
-AC_ARG_ENABLE(opt, [  --enable-mtrace         trun on mtrace])
-if test "$enable_mtrace" = "yes"; then
-  CFLAGS="-DMTRACE $CFLAGS"
-fi
-AC_SUBST([CFLAGS])
-AC_SUBST([LINKLIBS])
+
+AC_SUBST([SVM_CFLAGS])
+AC_SUBST([DEBUGINFO_CFLAGS])
+AC_SUBST([OPTIMIZATION_CFLAGS])
+AC_SUBST([MTRACE_CFLAGS])
 
 AC_CONFIG_FILES([makefile
-                 src/makefile
+		src/makefile
 		etc/makefile
 		etc/sheetreader/makefile
 		etc/sheetreader/srml/makefile
@@ -86,7 +97,3 @@ AC_CONFIG_FILES([makefile
 		etc/sheetreader/gocrdbs/idocrbdb/makefile
 		])
 AC_OUTPUT
-
-
-
-

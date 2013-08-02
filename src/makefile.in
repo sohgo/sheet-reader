@@ -45,17 +45,21 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_sheetreader_OBJECTS = cco_srAnalyzer.$(OBJEXT) \
-	cco_vSrPattern.$(OBJEXT) cco_srDb.$(OBJEXT) \
-	cco_srOcr.$(OBJEXT) cco_srOcrOpencv.$(OBJEXT) \
-	cco_srOcrGocr.$(OBJEXT) cco_srOcrKocr.$(OBJEXT) \
-	cco_srConf.$(OBJEXT) cco_srMl.$(OBJEXT) \
-	cco_srMlSheet.$(OBJEXT) utility.$(OBJEXT) \
-	sheetreader.$(OBJEXT)
+am_sheetreader_OBJECTS = sheetreader-cco_srAnalyzer.$(OBJEXT) \
+	sheetreader-cco_vSrPattern.$(OBJEXT) \
+	sheetreader-cco_srDb.$(OBJEXT) sheetreader-cco_srOcr.$(OBJEXT) \
+	sheetreader-cco_srOcrOpencv.$(OBJEXT) \
+	sheetreader-cco_srOcrGocr.$(OBJEXT) \
+	sheetreader-cco_srOcrKocr.$(OBJEXT) \
+	sheetreader-cco_srConf.$(OBJEXT) \
+	sheetreader-cco_srMl.$(OBJEXT) \
+	sheetreader-cco_srMlSheet.$(OBJEXT) \
+	sheetreader-utility.$(OBJEXT) \
+	sheetreader-sheetreader.$(OBJEXT)
 sheetreader_OBJECTS = $(am_sheetreader_OBJECTS)
 am__DEPENDENCIES_1 =
-sheetreader_DEPENDENCIES = $(am__DEPENDENCIES_1)
-sheetreader_LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+sheetreader_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+sheetreader_LINK = $(CCLD) $(sheetreader_CFLAGS) $(CFLAGS) \
 	$(sheetreader_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -82,6 +86,7 @@ CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFO_CFLAGS = @DEBUGINFO_CFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
@@ -98,16 +103,17 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
-LINKLIBS = @LINKLIBS@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
+MTRACE_CFLAGS = @MTRACE_CFLAGS@
 MYSQL_CFLAGS = @MYSQL_CFLAGS@
 MYSQL_LIBS = @MYSQL_LIBS@
 OBJEXT = @OBJEXT@
 OPENCV_CFLAGS = @OPENCV_CFLAGS@
 OPENCV_LIBS = @OPENCV_LIBS@
+OPTIMIZATION_CFLAGS = @OPTIMIZATION_CFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -123,6 +129,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SVM_CFLAGS = @SVM_CFLAGS@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -192,7 +199,8 @@ sheetreader_SOURCES = \
 	sheetreader.c\
 	sheetreader.h
 
-sheetreader_LDADD = @LINKLIBS@ $(OPENCV_LIBS)
+sheetreader_CFLAGS = $(DEBUGINFO_CFLAGS) $(OPTIMIZATION_CFLAGS) $(MTRACE_CFLAGS) $(SVM_CFLAGS) -DKOCR -DPREFIX="\"${prefix}\""
+sheetreader_LDADD = -lcluscore -lkocr $(OPENCV_LIBS) $(MYSQL_LIBS)
 sheetreader_LDFLAGS = \
 	-L/usr/local/lib\
 	-L$(top_srcdir)/../kocr/src
@@ -286,18 +294,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srAnalyzer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srConf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srDb.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srMl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srMlSheet.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srOcr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srOcrGocr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srOcrKocr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_srOcrOpencv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cco_vSrPattern.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srAnalyzer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srConf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srDb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srMl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srMlSheet.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srOcr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srOcrGocr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srOcrKocr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_srOcrOpencv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-cco_vSrPattern.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-sheetreader.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sheetreader-utility.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -312,6 +320,174 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+sheetreader-cco_srAnalyzer.o: cco_srAnalyzer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srAnalyzer.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srAnalyzer.Tpo -c -o sheetreader-cco_srAnalyzer.o `test -f 'cco_srAnalyzer.c' || echo '$(srcdir)/'`cco_srAnalyzer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srAnalyzer.Tpo $(DEPDIR)/sheetreader-cco_srAnalyzer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srAnalyzer.c' object='sheetreader-cco_srAnalyzer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srAnalyzer.o `test -f 'cco_srAnalyzer.c' || echo '$(srcdir)/'`cco_srAnalyzer.c
+
+sheetreader-cco_srAnalyzer.obj: cco_srAnalyzer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srAnalyzer.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srAnalyzer.Tpo -c -o sheetreader-cco_srAnalyzer.obj `if test -f 'cco_srAnalyzer.c'; then $(CYGPATH_W) 'cco_srAnalyzer.c'; else $(CYGPATH_W) '$(srcdir)/cco_srAnalyzer.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srAnalyzer.Tpo $(DEPDIR)/sheetreader-cco_srAnalyzer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srAnalyzer.c' object='sheetreader-cco_srAnalyzer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srAnalyzer.obj `if test -f 'cco_srAnalyzer.c'; then $(CYGPATH_W) 'cco_srAnalyzer.c'; else $(CYGPATH_W) '$(srcdir)/cco_srAnalyzer.c'; fi`
+
+sheetreader-cco_vSrPattern.o: cco_vSrPattern.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_vSrPattern.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_vSrPattern.Tpo -c -o sheetreader-cco_vSrPattern.o `test -f 'cco_vSrPattern.c' || echo '$(srcdir)/'`cco_vSrPattern.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_vSrPattern.Tpo $(DEPDIR)/sheetreader-cco_vSrPattern.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_vSrPattern.c' object='sheetreader-cco_vSrPattern.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_vSrPattern.o `test -f 'cco_vSrPattern.c' || echo '$(srcdir)/'`cco_vSrPattern.c
+
+sheetreader-cco_vSrPattern.obj: cco_vSrPattern.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_vSrPattern.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_vSrPattern.Tpo -c -o sheetreader-cco_vSrPattern.obj `if test -f 'cco_vSrPattern.c'; then $(CYGPATH_W) 'cco_vSrPattern.c'; else $(CYGPATH_W) '$(srcdir)/cco_vSrPattern.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_vSrPattern.Tpo $(DEPDIR)/sheetreader-cco_vSrPattern.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_vSrPattern.c' object='sheetreader-cco_vSrPattern.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_vSrPattern.obj `if test -f 'cco_vSrPattern.c'; then $(CYGPATH_W) 'cco_vSrPattern.c'; else $(CYGPATH_W) '$(srcdir)/cco_vSrPattern.c'; fi`
+
+sheetreader-cco_srDb.o: cco_srDb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srDb.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srDb.Tpo -c -o sheetreader-cco_srDb.o `test -f 'cco_srDb.c' || echo '$(srcdir)/'`cco_srDb.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srDb.Tpo $(DEPDIR)/sheetreader-cco_srDb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srDb.c' object='sheetreader-cco_srDb.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srDb.o `test -f 'cco_srDb.c' || echo '$(srcdir)/'`cco_srDb.c
+
+sheetreader-cco_srDb.obj: cco_srDb.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srDb.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srDb.Tpo -c -o sheetreader-cco_srDb.obj `if test -f 'cco_srDb.c'; then $(CYGPATH_W) 'cco_srDb.c'; else $(CYGPATH_W) '$(srcdir)/cco_srDb.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srDb.Tpo $(DEPDIR)/sheetreader-cco_srDb.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srDb.c' object='sheetreader-cco_srDb.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srDb.obj `if test -f 'cco_srDb.c'; then $(CYGPATH_W) 'cco_srDb.c'; else $(CYGPATH_W) '$(srcdir)/cco_srDb.c'; fi`
+
+sheetreader-cco_srOcr.o: cco_srOcr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcr.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcr.Tpo -c -o sheetreader-cco_srOcr.o `test -f 'cco_srOcr.c' || echo '$(srcdir)/'`cco_srOcr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcr.Tpo $(DEPDIR)/sheetreader-cco_srOcr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcr.c' object='sheetreader-cco_srOcr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcr.o `test -f 'cco_srOcr.c' || echo '$(srcdir)/'`cco_srOcr.c
+
+sheetreader-cco_srOcr.obj: cco_srOcr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcr.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcr.Tpo -c -o sheetreader-cco_srOcr.obj `if test -f 'cco_srOcr.c'; then $(CYGPATH_W) 'cco_srOcr.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcr.Tpo $(DEPDIR)/sheetreader-cco_srOcr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcr.c' object='sheetreader-cco_srOcr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcr.obj `if test -f 'cco_srOcr.c'; then $(CYGPATH_W) 'cco_srOcr.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcr.c'; fi`
+
+sheetreader-cco_srOcrOpencv.o: cco_srOcrOpencv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcrOpencv.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcrOpencv.Tpo -c -o sheetreader-cco_srOcrOpencv.o `test -f 'cco_srOcrOpencv.c' || echo '$(srcdir)/'`cco_srOcrOpencv.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcrOpencv.Tpo $(DEPDIR)/sheetreader-cco_srOcrOpencv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcrOpencv.c' object='sheetreader-cco_srOcrOpencv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcrOpencv.o `test -f 'cco_srOcrOpencv.c' || echo '$(srcdir)/'`cco_srOcrOpencv.c
+
+sheetreader-cco_srOcrOpencv.obj: cco_srOcrOpencv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcrOpencv.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcrOpencv.Tpo -c -o sheetreader-cco_srOcrOpencv.obj `if test -f 'cco_srOcrOpencv.c'; then $(CYGPATH_W) 'cco_srOcrOpencv.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcrOpencv.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcrOpencv.Tpo $(DEPDIR)/sheetreader-cco_srOcrOpencv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcrOpencv.c' object='sheetreader-cco_srOcrOpencv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcrOpencv.obj `if test -f 'cco_srOcrOpencv.c'; then $(CYGPATH_W) 'cco_srOcrOpencv.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcrOpencv.c'; fi`
+
+sheetreader-cco_srOcrGocr.o: cco_srOcrGocr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcrGocr.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcrGocr.Tpo -c -o sheetreader-cco_srOcrGocr.o `test -f 'cco_srOcrGocr.c' || echo '$(srcdir)/'`cco_srOcrGocr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcrGocr.Tpo $(DEPDIR)/sheetreader-cco_srOcrGocr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcrGocr.c' object='sheetreader-cco_srOcrGocr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcrGocr.o `test -f 'cco_srOcrGocr.c' || echo '$(srcdir)/'`cco_srOcrGocr.c
+
+sheetreader-cco_srOcrGocr.obj: cco_srOcrGocr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcrGocr.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcrGocr.Tpo -c -o sheetreader-cco_srOcrGocr.obj `if test -f 'cco_srOcrGocr.c'; then $(CYGPATH_W) 'cco_srOcrGocr.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcrGocr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcrGocr.Tpo $(DEPDIR)/sheetreader-cco_srOcrGocr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcrGocr.c' object='sheetreader-cco_srOcrGocr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcrGocr.obj `if test -f 'cco_srOcrGocr.c'; then $(CYGPATH_W) 'cco_srOcrGocr.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcrGocr.c'; fi`
+
+sheetreader-cco_srOcrKocr.o: cco_srOcrKocr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcrKocr.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcrKocr.Tpo -c -o sheetreader-cco_srOcrKocr.o `test -f 'cco_srOcrKocr.c' || echo '$(srcdir)/'`cco_srOcrKocr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcrKocr.Tpo $(DEPDIR)/sheetreader-cco_srOcrKocr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcrKocr.c' object='sheetreader-cco_srOcrKocr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcrKocr.o `test -f 'cco_srOcrKocr.c' || echo '$(srcdir)/'`cco_srOcrKocr.c
+
+sheetreader-cco_srOcrKocr.obj: cco_srOcrKocr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srOcrKocr.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srOcrKocr.Tpo -c -o sheetreader-cco_srOcrKocr.obj `if test -f 'cco_srOcrKocr.c'; then $(CYGPATH_W) 'cco_srOcrKocr.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcrKocr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srOcrKocr.Tpo $(DEPDIR)/sheetreader-cco_srOcrKocr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srOcrKocr.c' object='sheetreader-cco_srOcrKocr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srOcrKocr.obj `if test -f 'cco_srOcrKocr.c'; then $(CYGPATH_W) 'cco_srOcrKocr.c'; else $(CYGPATH_W) '$(srcdir)/cco_srOcrKocr.c'; fi`
+
+sheetreader-cco_srConf.o: cco_srConf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srConf.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srConf.Tpo -c -o sheetreader-cco_srConf.o `test -f 'cco_srConf.c' || echo '$(srcdir)/'`cco_srConf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srConf.Tpo $(DEPDIR)/sheetreader-cco_srConf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srConf.c' object='sheetreader-cco_srConf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srConf.o `test -f 'cco_srConf.c' || echo '$(srcdir)/'`cco_srConf.c
+
+sheetreader-cco_srConf.obj: cco_srConf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srConf.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srConf.Tpo -c -o sheetreader-cco_srConf.obj `if test -f 'cco_srConf.c'; then $(CYGPATH_W) 'cco_srConf.c'; else $(CYGPATH_W) '$(srcdir)/cco_srConf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srConf.Tpo $(DEPDIR)/sheetreader-cco_srConf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srConf.c' object='sheetreader-cco_srConf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srConf.obj `if test -f 'cco_srConf.c'; then $(CYGPATH_W) 'cco_srConf.c'; else $(CYGPATH_W) '$(srcdir)/cco_srConf.c'; fi`
+
+sheetreader-cco_srMl.o: cco_srMl.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srMl.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srMl.Tpo -c -o sheetreader-cco_srMl.o `test -f 'cco_srMl.c' || echo '$(srcdir)/'`cco_srMl.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srMl.Tpo $(DEPDIR)/sheetreader-cco_srMl.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srMl.c' object='sheetreader-cco_srMl.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srMl.o `test -f 'cco_srMl.c' || echo '$(srcdir)/'`cco_srMl.c
+
+sheetreader-cco_srMl.obj: cco_srMl.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srMl.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srMl.Tpo -c -o sheetreader-cco_srMl.obj `if test -f 'cco_srMl.c'; then $(CYGPATH_W) 'cco_srMl.c'; else $(CYGPATH_W) '$(srcdir)/cco_srMl.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srMl.Tpo $(DEPDIR)/sheetreader-cco_srMl.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srMl.c' object='sheetreader-cco_srMl.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srMl.obj `if test -f 'cco_srMl.c'; then $(CYGPATH_W) 'cco_srMl.c'; else $(CYGPATH_W) '$(srcdir)/cco_srMl.c'; fi`
+
+sheetreader-cco_srMlSheet.o: cco_srMlSheet.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srMlSheet.o -MD -MP -MF $(DEPDIR)/sheetreader-cco_srMlSheet.Tpo -c -o sheetreader-cco_srMlSheet.o `test -f 'cco_srMlSheet.c' || echo '$(srcdir)/'`cco_srMlSheet.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srMlSheet.Tpo $(DEPDIR)/sheetreader-cco_srMlSheet.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srMlSheet.c' object='sheetreader-cco_srMlSheet.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srMlSheet.o `test -f 'cco_srMlSheet.c' || echo '$(srcdir)/'`cco_srMlSheet.c
+
+sheetreader-cco_srMlSheet.obj: cco_srMlSheet.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-cco_srMlSheet.obj -MD -MP -MF $(DEPDIR)/sheetreader-cco_srMlSheet.Tpo -c -o sheetreader-cco_srMlSheet.obj `if test -f 'cco_srMlSheet.c'; then $(CYGPATH_W) 'cco_srMlSheet.c'; else $(CYGPATH_W) '$(srcdir)/cco_srMlSheet.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-cco_srMlSheet.Tpo $(DEPDIR)/sheetreader-cco_srMlSheet.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cco_srMlSheet.c' object='sheetreader-cco_srMlSheet.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-cco_srMlSheet.obj `if test -f 'cco_srMlSheet.c'; then $(CYGPATH_W) 'cco_srMlSheet.c'; else $(CYGPATH_W) '$(srcdir)/cco_srMlSheet.c'; fi`
+
+sheetreader-utility.o: utility.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-utility.o -MD -MP -MF $(DEPDIR)/sheetreader-utility.Tpo -c -o sheetreader-utility.o `test -f 'utility.c' || echo '$(srcdir)/'`utility.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-utility.Tpo $(DEPDIR)/sheetreader-utility.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utility.c' object='sheetreader-utility.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-utility.o `test -f 'utility.c' || echo '$(srcdir)/'`utility.c
+
+sheetreader-utility.obj: utility.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-utility.obj -MD -MP -MF $(DEPDIR)/sheetreader-utility.Tpo -c -o sheetreader-utility.obj `if test -f 'utility.c'; then $(CYGPATH_W) 'utility.c'; else $(CYGPATH_W) '$(srcdir)/utility.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-utility.Tpo $(DEPDIR)/sheetreader-utility.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utility.c' object='sheetreader-utility.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-utility.obj `if test -f 'utility.c'; then $(CYGPATH_W) 'utility.c'; else $(CYGPATH_W) '$(srcdir)/utility.c'; fi`
+
+sheetreader-sheetreader.o: sheetreader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-sheetreader.o -MD -MP -MF $(DEPDIR)/sheetreader-sheetreader.Tpo -c -o sheetreader-sheetreader.o `test -f 'sheetreader.c' || echo '$(srcdir)/'`sheetreader.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-sheetreader.Tpo $(DEPDIR)/sheetreader-sheetreader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sheetreader.c' object='sheetreader-sheetreader.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-sheetreader.o `test -f 'sheetreader.c' || echo '$(srcdir)/'`sheetreader.c
+
+sheetreader-sheetreader.obj: sheetreader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -MT sheetreader-sheetreader.obj -MD -MP -MF $(DEPDIR)/sheetreader-sheetreader.Tpo -c -o sheetreader-sheetreader.obj `if test -f 'sheetreader.c'; then $(CYGPATH_W) 'sheetreader.c'; else $(CYGPATH_W) '$(srcdir)/sheetreader.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sheetreader-sheetreader.Tpo $(DEPDIR)/sheetreader-sheetreader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sheetreader.c' object='sheetreader-sheetreader.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(sheetreader_CFLAGS) $(CFLAGS) -c -o sheetreader-sheetreader.obj `if test -f 'sheetreader.c'; then $(CYGPATH_W) 'sheetreader.c'; else $(CYGPATH_W) '$(srcdir)/sheetreader.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

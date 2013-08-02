@@ -26,7 +26,9 @@ sheetreader_SOURCES =\
 	sheetreader.c\
 	sheetreader.h
 	
-sheetreader_LDADD = @LINKLIBS@ $(OPENCV_LIBS)
+sheetreader_CFLAGS = $(DEBUGINFO_CFLAGS) $(OPTIMIZATION_CFLAGS) $(MTRACE_CFLAGS) $(SVM_CFLAGS) -DKOCR -DPREFIX="\"${prefix}\""
+
+sheetreader_LDADD = -lcluscore -lkocr $(OPENCV_LIBS) $(MYSQL_LIBS)
 
 sheetreader_LDFLAGS =\
 	-L/usr/local/lib\
@@ -39,5 +41,3 @@ INCLUDES =\
 	-I/usr/include/opencv\
 	-I$(top_srcdir)/include\
 	-I$(top_srcdir)/../kocr/src
-	
-	
