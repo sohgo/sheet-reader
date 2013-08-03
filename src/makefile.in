@@ -109,7 +109,6 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MTRACE_CFLAGS = @MTRACE_CFLAGS@
-MYSQL_CFLAGS = @MYSQL_CFLAGS@
 MYSQL_LIBS = @MYSQL_LIBS@
 OBJEXT = @OBJEXT@
 OCR_CFLAGS = @OCR_CFLAGS@
@@ -205,13 +204,9 @@ sheetreader_SOURCES = \
 sheetreader_CFLAGS = $(DEBUGINFO_CFLAGS) $(OPTIMIZATION_CFLAGS) $(MTRACE_CFLAGS) $(SVM_CFLAGS) $(OCR_CFLAGS) -DPREFIX="\"${prefix}\""
 sheetreader_LDADD = $(OCR_LIBS) $(OPENCV_LIBS) $(MYSQL_LIBS)
 sheetreader_LDFLAGS = \
-	-L/usr/local/lib\
 	-L$(top_srcdir)/../kocr/src
 
 INCLUDES = \
-	-I/usr/local/include\
-	-I/usr/include/libxml2\
-	-I/usr/include/opencv\
 	-I$(top_srcdir)/include\
 	-I$(top_srcdir)/../kocr/src
 

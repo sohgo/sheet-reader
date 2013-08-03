@@ -620,7 +620,6 @@ PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
 MYSQL_LIBS
-MYSQL_CFLAGS
 RANLIB
 LN_S
 CPP
@@ -4143,8 +4142,6 @@ if test "$am_t" != yes; then
    CC="$am_aux_dir/compile $CC"
 fi
 
-
-MYSQL_CFLAGS=`mysql_config --libs`
 
 MYSQL_LIBS=`mysql_config --libs`
 
