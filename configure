@@ -4327,31 +4327,11 @@ fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$OPENCV_PKG_ERRORS" >&5
 
-	as_fn_error $? "Package requirements (opencv) were not met:
-
-$OPENCV_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables OPENCV_CFLAGS
-and OPENCV_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5
+	as_fn_error $? "opencv not found. Please install it." "$LINENO" 5
 elif test $pkg_failed = untried; then
      	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables OPENCV_CFLAGS
-and OPENCV_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }
+	as_fn_error $? "opencv not found. Please install it." "$LINENO" 5
 else
 	OPENCV_CFLAGS=$pkg_cv_OPENCV_CFLAGS
 	OPENCV_LIBS=$pkg_cv_OPENCV_LIBS
@@ -4403,11 +4383,13 @@ _ACEOF
 
   LIBS="-lxml2 $LIBS"
 
+else
+  as_fn_error $? "libxml2 not found. Please install it." "$LINENO" 5
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cco_vString_toInt in -lcluscore" >&5
-$as_echo_n "checking for cco_vString_toInt in -lcluscore... " >&6; }
-if ${ac_cv_lib_cluscore_cco_vString_toInt+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cc_container_new in -lcluscore" >&5
+$as_echo_n "checking for cc_container_new in -lcluscore... " >&6; }
+if ${ac_cv_lib_cluscore_cc_container_new+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -4421,33 +4403,35 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char cco_vString_toInt ();
+char cc_container_new ();
 int
 main ()
 {
-return cco_vString_toInt ();
+return cc_container_new ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_cluscore_cco_vString_toInt=yes
+  ac_cv_lib_cluscore_cc_container_new=yes
 else
-  ac_cv_lib_cluscore_cco_vString_toInt=no
+  ac_cv_lib_cluscore_cc_container_new=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cluscore_cco_vString_toInt" >&5
-$as_echo "$ac_cv_lib_cluscore_cco_vString_toInt" >&6; }
-if test "x$ac_cv_lib_cluscore_cco_vString_toInt" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cluscore_cc_container_new" >&5
+$as_echo "$ac_cv_lib_cluscore_cc_container_new" >&6; }
+if test "x$ac_cv_lib_cluscore_cc_container_new" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBCLUSCORE 1
 _ACEOF
 
   LIBS="-lcluscore $LIBS"
 
+else
+  as_fn_error $? "cluscore not found. Please install it." "$LINENO" 5
 fi
 
 
@@ -5478,6 +5462,9 @@ _ACEOF
 
   LIBS="-lkocr $LIBS"
 
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SVM version of KOCR not found. Please install it." >&5
+$as_echo "$as_me: WARNING: SVM version of KOCR not found. Please install it." >&2;}
 fi
 
 		;;
@@ -5525,6 +5512,9 @@ _ACEOF
 
   LIBS="-lkocr $LIBS"
 
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: KOCR not found. Please install it." >&5
+$as_echo "$as_me: WARNING: KOCR not found. Please install it." >&2;}
 fi
 
 		;;

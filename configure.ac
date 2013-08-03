@@ -19,9 +19,9 @@ MYSQL_CFLAGS=`mysql_config --libs`
 AC_SUBST(MYSQL_CFLAGS)
 MYSQL_LIBS=`mysql_config --libs`
 AC_SUBST(MYSQL_LIBS)
-PKG_CHECK_MODULES([OPENCV], [opencv])
-AC_CHECK_LIB([xml2], [xmlParserInputRead])
-AC_CHECK_LIB([cluscore], [cco_vString_toInt])
+PKG_CHECK_MODULES([OPENCV], [opencv], [], AC_MSG_ERROR(opencv not found. Please install it.))
+AC_CHECK_LIB([xml2], [xmlParserInputRead], [], AC_MSG_ERROR(libxml2 not found. Please install it.))
+AC_CHECK_LIB([cluscore], [cc_container_new], [], AC_MSG_ERROR(cluscore not found. Please install it.))
 
 
 # Checks for header files.
@@ -90,10 +90,10 @@ kocr|yes)
 	OCR_LIBS="-lkocr"
 	case "$ac_cv_use_svm" in
 	yes)
-		AC_CHECK_LIB([kocr], [kocr_svm_init])
+		AC_CHECK_LIB([kocr], [kocr_svm_init], [], AC_MSG_WARN(SVM version of KOCR not found. Please install it.))
 		;;
 	*)
-		AC_CHECK_LIB([kocr], [kocr_init])
+		AC_CHECK_LIB([kocr], [kocr_init], [], AC_MSG_WARN(KOCR not found. Please install it.))
 		;;
 	esac
 	;;
