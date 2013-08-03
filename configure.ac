@@ -21,6 +21,7 @@ MYSQL_LIBS=`mysql_config --libs`
 AC_SUBST(MYSQL_LIBS)
 PKG_CHECK_MODULES([OPENCV], [opencv])
 AC_CHECK_LIB([xml2], [xmlParserInputRead])
+AC_CHECK_LIB([cluscore], [cco_vString_toInt])
 
 
 # Checks for header files.

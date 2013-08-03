@@ -28,7 +28,7 @@ sheetreader_SOURCES =\
 	
 sheetreader_CFLAGS = $(DEBUGINFO_CFLAGS) $(OPTIMIZATION_CFLAGS) $(MTRACE_CFLAGS) $(SVM_CFLAGS) $(OCR_CFLAGS) -DPREFIX="\"${prefix}\""
 
-sheetreader_LDADD = -lcluscore $(OCR_LIBS) $(OPENCV_LIBS) $(MYSQL_LIBS)
+sheetreader_LDADD = $(OCR_LIBS) $(OPENCV_LIBS) $(MYSQL_LIBS)
 
 sheetreader_LDFLAGS =\
 	-L/usr/local/lib\
@@ -36,7 +36,6 @@ sheetreader_LDFLAGS =\
 
 INCLUDES =\
 	-I/usr/local/include\
-	-I/usr/local/cluscore\
 	-I/usr/include/libxml2\
 	-I/usr/include/opencv\
 	-I$(top_srcdir)/include\

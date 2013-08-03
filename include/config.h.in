@@ -13,6 +13,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the `cluscore' library (-lcluscore). */
+#undef HAVE_LIBCLUSCORE
+
 /* Define to 1 if you have the `kocr' library (-lkocr). */
 #undef HAVE_LIBKOCR
 
