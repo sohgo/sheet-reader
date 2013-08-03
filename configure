@@ -608,8 +608,6 @@ LTLIBOBJS
 OCR_LIBS
 OCR_CFLAGS
 MTRACE_CFLAGS
-OPTIMIZATION_CFLAGS
-DEBUGINFO_CFLAGS
 SVM_CFLAGS
 LIBOBJS
 EGREP
@@ -706,8 +704,6 @@ ac_user_opts='
 enable_option_checking
 enable_dependency_tracking
 enable_svm
-enable_gdbinfo
-enable_opt
 enable_mtrace
 with_ocr
 '
@@ -1344,8 +1340,6 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-svm           SVM method for KOCR
-  --enable-gdbinfo        turn on gdbinfo (default is YES)
-  --enable-opt            turn on optimization (default is NO)
   --enable-mtrace         turn on mtrace (default is NO)
 
 Optional Packages:
@@ -5367,29 +5361,6 @@ fi
 if test "$ac_cv_use_svm" = "yes" ; then
 	SVM_CFLAGS="-DUSE_SVM"
 fi
-# Check whether --enable-gdbinfo was given.
-if test "${enable_gdbinfo+set}" = set; then :
-  enableval=$enable_gdbinfo; ac_cv_use_gdbinfo=$enableval
-else
-  ac_cv_use_gdbinfo=yes
-fi
-
-if test "$ac_cv_use_gdbinfo" = "yes"; then
-	DEBUGINFO_CFLAGS="-g"
-else
-	DEBUGINFO_CFLAGS=""
-fi
-
-# Check whether --enable-opt was given.
-if test "${enable_opt+set}" = set; then :
-  enableval=$enable_opt; ac_cv_use_opt=$enableval
-else
-  ac_cv_use_opt=no
-fi
-
-if test "$ac_cv_use_opt" = "yes"; then
-	OPTIMIZATION_CFLAGS="-O4"
-fi
 
 # Check whether --enable-mtrace was given.
 if test "${enable_mtrace+set}" = set; then :
@@ -5525,8 +5496,6 @@ gocr|no)
 	SVM_CFLAGS=""
 	;;
 esac
-
-
 
 
 

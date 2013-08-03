@@ -52,23 +52,6 @@ AC_ARG_ENABLE([svm],
 if test "$ac_cv_use_svm" = "yes" ; then
 	SVM_CFLAGS="-DUSE_SVM"
 fi
-AC_ARG_ENABLE([gdbinfo],
-	      AS_HELP_STRING([--enable-gdbinfo],
-	      		     [turn on gdbinfo (default is YES)]),
-		[ac_cv_use_gdbinfo=$enableval], [ac_cv_use_gdbinfo=yes])
-if test "$ac_cv_use_gdbinfo" = "yes"; then
-	DEBUGINFO_CFLAGS="-g"
-else
-	DEBUGINFO_CFLAGS=""
-fi
-
-AC_ARG_ENABLE([opt],
-	      AS_HELP_STRING([--enable-opt],
-	      		     [turn on optimization (default is NO)]),
-		[ac_cv_use_opt=$enableval], [ac_cv_use_opt=no])
-if test "$ac_cv_use_opt" = "yes"; then
-	OPTIMIZATION_CFLAGS="-O4"
-fi
 
 AC_ARG_ENABLE([mtrace],
 	      AS_HELP_STRING([--enable-mtrace],
@@ -105,8 +88,6 @@ gocr|no)
 esac
 
 AC_SUBST([SVM_CFLAGS])
-AC_SUBST([DEBUGINFO_CFLAGS])
-AC_SUBST([OPTIMIZATION_CFLAGS])
 AC_SUBST([MTRACE_CFLAGS])
 AC_SUBST([OCR_CFLAGS])
 AC_SUBST([OCR_LIBS])
