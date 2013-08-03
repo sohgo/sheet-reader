@@ -8,21 +8,36 @@
 
 $ git clone https://code.google.com/p/kocr/
 $ cd kocr/src
-$ make library
+$ make all library
+$ sudo make install
 
  - 次に、sheetreaderをコンパイルします
 
-$./configure
-$./make
+$./configure CFLAGS="-O4"
+$ make
 
- - Sheetreaderは、文字認識エンジンとして、GNU GOCRかKOCRを利用できます
-   もし、GOCRを利用する場合には、configureファイルを修正したうえで、
-   再コンパイルが必要です。
+ - Sheetreaderは、文字認識エンジンとして、GNU GOCRかKOCRを利用できます。
+   標準で KOCR を利用します。GOCRを利用する場合には、configure に
+   --with-ocr=gocr オプションをつけて再コンパイルして下さい。
 
-   configure中に含まれる下記の行をそれぞれ変更して下さい。
+ - configure オプションについて
+   configure に様々なオプションを指定することで、異なる特徴を持つ
+   sheetreaderをコンパイルできます。
 
-(KOCR) CFLAGS="-O3 -DKOCR"
-(GOCR) CFLAGS="-O3"
+     --with-ocr=OCR
+        OCR には kocr か gocr を指定します。default は kocr です。
+     --disable-svm
+        SVM法を利用した KOCR を利用するか、最近傍法を利用した KOCR を
+        利用するかを指定します。標準で SVM 法を利用した KOCR を使います。
+        最近傍法を利用した KOCR を使いたい場合にこのオプションを指定します。
 
-(KOCR) LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lcluscore -lkocr"
-(GOCR) LINKLIBS="-lcv -lhighgui -lcvaux -lxml2 -lcluscore"
+ - 最適化、デバッグオプション
+   CFLAGS に標準で -g -O2 フラグがついています。
+
+   開発で長期的に CFLAGS を変更したい場合は、
+     configure CFLAGS="-g"
+   のようにしてあとは、make して下さい。
+
+   短期的に CFLAGS を変更したい場合は、
+     make CFLAGS="-O4"
+   のようにして利用して下さい。
