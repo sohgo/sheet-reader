@@ -2,9 +2,9 @@
 Test cases for KOCR-enabled sheetreader
 
 1) put OCR data files into etc/
-   - list-mbs.db
-   - list-num.db
-   - list-ocrb.db
+   - list-mbs.{db,xml}
+   - list-num.db (copy list-numocrb.{db,xml} as list-num.{db,xml} for SVM)
+   - list-ocrb.{db,xml}
 
 2) and, type make, to run test cases
 
