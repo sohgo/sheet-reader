@@ -39,5 +39,5 @@ $ make
    のようにしてあとは、make して下さい。
 
    短期的に CFLAGS を変更したい場合は、
-     make CFLAGS="-O4"
+     make CFLAGS="-O3"
    のようにして利用して下さい。
