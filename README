@@ -13,7 +13,7 @@ $ sudo make install
 
  - 次に、sheetreaderをコンパイルします
 
-$./configure CFLAGS="-O4"
+$./configure CFLAGS="-O3"
 $ make
 
  - Sheetreaderは、文字認識エンジンとして、GNU GOCRかKOCRを利用できます。
