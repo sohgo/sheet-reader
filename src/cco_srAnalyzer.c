@@ -488,6 +488,58 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_fitPlace(cco_srAnalyzer *obj, cco_vSrPattern
 /**
  *
  */
+static cco_vString *marker_sample_image_filename;
+CCOSRANALYZER_STATUS cco_srAnalyzer_setMarkerSampleImageFile(char *filename)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	struct stat st;
+
+	if (stat(filename, &st) != 0)
+	{
+		return CCOSRANALYZER_STATUS_NOT_LOAD_IMAGE;
+	}
+	marker_sample_image_filename = cco_vString_new(filename);
+
+	return result;
+}
+
+/**
+ *
+ */
+CCOSRANALYZER_STATUS cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer *obj, double *accuracy, IplImage *image, CvRect *marker_rect)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+
+	IplImage *target_marker_img = NULL;
+	IplImage *target_marker_img_gray = NULL;
+	static IplImage *sample_image = NULL;
+
+	if (sample_image == NULL)
+	{
+		sample_image = cvLoadImage(marker_sample_image_filename->v_getCstring(marker_sample_image_filename), CV_LOAD_IMAGE_GRAYSCALE);
+	}
+
+	target_marker_img = (IplImage *)cvClone(image);
+	target_marker_img_gray = cvCreateImage(cvGetSize(image), IPL_DEPTH_8U, 1);
+	cvCvtColor(target_marker_img, target_marker_img_gray, CV_BGR2GRAY);
+	cvSetImageROI(target_marker_img_gray, *marker_rect);
+	 *accuracy = cvMatchShapes(target_marker_img_gray, sample_image, CV_CONTOURS_MATCH_I2, 0);
+	if (obj->srAnalyzer_debug >= 3)
+	{
+		cco_srAnalyzer_showShrinkedImageNow_withImage(obj,
+				"cco_srAnalyzer_findPatternsByMatchShapesFromArea: target marker",
+				target_marker_img_gray, 1);
+	}
+
+	cvReleaseImage(&target_marker_img_gray);
+	cvReleaseImage(&target_marker_img);
+
+	return result;
+}
+
+/**
+ *
+ */
 CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *image,
 		cco_arraylist *added_patternlist)
 {
@@ -592,17 +644,22 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 						rect_parent.height);
 				if (cco_vSrPattern_isPattern(parent_pattern, list_pattern_in_build))
 				{
-					/* Draws pattern to image. */
-					cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
-							rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
-							CV_RGB(255, 0, 0), 4, 8, 0);
+					double accuracy = 0.0;
+					cco_srAnalyzer_compareMarkerWithSampleImage(obj, &accuracy, image, &rect_parent);
+					if (accuracy < 0.15)	// XXX: must consider the appropriate value
+					{
+						/* Draws pattern to image. */
+						cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
+								rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
+								CV_RGB(255, 0, 0), 4, 8, 0);
 
-					/* Adds pattern to list of candidate. */
-					candidate_pattern = cco_vSrPattern_new();
-					cco_vSrPattern_setInInt(candidate_pattern, rect_parent.x, rect_parent.y,
-							rect_parent.width, rect_parent.height);
-					cco_arraylist_addAtBack(list_candidate_pattern, candidate_pattern);
-					cco_release(candidate_pattern);
+						/* Adds pattern to list of candidate. */
+						candidate_pattern = cco_vSrPattern_new();
+						cco_vSrPattern_setInInt(candidate_pattern, rect_parent.x, rect_parent.y,
+								rect_parent.width, rect_parent.height);
+						cco_arraylist_addAtBack(list_candidate_pattern, candidate_pattern);
+						cco_release(candidate_pattern);
+					}
 				}
 				cco_release(parent_pattern);
 			}

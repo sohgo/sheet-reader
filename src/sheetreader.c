@@ -202,6 +202,21 @@ int main(int argc, char *argv[])
 		free(tmp_cstring);
 		cco_safeRelease(tmp_string);
 
+		tmp_string = cco_vString_newWithFormat("%s/marker-sample.png", configdir);
+		tmp_cstring = tmp_string->v_getCstring(tmp_string);
+		analyzer_result = cco_srAnalyzer_setMarkerSampleImageFile(tmp_cstring);
+		if (analyzer_result != CCOSRANALYZER_STATUS_SUCCESS)
+		{
+			fprintf(stderr, "Error: Sample marker image file(%s) is not found\n", tmp_cstring);
+			result = analyzer_result;
+		}
+		free(tmp_cstring);
+		cco_safeRelease(tmp_string);
+		if (analyzer_result != CCOSRANALYZER_STATUS_SUCCESS)
+		{
+			break;
+		}
+
 		/* Counts usable srml. */
 		if (cco_srAnalyzer_countSheets(srAnalyzer) <= 0)
 		{
