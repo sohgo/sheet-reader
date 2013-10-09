@@ -153,7 +153,7 @@ int cco_vSrPattern_setInInt(cco_vSrPattern *obj, int x, int y, int width, int he
 	return result;
 }
 
-int cco_vSrPattern_isInside(cco_vSrPattern *obj, cco_vSrPattern *inside_obj)
+inline int cco_vSrPattern_isInside(cco_vSrPattern *obj, cco_vSrPattern *inside_obj)
 {
 	int result = 0;
 
@@ -167,7 +167,7 @@ int cco_vSrPattern_isInside(cco_vSrPattern *obj, cco_vSrPattern *inside_obj)
 	return result;
 }
 
-int cco_vSrPattern_isSquare(cco_vSrPattern *obj)
+inline int cco_vSrPattern_isSquare(cco_vSrPattern *obj)
 {
 	float rate;
 	int result = 0;
@@ -185,7 +185,7 @@ int cco_vSrPattern_isSquare(cco_vSrPattern *obj)
 	return result;
 }
 
-int cco_vSrPattern_isRectangle1to2(cco_vSrPattern *obj)
+inline int cco_vSrPattern_isRectangle1to2(cco_vSrPattern *obj)
 {
 	float rate;
 	int result = 0;

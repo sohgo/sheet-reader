@@ -620,12 +620,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 				rect_child = cvBoundingRect(seq_conturs_child, 0);
 				cco_vSrPattern_set(pattern_child, rect_child.x, rect_child.y, rect_child.width,
 						rect_child.height);
+				if (!cco_vSrPattern_isInside(pattern_parent, pattern_child))
+					continue;
 //				if (!cco_vSrPattern_isSquare(pattern_child))
 //					continue;
 				if (cco_vSrPattern_isSquare(pattern_child) != 0
 						&& cco_vSrPattern_isRectangle1to2(pattern_child) != 0)
-					continue;
-				if (!cco_vSrPattern_isInside(pattern_parent, pattern_child))
 					continue;
 
 				/* Adds a child square to build a pattern. */
