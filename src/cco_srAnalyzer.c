@@ -506,7 +506,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_setMarkerSampleImageFile(char *filename)
 /**
  *
  */
-CCOSRANALYZER_STATUS cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer *obj, double *accuracy, IplImage *image, CvRect *marker_rect)
+CCOSRANALYZER_STATUS cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer *obj, double *out_accuracy, IplImage *image, CvRect *marker_rect)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 
@@ -523,7 +523,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer 
 	target_marker_img_gray = cvCreateImage(cvGetSize(image), IPL_DEPTH_8U, 1);
 	cvCvtColor(target_marker_img, target_marker_img_gray, CV_BGR2GRAY);
 	cvSetImageROI(target_marker_img_gray, *marker_rect);
-	 *accuracy = cvMatchShapes(target_marker_img_gray, sample_image, CV_CONTOURS_MATCH_I2, 0);
+	*out_accuracy = cvMatchShapes(target_marker_img_gray, sample_image, CV_CONTOURS_MATCH_I2, 0);
 	if (obj->srAnalyzer_debug >= 3)
 	{
 		cco_srAnalyzer_showShrinkedImageNow_withImage(obj,
