@@ -646,7 +646,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 				{
 					double accuracy = 0.0;
 					cco_srAnalyzer_compareMarkerWithSampleImage(obj, &accuracy, image, &rect_parent);
-					if (accuracy < 0.16)	// XXX: must consider the appropriate value
+					if (accuracy < 0.2)	// XXX: must consider the appropriate value
 					{
 						/* Draws pattern to image. */
 						cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
