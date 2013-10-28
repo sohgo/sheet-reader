@@ -219,7 +219,7 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 		free(tmp1_cstring);
 		tmp1_cstring = NULL;
 
-		cmdppmtopgm_string = cco_vString_newWithFormat("ppmtopgm %@ > %@", tmpppm_string, tmppgm_string);
+		cmdppmtopgm_string = cco_vString_newWithFormat("ppmtopgm --quiet %@ > %@", tmpppm_string, tmppgm_string);
 		tmp1_cstring = cmdppmtopgm_string->v_getCstring(cmdppmtopgm_string);
 		system(tmp1_cstring);
 		free(tmp1_cstring);

@@ -341,7 +341,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 		free(tmp1_cstring);
 		tmp1_cstring = NULL;
 
-		cmdppmtobmp_string = cco_vString_newWithFormat("ppmtobmp %@ > %@", tmpppm_string, tmpbmp_string);
+		cmdppmtobmp_string = cco_vString_newWithFormat("ppmtobmp --quiet %@ > %@", tmpppm_string, tmpbmp_string);
 		tmp1_cstring = cmdppmtobmp_string->v_getCstring(cmdppmtobmp_string);
 		system(tmp1_cstring);
 		free(tmp1_cstring);
