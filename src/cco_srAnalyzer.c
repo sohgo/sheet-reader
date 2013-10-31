@@ -506,7 +506,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_setMarkerSampleImageFile(char *filename)
 /**
  *
  */
-CCOSRANALYZER_STATUS cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer *obj, double *out_accuracy, IplImage *image, CvRect *marker_rect)
+CCOSRANALYZER_STATUS cco_srAnalyzer_getAccuracyByComparingWithSampleMarker(cco_srAnalyzer *obj, double *out_accuracy, IplImage *image, CvRect *marker_rect)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 
@@ -527,13 +527,118 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer 
 	if (obj->srAnalyzer_debug >= 3)
 	{
 		cco_srAnalyzer_showShrinkedImageNow_withImage(obj,
-				"cco_srAnalyzer_findPatternsByMatchShapesFromArea: target marker",
+				"cco_srAnalyzer_getAccuracyByComparingWithSampleMarker: target marker",
 				target_marker_img_gray, 1);
 	}
 
 	cvReleaseImage(&target_marker_img_gray);
 	cvReleaseImage(&target_marker_img);
 
+	return result;
+}
+
+/**
+ *
+ */
+int cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer *obj, IplImage *image, CvRect *marker_rect)
+{
+	int result = 0;
+
+	double accuracy = 0.0;
+	const double accuracy_threshold = 0.2;	// XXX: must consider the appropriate value
+	cco_srAnalyzer_getAccuracyByComparingWithSampleMarker(obj, &accuracy, image, marker_rect);
+	if (obj->srAnalyzer_debug >= 1)
+	{
+		fprintf(stderr, "Compare the marker with sample marker: target marker's accuracy=%lf: threshold=%lf\n", accuracy, accuracy_threshold);
+	}
+	if (accuracy < accuracy_threshold)
+	{
+		result = 1;
+	}
+	return result;
+}
+
+/**
+ *
+ */
+CCOSRANALYZER_STATUS cco_srAnalyzer_getTop3PatternByComparingWithSampleMarker(cco_srAnalyzer *obj,
+		cco_arraylist *list_candidate_pattern, cco_arraylist *out_top3_patterns)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	int num_of_patterns = cco_arraylist_length(list_candidate_pattern);
+	struct patterns_with_accuracy
+	{
+		double accuracy;
+		cco_vSrPattern *pattern;
+	} patterns[num_of_patterns];
+	double accuracy_list[num_of_patterns];
+	cco_vSrPattern *pattern = NULL;
+	int i = 0;
+	int j = 0;
+
+	int compare_accuracy(const void* v1, const void* v2)
+	{
+		const double *p1 = (double *)v1;
+		const double *p2 = (double *)v2;
+		if (*p1 > *p2)
+			return 1;
+		else if (*p1 < *p2)
+			return -1;
+		else
+			return 0;
+
+	}
+
+	cco_arraylist_setCursorAtFront(list_candidate_pattern);
+	while ((pattern = (cco_vSrPattern *) cco_arraylist_getAtCursor(list_candidate_pattern)) != NULL && i < num_of_patterns)
+	{
+		CvRect rect;
+		rect.x = pattern->vSrPattern_x;
+		rect.y = pattern->vSrPattern_y;
+		rect.width = pattern->vSrPattern_width;
+		rect.height = pattern->vSrPattern_height;
+		patterns[i].pattern = pattern;
+		cco_srAnalyzer_getAccuracyByComparingWithSampleMarker(obj, &patterns[i].accuracy, obj->srAnalyzer_img, &rect);
+		accuracy_list[i] = patterns[i].accuracy;
+		cco_arraylist_setCursorAtNext(list_candidate_pattern);
+		++i;
+	}
+	qsort(accuracy_list, num_of_patterns, sizeof(double), compare_accuracy);
+	IplImage *tmp_img = (IplImage *)cvClone(obj->srAnalyzer_img);
+	for (i = 0; i < num_of_patterns; i++)	// keep the order as we can do
+	{
+		for (j = 0; j < 3; j++) {
+			if (patterns[i].accuracy == accuracy_list[j])
+			{
+				cco_arraylist_addAtBack(out_top3_patterns, patterns[i].pattern);
+				if (obj->srAnalyzer_debug >= 2)
+				{
+					cvRectangle(tmp_img, cvPoint(patterns[i].pattern->vSrPattern_x, patterns[i].pattern->vSrPattern_y),
+							cvPoint(patterns[i].pattern->vSrPattern_x + patterns[i].pattern->vSrPattern_width,
+								patterns[i].pattern->vSrPattern_y + patterns[i].pattern->vSrPattern_height),
+							CV_RGB(255,0,0), 4, 8, 0);
+				}
+				break;
+			}
+		}
+	}
+	if (obj->srAnalyzer_debug >= 2)
+	{
+		cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "cco_srAnalyzer_getTop3PatternByComparingWithSampleMarker: top3 patterns", tmp_img, 3);
+	}
+	cvReleaseImage(&tmp_img);
+
+	return result;
+}
+
+/**
+ *
+ */
+CCOSRANALYZER_STATUS cco_srAnalyzer_getTop3Pattern(cco_srAnalyzer *obj,
+		cco_arraylist *list_candidate_pattern, cco_arraylist *out_top3_patterns)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	result = cco_srAnalyzer_getTop3PatternByComparingWithSampleMarker(obj, list_candidate_pattern, out_top3_patterns);
 	return result;
 }
 
@@ -644,22 +749,17 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 						rect_parent.height);
 				if (cco_vSrPattern_isPattern(parent_pattern, list_pattern_in_build))
 				{
-					double accuracy = 0.0;
-					cco_srAnalyzer_compareMarkerWithSampleImage(obj, &accuracy, image, &rect_parent);
-					if (accuracy < 0.2)	// XXX: must consider the appropriate value
-					{
-						/* Draws pattern to image. */
-						cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
-								rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
-								CV_RGB(255, 0, 0), 4, 8, 0);
+					/* Draws pattern to image. */
+					cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
+							rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
+							CV_RGB(255, 0, 0), 4, 8, 0);
 
-						/* Adds pattern to list of candidate. */
-						candidate_pattern = cco_vSrPattern_new();
-						cco_vSrPattern_setInInt(candidate_pattern, rect_parent.x, rect_parent.y,
-								rect_parent.width, rect_parent.height);
-						cco_arraylist_addAtBack(list_candidate_pattern, candidate_pattern);
-						cco_release(candidate_pattern);
-					}
+					/* Adds pattern to list of candidate. */
+					candidate_pattern = cco_vSrPattern_new();
+					cco_vSrPattern_setInInt(candidate_pattern, rect_parent.x, rect_parent.y,
+							rect_parent.width, rect_parent.height);
+					cco_arraylist_addAtBack(list_candidate_pattern, candidate_pattern);
+					cco_release(candidate_pattern);
 				}
 				cco_release(parent_pattern);
 			}
@@ -803,6 +903,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_examineImageToFindPattern(cco_srAnalyzer *ob
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 	cco_arraylist *list_candidate_pattern = NULL;
+	cco_arraylist *list_top3_candidate_pattern = NULL;
 	cco_vSrPattern *upperleft = NULL;
 	cco_vSrPattern *upperright = NULL;
 	cco_vSrPattern *bottomleft = NULL;
@@ -818,14 +919,17 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_examineImageToFindPattern(cco_srAnalyzer *ob
 		/* Count the pattern of adjust to check an error. */
 		if (obj->srAnalyzer_debug >= 1)
 			printf("number of patterns found:%d\n", cco_arraylist_length(list_candidate_pattern));
+		list_top3_candidate_pattern = cco_arraylist_new();
 		result = cco_srAnalyzer_countPatterns(obj, list_candidate_pattern);
 		if (result != CCOSRANALYZER_STATUS_SUCCESS)
 		{
-			break;
+			if (obj->srAnalyzer_debug >= 1)
+				printf("use top 3 patterns from %d patterns\n", cco_arraylist_length(list_candidate_pattern));
+			result = cco_srAnalyzer_getTop3Pattern(obj, list_candidate_pattern, list_top3_candidate_pattern);
 		}
-		upperleft = (cco_vSrPattern *) cco_arraylist_getAt(list_candidate_pattern, 0);
-		upperright = (cco_vSrPattern *) cco_arraylist_getAt(list_candidate_pattern, 1);
-		bottomleft = (cco_vSrPattern *) cco_arraylist_getAt(list_candidate_pattern, 2);
+		upperleft = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 0);
+		upperright = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 1);
+		bottomleft = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 2);
 		result = cco_srAnalyzer_fitPlace(obj, &upperleft, &bottomleft, &upperright);
 		if (result != CCOSRANALYZER_STATUS_SUCCESS)
 		{
@@ -840,6 +944,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_examineImageToFindPattern(cco_srAnalyzer *ob
 		obj->srAnalyzer_pattern_upperright = cco_get(upperright);
 	} while (0);
 	cco_release(list_candidate_pattern);
+	cco_release(list_top3_candidate_pattern);
 	cco_release(upperleft);
 	cco_release(upperright);
 	cco_release(bottomleft);
