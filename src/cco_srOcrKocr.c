@@ -172,7 +172,7 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 	ocr = obj;
 
 #ifdef KOCR
-	// load databases
+	/* load databases */
 	if (db_num == NULL)
 #ifdef USE_SVM
 		db_num = kocr_svm_init(dircat(ocrdb_dir, DB_FILE_NUM));
@@ -327,9 +327,9 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 			break;
 		}
 
-		//
-		// ppm to bmp conversion (what's the original format here?)
-		//
+		/*
+		 * ppm to bmp conversion (what's the original format here?)
+		 */
 		tmpppm_string = cco_vString_newWithFormat("%s.ppm", ocrobj->srOcrKocr_filename);
 		tmpbmp_string = cco_vString_newWithFormat("%s.bmp", ocrobj->srOcrKocr_filename);
 		tmptxt_string = cco_vString_newWithFormat("%s.txt", ocrobj->srOcrKocr_filename);
@@ -347,9 +347,9 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 		free(tmp1_cstring);
 		tmp1_cstring = NULL;
 
-		//
-		// OCR processing
-		//
+		/*
+		 * OCR processing
+		 */
 #ifdef KOCR
 		{
 			char *fn = tmpbmp_string->v_getCstring(tmpbmp_string);
@@ -358,7 +358,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 #else
 			char *rc = kocr_recognize_image((feature_db *) ocrobj->srOcrKocr_db, (char *) fn);
 #endif
-			cco_release(*recognizedString); // needed?
+			cco_release(*recognizedString); /* needed? */
 			if (rc) {
 				tmp1_string = cco_vString_new(rc);
 				cco_vString_replaceWithCstring(tmp1_string, "m", "○");

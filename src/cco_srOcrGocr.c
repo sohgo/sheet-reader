@@ -269,9 +269,9 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 		cco_vString_replaceWithCstring(tmp1_string, "b", "×");
 		cco_vString_replaceWithCstring(tmp1_string, "s", "△");
 		*recognizedString = cco_vString_getReplacedStringWithCstring(tmp1_string, " ", "");
-		//*recognizedString = cco_vString_getReplacedStringWithCstring(tmp2_string, "[ijflI]", "1");
+		/* *recognizedString = cco_vString_getReplacedStringWithCstring(tmp2_string, "[ijflI]", "1"); */
 		cco_release(tmp1_string);
-		//cco_release(tmp2_string);
+		/* cco_release(tmp2_string); */
 	} while (0);
 	if (tmp1_cstring != NULL)
 	{

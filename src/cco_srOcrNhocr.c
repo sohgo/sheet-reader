@@ -211,9 +211,9 @@ CCOSROCR_STATUS cco_srOcrNhocr_getRecognizeString(void *obj, cco_vString **recog
 		cco_srOcrNhocr_getRecognizeString_currn(ocrobj, recognize_buff);
 		tmp1_string = cco_vString_new(recognize_buff);
 		*recognizedString = cco_vString_getReplacedStringWithCstring(tmp1_string, " ", "");
-		//*recognizedString = cco_vString_getReplacedStringWithCstring(tmp2_string, "[ijflI]", "1");
+		/* *recognizedString = cco_vString_getReplacedStringWithCstring(tmp2_string, "[ijflI]", "1"); */
 		cco_release(tmp1_string);
-		//cco_release(tmp2_string);
+		/* cco_release(tmp2_string); */
 	} while (0);
 	if (getenv_cstring != NULL)
 	{

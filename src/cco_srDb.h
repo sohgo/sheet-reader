@@ -25,7 +25,7 @@
 #include <cluscore/cco.h>
 #include <cluscore/cco_vString.h>
 #include <mysql/mysql.h>
-//#include <mysql/my_global.h>
+/* #include <mysql/my_global.h> */
 
 #define CCO_SRDB_PROPERTIES \
 	MYSQL *cco_srDb_mysql;\

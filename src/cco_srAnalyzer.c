@@ -39,7 +39,7 @@
 
 #include "cco_srOcrKocr.h"
 #include "cco_srOcrGocr.h"
-// #include "cco_srOcrNhocr.h"
+/* #include "cco_srOcrNhocr.h" */
 
 #include "cco_vSrPattern.h"
 #include "cco_srMl.h"
@@ -96,7 +96,7 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 	o->srAnalyzer_save_prefix = cco_vString_new("");
 	o->srAnalyzer_backup_image = cco_vString_new("");
 #ifdef KOCR
-	o->srAnalyzer_ocr = cco_vString_new("kocr"); // nhocr
+	o->srAnalyzer_ocr = cco_vString_new("kocr"); /* nhocr */
 #else
 	o->srAnalyzer_ocr = cco_vString_new("gocr");
 #endif
@@ -545,7 +545,7 @@ int cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer *obj, IplImage *i
 	int result = 0;
 
 	double accuracy = 0.0;
-	const double accuracy_threshold = 0.2;	// XXX: must consider the appropriate value
+	const double accuracy_threshold = 0.2;	/* XXX: must consider the appropriate value */
 	cco_srAnalyzer_getAccuracyByComparingWithSampleMarker(obj, &accuracy, image, marker_rect);
 	if (obj->srAnalyzer_debug >= 1)
 	{
@@ -605,7 +605,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getTop3PatternByComparingWithSampleMarker(cc
 	}
 	qsort(accuracy_list, num_of_patterns, sizeof(double), compare_accuracy);
 	IplImage *tmp_img = (IplImage *)cvClone(obj->srAnalyzer_img);
-	for (i = 0; i < num_of_patterns; i++)	// keep the order as we can do
+	for (i = 0; i < num_of_patterns; i++)	/* keep the order as long as we can do */
 	{
 		for (j = 0; j < 3; j++) {
 			if (patterns[i].accuracy == accuracy_list[j])
@@ -727,8 +727,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 						rect_child.height);
 				if (!cco_vSrPattern_isInside(pattern_parent, pattern_child))
 					continue;
-//				if (!cco_vSrPattern_isSquare(pattern_child))
-//					continue;
+				/* if (!cco_vSrPattern_isSquare(pattern_child))
+					continue; */
 				if (cco_vSrPattern_isSquare(pattern_child) != 0
 						&& cco_vSrPattern_isRectangle1to2(pattern_child) != 0)
 					continue;
@@ -844,7 +844,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findBoxes(cco_srAnalyzer *obj, IplImage *ima
 			}
 			if (rate_height < 0.85 || rate_width < 0.85)
 			{
-				//continue;
+				/* continue; */
 			}
 			pattern_parent = cco_vSrPattern_new();
 			cco_vSrPattern_set(pattern_parent, rect_parent.x, rect_parent.y, rect_parent.width,
@@ -898,7 +898,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ThresholdImageToOcr(cco_srAnalyzer *obj, Ipl
 	return result;
 }
 
-// find 3 markers from a fax image
+/*
+ * find 3 markers from a fax image
+ */
 CCOSRANALYZER_STATUS cco_srAnalyzer_examineImageToFindPattern(cco_srAnalyzer *obj)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
@@ -1302,7 +1304,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 		scale_x = offset_width / offset_width_excel;
 		scale_y = offset_height / offset_height_excel;
 
-		// size of the upper-left marker
+		/* size of the upper-left marker */
 		marker_width  = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list,  -1) * scale_x;
 		marker_height = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, -1) * scale_y;
 
@@ -1386,7 +1388,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				pattern_y += offset_y;
 				while (pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
 				{
-					// First, check the position
+					/* First, check the position */
 					if (pattern->vSrPattern_x < pattern_x
 							&& (pattern->vSrPattern_x + pattern->vSrPattern_width) > pattern_x
 							&& pattern->vSrPattern_y < pattern_y
@@ -1395,7 +1397,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 						if (obj->srAnalyzer_debug >= 1) {
 							printf("%s:%s\n", __func__, "find a target within an expected area.");
 						}
-						// Second, check the size of pattern. If it is small(rate is less than 85%), it will be ignored.
+						/* Second, check the size of pattern. If it is small(rate is less than 85%), it will be ignored. */
 						float rate_width  = 0.0;
 						float rate_height = 0.0;
 						if (pattern->vSrPattern_width < current_cell_width_scaled)
@@ -1406,7 +1408,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 						{
 							rate_height = pattern->vSrPattern_height / current_cell_height_scaled;
 						}
-						//if (rate_height < 0.85 || rate_width < 0.85)
+						/* if (rate_height < 0.85 || rate_width < 0.85) */
 						if (rate_height < 0.5)
 						{
 							if (obj->srAnalyzer_debug >= 1) {
