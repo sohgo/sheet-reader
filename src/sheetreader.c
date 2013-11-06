@@ -181,8 +181,8 @@ int main(int argc, char *argv[])
 		cco_safeRelease(srAnalyzer->srAnalyzer_sid);
 		srAnalyzer->srAnalyzer_sid = cco_get(sheetid_string);
 
-		cco_safeRelease(srAnalyzer->srAnalyzer_ocr);
-		srAnalyzer->srAnalyzer_ocr = cco_get(ocr_string);
+		cco_safeRelease(srAnalyzer->srAnalyzer_ocr_type);
+		srAnalyzer->srAnalyzer_ocr_type = cco_get(ocr_string);
 
 		if (configdir == NULL)
 		{

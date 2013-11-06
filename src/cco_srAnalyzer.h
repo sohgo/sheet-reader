@@ -49,7 +49,7 @@
 	cco_vString *srAnalyzer_outSql;\
 	cco_vString *srAnalyzer_outProp;\
 	cco_vString *srAnalyzer_out;\
-	cco_vString *srAnalyzer_ocr;\
+	cco_vString *srAnalyzer_ocr_type;\
 	cco_vXml *srAnalyzer_analyzedSrml;\
 	cco_redblacktree *srAnalyzer_analyzedData;\
 	int srAnalyzer_debug;

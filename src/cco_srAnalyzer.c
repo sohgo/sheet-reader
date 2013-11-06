@@ -96,9 +96,9 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 	o->srAnalyzer_save_prefix = cco_vString_new("");
 	o->srAnalyzer_backup_image = cco_vString_new("");
 #ifdef KOCR
-	o->srAnalyzer_ocr = cco_vString_new("kocr"); /* nhocr */
+	o->srAnalyzer_ocr_type = cco_vString_new("kocr"); /* nhocr */
 #else
-	o->srAnalyzer_ocr = cco_vString_new("gocr");
+	o->srAnalyzer_ocr_type = cco_vString_new("gocr");
 #endif
 	time(&time_val);
 	localtime_r(&time_val, &tm_val);
@@ -128,7 +128,7 @@ void cco_srAnalyzer_baseFinalize(cco_srAnalyzer *o)
 	cco_release(o->srAnalyzer_receiver);
 	cco_release(o->srAnalyzer_save_prefix);
 	cco_release(o->srAnalyzer_backup_image);
-	cco_release(o->srAnalyzer_ocr);
+	cco_release(o->srAnalyzer_ocr_type);
 	cco_release(o->srAnalyzer_outXml);
 	cco_release(o->srAnalyzer_outSql);
 	cco_release(o->srAnalyzer_out);
@@ -1325,7 +1325,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 		}
 		close(tmpfilefd);
 
-		ocrtype = obj->srAnalyzer_ocr->v_getCstring(obj->srAnalyzer_ocr);
+		ocrtype = obj->srAnalyzer_ocr_type->v_getCstring(obj->srAnalyzer_ocr_type);
 
 		xml_blockOcrs = cco_vXml_getElements(sheet->srMlSheet_xml, "properties/blockOcr");
 		cco_arraylist_setCursorAtFront(xml_blockOcrs);
