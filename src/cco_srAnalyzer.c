@@ -921,6 +921,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_examineImageToFindPattern(cco_srAnalyzer *ob
 		/* Count the pattern of adjust to check an error. */
 		if (obj->srAnalyzer_debug >= 1)
 			printf("number of patterns found:%d\n", cco_arraylist_length(list_candidate_pattern));
+		upperleft = (cco_vSrPattern *) cco_arraylist_getAt(list_candidate_pattern, 0);
+		upperright = (cco_vSrPattern *) cco_arraylist_getAt(list_candidate_pattern, 1);
+		bottomleft = (cco_vSrPattern *) cco_arraylist_getAt(list_candidate_pattern, 2);
+
 		list_top3_candidate_pattern = cco_arraylist_new();
 		result = cco_srAnalyzer_countPatterns(obj, list_candidate_pattern);
 		if (result != CCOSRANALYZER_STATUS_SUCCESS)
@@ -928,10 +932,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_examineImageToFindPattern(cco_srAnalyzer *ob
 			if (obj->srAnalyzer_debug >= 1)
 				printf("use top 3 patterns from %d patterns\n", cco_arraylist_length(list_candidate_pattern));
 			result = cco_srAnalyzer_getTop3Pattern(obj, list_candidate_pattern, list_top3_candidate_pattern);
+			upperleft = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 0);
+			upperright = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 1);
+			bottomleft = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 2);
 		}
-		upperleft = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 0);
-		upperright = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 1);
-		bottomleft = (cco_vSrPattern *) cco_arraylist_getAt(list_top3_candidate_pattern, 2);
 		result = cco_srAnalyzer_fitPlace(obj, &upperleft, &bottomleft, &upperright);
 		if (result != CCOSRANALYZER_STATUS_SUCCESS)
 		{
