@@ -50,6 +50,8 @@
 cco_defineClass(cco_srAnalyzer)
 ;
 
+int cco_srAnalyzer_setOcrObj(cco_srAnalyzer *obj, cco_vString *ocr_type);
+
 cco_srAnalyzer *cco_srAnalyzer_baseNew(int size)
 {
 	cco_srAnalyzer *o = NULL;
@@ -100,6 +102,8 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 #else
 	o->srAnalyzer_ocr_type = cco_vString_new("gocr");
 #endif
+	o->srAnalyzer_ocr_obj = NULL;
+	cco_srAnalyzer_setOcrObj(o, o->srAnalyzer_ocr_type);
 	time(&time_val);
 	localtime_r(&time_val, &tm_val);
     strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", &tm_val);
@@ -129,6 +133,7 @@ void cco_srAnalyzer_baseFinalize(cco_srAnalyzer *o)
 	cco_release(o->srAnalyzer_save_prefix);
 	cco_release(o->srAnalyzer_backup_image);
 	cco_release(o->srAnalyzer_ocr_type);
+	cco_release(o->srAnalyzer_ocr_obj);
 	cco_release(o->srAnalyzer_outXml);
 	cco_release(o->srAnalyzer_outSql);
 	cco_release(o->srAnalyzer_out);
@@ -146,6 +151,60 @@ cco_srAnalyzer *cco_srAnalyzer_new()
 void cco_srAnalyzer_release(void *o)
 {
 	cco_release(o);
+}
+
+struct ocr_engine
+{
+	char *ocr_type_name;
+	cco_srOcr* (*factory)();
+};
+
+static struct ocr_engine ocr_engine_list[] = {
+	{ "gocr", (cco_srOcr* (*)())cco_srOcrGocr_new },
+	/* { "nhocr", (cco_srOcr* (*)())cco_srOcrNhocr_new }, */
+#ifdef KOCR
+	{ "kocr", (cco_srOcr* (*)())cco_srOcrKocr_new },
+#endif
+};
+
+int cco_srAnalyzer_setOcrObj(cco_srAnalyzer *obj, cco_vString *ocr_type)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	char *ocr_type_name_in_use = ocr_type->v_getCstring(ocr_type);
+	int supported_ocr_engine_flag = 0;
+	struct ocr_engine *cur_ptr;
+	for (cur_ptr = ocr_engine_list; cur_ptr != NULL; cur_ptr++)
+	{
+		if (strcmp(cur_ptr->ocr_type_name, ocr_type_name_in_use) == 0)
+		{
+			cco_safeRelease(obj->srAnalyzer_ocr_obj);
+			obj->srAnalyzer_ocr_obj = (cco_srOcr *)cur_ptr->factory();
+			supported_ocr_engine_flag = 1;
+			break;
+		}
+	}
+	if (supported_ocr_engine_flag == 0)
+	{
+		result = CCOSRANALYZER_STATUS_UNSUPPORTED_OCR_ENGINE;
+	}
+	return result;
+}
+
+CCOSRANALYZER_STATUS cco_srAnalyzer_setOcrEngine(cco_srAnalyzer *obj, char *ocr_type_name)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	int result1 = 0;
+
+	cco_safeRelease(obj->srAnalyzer_ocr_type);
+	obj->srAnalyzer_ocr_type = cco_vString_new(ocr_type_name);
+	result1 = cco_srAnalyzer_setOcrObj(obj, obj->srAnalyzer_ocr_type);
+	if (result1 == CCOSRANALYZER_STATUS_UNSUPPORTED_OCR_ENGINE)
+	{
+		/* exception */
+		fprintf(stderr, "unsupported OCR engine:%s\n", ocr_type_name);
+		exit(result1);
+	}
+	return result;
 }
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_ThresholdImageToOcr(cco_srAnalyzer *obj, IplImage *img,
@@ -605,7 +664,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getTop3PatternByComparingWithSampleMarker(cc
 	}
 	qsort(accuracy_list, num_of_patterns, sizeof(double), compare_accuracy);
 	IplImage *tmp_img = (IplImage *)cvClone(obj->srAnalyzer_img);
-	for (i = 0; i < num_of_patterns; i++)	/* keep the order as long as we can do */
+	for (i = 0; i < num_of_patterns; i++)	/* keep the order as far as we can */
 	{
 		for (j = 0; j < 3; j++) {
 			if (patterns[i].accuracy == accuracy_list[j])
@@ -1132,7 +1191,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getIdFromImage(cco_srAnalyzer *obj, cco_vSrP
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_vSrPattern *upperleft,
 		cco_vSrPattern *bottomleft, cco_vSrPattern *upperright, cco_vString **out_uid,
-		cco_vString **out_sid)
+		cco_vString **out_sid, char *ocr_db)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 	cco_vString *tmp_string = NULL;
@@ -1146,11 +1205,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 	int smooth;
 
 	do {
-#ifdef KOCR
-		ocr = (cco_srOcr *) cco_srOcrKocr_new();
-#else
-		ocr = (cco_srOcr *) cco_srOcrGocr_new();
-#endif
+		ocr = obj->srAnalyzer_ocr_obj;
 		width = (upperleft->vSrPattern_width + bottomleft->vSrPattern_width
 				+ upperright->vSrPattern_width) / 3.0;
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
@@ -1174,7 +1229,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 				upperleft->vSrPattern_y,
 				(width * 5), height, smooth, 150);
 		ocr->srOcr_setImage(ocr, tmpfiletif);
-		ocr->srOcr_setOption(ocr, "idocrbs");
+		ocr->srOcr_setOption(ocr, ocr_db);
 		ocr->srOcr_getRecognizeString(ocr, out_uid);
 		remove(tmpfiletif);
 
@@ -1186,7 +1241,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 				bottomleft->vSrPattern_y,
 				(width * 5), height, smooth, 150);
 		ocr->srOcr_setImage(ocr, tmpfiletif);
-		ocr->srOcr_setOption(ocr, "idocrbs");
+		ocr->srOcr_setOption(ocr, ocr_db);
 		ocr->srOcr_getRecognizeString(ocr, out_sid);
 		if (obj->srAnalyzer_debug >= 1)
 		{
@@ -1199,7 +1254,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 		remove(tmpfiletif);
 		remove(tmpfile);
 	} while (0);
-	cco_safeRelease(ocr);
 	cco_safeRelease(tmp_string);
 	return result;
 }
@@ -1277,7 +1331,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	int index_colspan;
 	cco_srOcr *ocr = NULL;
 	cco_vString *recognized_string = NULL;
-	char *ocrtype = NULL;
 	IplImage *img_tmp = NULL;
 
 	char tmpfile[512];
@@ -1328,8 +1381,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			break;
 		}
 		close(tmpfilefd);
-
-		ocrtype = obj->srAnalyzer_ocr_type->v_getCstring(obj->srAnalyzer_ocr_type);
 
 		xml_blockOcrs = cco_vXml_getElements(sheet->srMlSheet_xml, "properties/blockOcr");
 		cco_arraylist_setCursorAtFront(xml_blockOcrs);
@@ -1475,16 +1526,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				}
 				cco_safeRelease(pattern);
 				/* creates an ocr engine. */
-				if (strcmp(ocrtype, "gocr") == 0)
-				{
-					ocr = (cco_srOcr *) cco_srOcrGocr_new();
-				} else {
-#ifdef KOCR
-					ocr = (cco_srOcr *) cco_srOcrKocr_new();
-#else
-					ocr = (cco_srOcr *) cco_srOcrGocr_new();
-#endif
-				}
+				ocr = obj->srAnalyzer_ocr_obj;
 				ocr->srOcr_setImage(ocr, tmp_cstring);
 				if (xml_attr_option != NULL)
 				{
@@ -1537,10 +1579,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 		cco_safeRelease(xml_blockOcrs);
 	} while (0);
 	cco_safeRelease(list_candidate_pattern);
-	if (ocrtype != NULL)
-	{
-		free(ocrtype);
-	}
 	if (obj->srAnalyzer_debug >= 2)
 	{
 		cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "ocr", img_tmp, 3);
@@ -1688,12 +1726,73 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	return result;
 }
 
+CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetIdsFromImage(cco_srAnalyzer *obj, char *ocr_db, int force_set_uid, int force_set_sid)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	cco_vString *userid = NULL;
+	cco_vString *sheetid = NULL;
+
+	do
+	{
+		cco_srAnalyzer_getOcrbIdFromImage(obj, obj->srAnalyzer_pattern_upperleft,
+				obj->srAnalyzer_pattern_bottomleft, obj->srAnalyzer_pattern_upperright,
+				&userid, &sheetid, ocr_db);
+		if (force_set_uid)
+		{
+			cco_safeRelease(obj->srAnalyzer_uid);
+			obj->srAnalyzer_uid = cco_get(userid);
+		}
+		if (force_set_sid)
+		{
+			cco_safeRelease(obj->srAnalyzer_sid);
+			obj->srAnalyzer_sid = cco_get(sheetid);
+		}
+	} while (0);
+	cco_safeRelease(userid);
+	cco_safeRelease(sheetid);
+	return result;
+}
+
+CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetSheetAndSurveyIds(cco_srAnalyzer *obj)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	int is_uid_specified_in_cmd_line = 0;
+	int is_sid_specified_in_cmd_line = 0;
+
+	do
+	{
+		if (cco_vString_length(obj->srAnalyzer_uid) != 0)
+		{
+			is_uid_specified_in_cmd_line = 1;
+		}
+		if (cco_vString_length(obj->srAnalyzer_sid) != 0)
+		{
+			is_sid_specified_in_cmd_line = 1;
+		}
+#ifdef KOCR
+		/* try ocr by using kocr */
+		cco_srAnalyzer_setOcrEngine(obj, "kocr");
+		cco_srAnalyzer_ocrToGetIdsFromImage(obj, "idocrbs", !is_uid_specified_in_cmd_line, !is_sid_specified_in_cmd_line);
+		if (cco_vString_length(obj->srAnalyzer_sid) == 5)
+		{
+			break;
+		}
+#endif
+		/* try ocr by using gocr */
+		cco_srAnalyzer_setOcrEngine(obj, "gocr");
+		cco_srAnalyzer_ocrToGetIdsFromImage(obj, "number", !is_uid_specified_in_cmd_line, !is_sid_specified_in_cmd_line);
+		if (cco_vString_length(obj->srAnalyzer_sid) == 5)
+		{
+			break;
+		}
+	} while (0);
+	return result;
+}
+
 CCOSRANALYZER_STATUS cco_srAnalyzer_ocr(cco_srAnalyzer *obj)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 	cco_srMlSheet *sheet = NULL;
-	cco_vString *userid = NULL;
-	cco_vString *sheetid = NULL;
 
 	do
 	{
@@ -1703,36 +1802,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocr(cco_srAnalyzer *obj)
 		{
 			break;
 		}
-
-		/* gets the code of new version. */
-		cco_srAnalyzer_getOcrbIdFromImage(obj, obj->srAnalyzer_pattern_upperleft,
-				obj->srAnalyzer_pattern_bottomleft, obj->srAnalyzer_pattern_upperright,
-				&userid, &sheetid);
-		if (cco_vString_length(obj->srAnalyzer_uid) == 0)
+		/* get a sheet ID and a survey ID */
+		result = cco_srAnalyzer_ocrToGetSheetAndSurveyIds(obj);
+		if (result != CCOSRANALYZER_STATUS_SUCCESS)
 		{
-			cco_safeRelease(obj->srAnalyzer_uid);
-			obj->srAnalyzer_uid = cco_get(userid);
+			break;
 		}
-		if (cco_vString_length(obj->srAnalyzer_sid) == 0)
-		{
-			cco_safeRelease(obj->srAnalyzer_sid);
-			obj->srAnalyzer_sid = cco_get(sheetid);
-		}
-		cco_safeRelease(userid);
-		cco_safeRelease(sheetid);
-		if (cco_vString_length(obj->srAnalyzer_sid) != 5)
-		{
-			/* if could not get the code of new version */
-			/* gets the code of old version. */
-			cco_srAnalyzer_getIdFromImage(obj, obj->srAnalyzer_pattern_upperleft,
-					obj->srAnalyzer_pattern_bottomleft, obj->srAnalyzer_pattern_upperright,
-					&userid, &sheetid);
-			cco_safeRelease(obj->srAnalyzer_uid);
-			obj->srAnalyzer_uid = cco_get(userid);
-			cco_safeRelease(obj->srAnalyzer_sid);
-			obj->srAnalyzer_sid = cco_get(sheetid);
-		}
-
 		/* OCR */
 		sheet = cco_srMl_getSheet(obj->srAnalyzer_srml, obj->srAnalyzer_sid);
 		if (sheet == NULL)
@@ -1745,8 +1820,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocr(cco_srAnalyzer *obj)
 		cco_srAnalyzer_ocrProcBlockImg(obj, sheet, obj->srAnalyzer_analyzedData);
 	} while (0);
 	cco_safeRelease(sheet);
-	cco_safeRelease(userid);
-	cco_safeRelease(sheetid);
 	return result;
 }
 
@@ -2107,7 +2180,6 @@ int cco_srAnalyzer_readSrconf(cco_srAnalyzer *obj, char *file)
 	cco_release(ml);
 	return result;
 }
-
 
 int cco_srAnalyzer_showImage_createWindow(cco_srAnalyzer *obj, char* windowname, IplImage *img)
 {

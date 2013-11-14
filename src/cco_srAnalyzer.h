@@ -30,6 +30,7 @@
 #include "cco_vSrPattern.h"
 #include "cco_srMl.h"
 #include "cco_srConf.h"
+#include "cco_srOcr.h"
 
 #define CCO_SRANALYZER_PROPERTIES \
 	IplImage *srAnalyzer_img;\
@@ -50,6 +51,7 @@
 	cco_vString *srAnalyzer_outProp;\
 	cco_vString *srAnalyzer_out;\
 	cco_vString *srAnalyzer_ocr_type;\
+	cco_srOcr *srAnalyzer_ocr_obj;\
 	cco_vXml *srAnalyzer_analyzedSrml;\
 	cco_redblacktree *srAnalyzer_analyzedData;\
 	int srAnalyzer_debug;
@@ -72,6 +74,7 @@ enum CCOSRANALYZER_STATUS {
 	CCOSRANALYZER_STATUS_NOT_READ_SRML,
 	CCOSRANALYZER_STATUS_NOT_READ_SRCONF,
 	CCOSRANALYZER_STATUS_CANNOT_SAVE_IMAGE,
+	CCOSRANALYZER_STATUS_UNSUPPORTED_OCR_ENGINE,
 	CCOSRANALYZER_STATUS_ERROR
 };
 
