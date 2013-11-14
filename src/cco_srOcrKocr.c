@@ -83,9 +83,7 @@ cco_srOcrKocr *cco_srOcrKocr_baseNew(int size)
 		}
 		cco_setClass(o, cco_srOcrKocr);
 		cco_srOcrKocr_baseInitialize(o);
-#ifdef KOCR
 		cco_srOcrKocr_initialize(o, NULL);
-#endif
 	} while (0);
 	return o;
 }
@@ -171,7 +169,6 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 	cco_srOcrKocr *ocr;
 	ocr = obj;
 
-#ifdef KOCR
 	/* load databases */
 	if (db_num == NULL)
 #ifdef USE_SVM
@@ -196,7 +193,6 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 
 	if (db_num == NULL || db_mbs == NULL || db_ocrb == NULL)
 		return CCOSROCR_STATUS_DBDONOTEXIST;
-#endif
 
 	return CCOSROCR_STATUS_SUCCESS;
 }
@@ -218,7 +214,6 @@ CCOSROCR_STATUS cco_srOcrKocr_setOption(void *obj, char *option)
 	cco_srOcrKocr *ocr;
 	ocr = obj;
 
-#ifdef KOCR
 	if (strcmp(option, "number") == 0)
 	{
 		ocr->srOcrKocr_option = strdup("0-9");
@@ -242,58 +237,6 @@ CCOSROCR_STATUS cco_srOcrKocr_setOption(void *obj, char *option)
 		ocr->srOcrKocr_option = strdup("0-9");
 		ocr->srOcrKocr_db = (char *) db_num;
 	}
-#else
-	if (ocr->srOcrKocr_option != NULL)
-	{
-		free(ocr->srOcrKocr_option);
-	}
-	if (ocr->srOcrKocr_db != NULL)
-	{
-		free(ocr->srOcrKocr_db);
-	}
-	if (ocr->srOcrKocr_dustsize != NULL)
-	{
-		free(ocr->srOcrKocr_dustsize);
-	}
-	if (ocr->srOcrKocr_aoption != NULL)
-	{
-		free(ocr->srOcrKocr_aoption);
-	}
-
-	if (strcmp(option, "number") == 0)
-	{
-		ocr->srOcrKocr_option = strdup("0-9");
-		ocr->srOcrKocr_db = strdup("handwrite_09db");
-		ocr->srOcrKocr_dustsize = strdup("80");
-		ocr->srOcrKocr_aoption = strdup("1");
-	}
-	else if (strcmp(option, "rating") == 0)
-	{
-		ocr->srOcrKocr_option = strdup("mbs");
-		ocr->srOcrKocr_db = strdup("handwrite_mbsdb");
-		ocr->srOcrKocr_dustsize = strdup("80");
-		ocr->srOcrKocr_aoption = strdup("1");
-	}
-	else if (strcmp(option, "ids") == 0)
-	{
-		ocr->srOcrKocr_option = strdup("0-9");
-		ocr->srOcrKocr_db = strdup("iddb");
-		ocr->srOcrKocr_dustsize = strdup("10");
-		ocr->srOcrKocr_aoption = strdup("1");
-	}
-	else if (strcmp(option, "idocrbs") == 0)
-	{
-		ocr->srOcrKocr_option = strdup("0-9");
-		ocr->srOcrKocr_db = strdup("idocrbdb");
-		ocr->srOcrKocr_dustsize = strdup("50");
-		ocr->srOcrKocr_aoption = strdup("1");
-	} else {
-		ocr->srOcrKocr_option = strdup("0-9");
-		ocr->srOcrKocr_db = strdup("handwrite_09db");
-		ocr->srOcrKocr_dustsize = strdup("80");
-		ocr->srOcrKocr_aoption = strdup("1");
-	}
-#endif /* KOCR */
 
 	return CCOSROCR_STATUS_SUCCESS;
 }
@@ -350,7 +293,6 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 		/*
 		 * OCR processing
 		 */
-#ifdef KOCR
 		{
 			char *fn = tmpbmp_string->v_getCstring(tmpbmp_string);
 #ifdef USE_SVM
@@ -372,55 +314,6 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 				*recognizedString = cco_vString_new(rc);
 			}
 		}
-#else
-		int read_length;
-		char recognize_buff[124];
-		recognize_buff[0] = 0;
-		cmdkocr_string = cco_vString_newWithFormat(
-				"kocr -d %s -C %s -m 258 -a %s "
-				"-p %s/etc/sheetreader/kocrdbs/%s/ "
-				"-o %@ %@ 1> /dev/null 2> /dev/null",
-				ocrobj->srOcrKocr_dustsize,
-				ocrobj->srOcrKocr_option,
-				ocrobj->srOcrKocr_aoption,
-				PREFIX,
-				ocrobj->srOcrKocr_db,
-				tmptxt_string,
-				tmpbmp_string);
-
-		tmp1_cstring = cmdkocr_string->v_getCstring(cmdkocr_string);
-		system(tmp1_cstring);
-		free(tmp1_cstring);
-		tmp1_cstring = NULL;
-
-		tmp1_cstring = tmptxt_string->v_getCstring(tmptxt_string);
-		read_length = 0;
-		do {
-			fp = fopen(tmp1_cstring, "r");
-			if (fp == NULL)
-			{
-				result = CCOSROCR_STATUS_DONOTRECOGNIZE;
-				break;
-			}
-			read_length = fread(recognize_buff, 1, sizeof(recognize_buff) - 1, fp);
-			if (read_length < 0)
-			{
-				result = CCOSROCR_STATUS_DONOTRECOGNIZE;
-				break;
-			}
-		} while (0);
-		recognize_buff[read_length] = 0;
-		free(tmp1_cstring);
-		tmp1_cstring = NULL;
-		cco_release(*recognizedString);
-		cco_srOcrKocr_getRecognizeString_currn(ocrobj, recognize_buff);
-		tmp1_string = cco_vString_new(recognize_buff);
-		cco_vString_replaceWithCstring(tmp1_string, "m", "○");
-		cco_vString_replaceWithCstring(tmp1_string, "b", "×");
-		cco_vString_replaceWithCstring(tmp1_string, "s", "△");
-		*recognizedString = cco_vString_getReplacedStringWithCstring(tmp1_string, " ", "");
-		cco_release(tmp1_string);
-#endif
 	} while (0);
 	if (tmp1_cstring != NULL)
 	{

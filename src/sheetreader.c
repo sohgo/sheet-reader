@@ -146,15 +146,9 @@ int main(int argc, char *argv[])
 			case 'v':
 				help = 1;
 				break;
-#ifdef KOCR
-			case 'l':
+			case 'l':	/* only used for KOCR */
 				ocrdb_dir = strdup(optarg);
 				break;
-#else
-			case 'l':
-				ocrdb_dir = strdup(optarg);
-				break;
-#endif
 			}
 			optarg = NULL;
 		}
