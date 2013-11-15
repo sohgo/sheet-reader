@@ -31,6 +31,7 @@
 #include "cco_srMl.h"
 #include "config.h"
 
+char *tmpdir_prefix = "/tmp";
 /* KOCR */
 char *ocrdb_dir = NULL;
 
@@ -157,6 +158,11 @@ int main(int argc, char *argv[])
 			sheetreader_usage();
 			result = -1;
 			break;
+		}
+
+		tmpdir_prefix = getenv("TMPDIR");
+		if (tmpdir_prefix == NULL) {
+			tmpdir_prefix = "/tmp";
 		}
 
 		srAnalyzer = cco_srAnalyzer_new();

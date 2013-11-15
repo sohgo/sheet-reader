@@ -153,6 +153,8 @@ void cco_srAnalyzer_release(void *o)
 	cco_release(o);
 }
 
+extern char *tmpdir_prefix;
+
 struct ocr_engine
 {
 	char *ocr_type_name;
@@ -1145,7 +1147,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getIdFromImage(cco_srAnalyzer *obj, cco_vSrP
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
 				+ upperright->vSrPattern_height) / 3.0;
 
-		snprintf(tmpfile, sizeof(tmpfile), "/tmp/srgetid_XXXXXX");
+		snprintf(tmpfile, sizeof(tmpfile), "%s/srgetid_XXXXXX", tmpdir_prefix);
 		tmpfilefd = mkstemp(tmpfile);
 		if (tmpfilefd == -1)
 		{
@@ -1211,7 +1213,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
 				+ upperright->vSrPattern_height) / 3.0;
 
-		snprintf(tmpfile, sizeof(tmpfile), "/tmp/srgetid_XXXXXX");
+		snprintf(tmpfile, sizeof(tmpfile), "%s/srgetid_XXXXXX", tmpdir_prefix);
 		tmpfilefd = mkstemp(tmpfile);
 		if (tmpfilefd == -1)
 		{
@@ -1372,7 +1374,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			break;
 		}
 
-		snprintf(tmpfile, sizeof(tmpfile), "/tmp/srocr_XXXXXX");
+		snprintf(tmpfile, sizeof(tmpfile), "%s/srocr_XXXXXX", tmpdir_prefix);
 		tmpfilefd = mkstemp(tmpfile);
 		if (tmpfilefd == -1)
 		{
