@@ -192,6 +192,45 @@ int cco_srAnalyzer_setOcrObj(cco_srAnalyzer *obj, cco_vString *ocr_type)
 	return result;
 }
 
+/**
+ * save current ROI, do some action and restore the ROI
+ *
+ * x, y, width, height: ROI
+ * needClone: 0=do not clone, 1:clone
+ * doAction: action
+ */
+int cco_srAnalyzer_doSomeActionToROI(cco_srAnalyzer *obj,
+		int x, int y, int width, int height,
+		int needClone,
+		int (*doAction)(IplImage *))
+{
+	int result = -1;
+	CvRect saved_rect;
+	IplImage *clonedImage;
+
+	if (obj->srAnalyzer_img == NULL)
+	{
+		return result;
+	}
+
+	saved_rect = cvGetImageROI(obj->srAnalyzer_img);
+	cvSetImageROI(obj->srAnalyzer_img, cvRect(x, y, width, height));
+	if (needClone == 1) {
+		clonedImage = (IplImage *)cvClone(obj->srAnalyzer_img);
+		result = doAction(clonedImage);
+		cvReleaseImage(&clonedImage);
+	}
+	else
+	{
+		result = doAction(obj->srAnalyzer_img);
+	}
+	cvSetImageROI(obj->srAnalyzer_img, saved_rect);
+
+	return result;
+}
+
+
+
 CCOSRANALYZER_STATUS cco_srAnalyzer_setOcrEngine(cco_srAnalyzer *obj, char *ocr_type_name)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
@@ -286,23 +325,17 @@ int cco_srAnalyzer_writeImage(cco_srAnalyzer *obj, char *file)
 int cco_srAnalyzer_writeImageWithPlace(cco_srAnalyzer *obj, char *file, int x, int y, int width,
 		int height)
 {
-	int result = -1;
-	CvRect save_rect;
-	CvRect set_rect;
-
-	if (obj->srAnalyzer_img != NULL)
+	int action(IplImage *image)
 	{
-		save_rect = cvGetImageROI(obj->srAnalyzer_img);
-		set_rect.x = x;
-		set_rect.y = y;
-		set_rect.width = width;
-		set_rect.height = height;
-		cvSetImageROI(obj->srAnalyzer_img, set_rect);
-		cvSaveImage(file, obj->srAnalyzer_img);
-		cvSetImageROI(obj->srAnalyzer_img, save_rect);
-		result = 0;
+		cvSaveImage(file, image);
+		return 0;
 	}
-	return result;
+
+	return cco_srAnalyzer_doSomeActionToROI(
+			obj,
+			x, y, width, height,
+			0,
+			action);
 }
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToOcr(cco_srAnalyzer *obj, char *file,
@@ -313,74 +346,62 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToOcr(cco_srAnalyzer *obj
 	CvRect set_rect;
 	IplImage *tmp_img;
 
-	if (obj->srAnalyzer_img != NULL)
+	int action(IplImage *image)
 	{
-		save_rect = cvGetImageROI(obj->srAnalyzer_img);
-		set_rect.x = x;
-		set_rect.y = y;
-		set_rect.width = width;
-		set_rect.height = height;
-		cvSetImageROI(obj->srAnalyzer_img, set_rect);
-		tmp_img = (IplImage *)cvClone(obj->srAnalyzer_img);
-		cvSetImageROI(tmp_img, set_rect);
-		result = cco_srAnalyzer_ThresholdImageToOcr(obj, obj->srAnalyzer_img, tmp_img, smooth, threshold);
+		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 
-		cvSaveImage(file, tmp_img);
-		cvSetImageROI(obj->srAnalyzer_img, save_rect);
-		cvReleaseImage(&tmp_img);
+		result = cco_srAnalyzer_ThresholdImageToOcr(obj, obj->srAnalyzer_img, image, smooth, threshold);
+		cvSaveImage(file, image);
+		return result;
 	}
-	return result;
+
+	return cco_srAnalyzer_doSomeActionToROI(
+			obj,
+			x, y, width, height,
+			1,
+			action);
 }
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToLOcr(cco_srAnalyzer *obj, char *file,
 		int x, int y, int width, int height, int smooth, int threshold)
 {
-	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
-	CvRect save_rect;
-	CvRect set_rect;
-	IplImage *tmp_img;
 
-	if (obj->srAnalyzer_img != NULL)
+	int action(IplImage *image)
 	{
-		save_rect = cvGetImageROI(obj->srAnalyzer_img);
-		set_rect.x = x;
-		set_rect.y = y;
-		set_rect.width = width;
-		set_rect.height = height;
-		cvSetImageROI(obj->srAnalyzer_img, set_rect);
+		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+		IplImage *tmp_img;
+
 		tmp_img = cvCreateImage(cvSize(width * 2, height * 2), obj->srAnalyzer_img->depth, obj->srAnalyzer_img->nChannels);
 		cvRectangle(tmp_img, cvPoint(0,0), cvPoint(width * 2, height * 2), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
 		cvSetImageROI(tmp_img, cvRect(width / 2, height / 2, width, height));
 		result = cco_srAnalyzer_ThresholdImageToOcr(obj, obj->srAnalyzer_img, tmp_img, smooth, threshold);
 		cvResetImageROI(tmp_img);
 		cvSaveImage(file, tmp_img);
-		cvSetImageROI(obj->srAnalyzer_img, save_rect);
 		cvReleaseImage(&tmp_img);
+
+		return result;
 	}
-	return result;
+
+	return cco_srAnalyzer_doSomeActionToROI(
+			obj,
+			x, y, width, height,
+			0,
+			action);
 }
 
 int cco_srAnalyzer_writeResizeImageWithPlace(cco_srAnalyzer *obj, char *file, int x, int y,
 		int width, int height, int resize_width, int resize_height)
 {
-	int result = -1;
-	CvRect save_rect;
-	CvRect set_rect;
-	CvSize resize;
-	IplImage *resizeimage;
-	IplImage *resizeimage2;
-
-	resize_width = 400;
-	resize_height = 200;
-	if (obj->srAnalyzer_img != NULL)
+	int action(IplImage *image)
 	{
-		save_rect = cvGetImageROI(obj->srAnalyzer_img);
-		set_rect.x = x;
-		set_rect.y = y;
-		set_rect.width = width;
-		set_rect.height = height;
-		cvSetImageROI(obj->srAnalyzer_img, set_rect);
+		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+		CvSize resize;
+		CvRect set_rect;
+		IplImage *resizeimage;
+		IplImage *resizeimage2;
 
+		resize_width = 400;
+		resize_height = 200;
 		resize.width = resize_width;
 		resize.height = resize_height;
 		resizeimage = cvCreateImage(resize, obj->srAnalyzer_img->depth,
@@ -399,14 +420,18 @@ int cco_srAnalyzer_writeResizeImageWithPlace(cco_srAnalyzer *obj, char *file, in
 		cvSmooth(resizeimage, resizeimage2, CV_MEDIAN, 3, 0, 0, 0);
 		cvSaveImage(file, resizeimage2);
 
-		cvSetImageROI(obj->srAnalyzer_img, save_rect);
-
 		cvReleaseImage(&resizeimage);
 		cvReleaseImage(&resizeimage2);
-		result = 0;
+
+		return result;
 	}
 
-	return result;
+	return cco_srAnalyzer_doSomeActionToROI(
+			obj,
+			x, y, width, height,
+			0,
+			action);
+
 }
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_calculateAngleToFit(cco_srAnalyzer *obj,
@@ -702,6 +727,117 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getTop3Pattern(cco_srAnalyzer *obj,
 	result = cco_srAnalyzer_getTop3PatternByComparingWithSampleMarker(obj, list_candidate_pattern, out_top3_patterns);
 	return result;
 }
+
+/**
+ *
+ */
+CCOSRANALYZER_STATUS cco_srAnalyzer_findPatternsInSpecifiedArea(
+		cco_srAnalyzer *obj, IplImage *image,
+		cco_arraylist *added_patternlist)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	IplImage *img_tmp = NULL;
+	IplImage *img_prebinarized = NULL;
+	IplImage *img_binarized = NULL;
+	CvMemStorage *strage_conturs = cvCreateMemStorage(0);
+	CvSeq *seq_conturs;
+	CvSeq *seq_conturs_parent;
+	CvSeq *seq_conturs_child;
+	CvRect rect_parent;
+	CvRect rect_child;
+	cco_vSrPattern *pattern_parent = NULL;
+	cco_vSrPattern *pattern_child = NULL;
+	cco_arraylist *list_candidate_pattern = added_patternlist;
+	cco_arraylist *list_pattern_in_build = NULL;
+	cco_vSrPattern *parent_pattern = NULL;
+	cco_vSrPattern *candidate_pattern = NULL;
+
+	/* Examines an image to find contours. */
+	seq_conturs = cvCreateSeq(CV_SEQ_ELTYPE_POINT, sizeof(CvSeq), sizeof(CvPoint),
+			strage_conturs);
+	cvFindContours(img_binarized, strage_conturs, &seq_conturs, sizeof(CvContour),
+			CV_RETR_LIST, CV_CHAIN_APPROX_NONE, cvPoint(0, 0));
+	cvReleaseImage(&img_tmp);
+
+	/* Examines an image to find square patterns. */
+	img_tmp = cvCloneImage(image);
+	pattern_parent = cco_vSrPattern_new();
+	pattern_child = cco_vSrPattern_new();
+	for (seq_conturs_parent = seq_conturs; seq_conturs_parent != NULL; seq_conturs_parent
+			= seq_conturs_parent->h_next)
+	{
+		rect_parent = cvBoundingRect(seq_conturs_parent, 0);
+		cco_vSrPattern_set(pattern_parent, rect_parent.x, rect_parent.y, rect_parent.width,
+				rect_parent.height);
+
+		cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
+				rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
+				CV_RGB(0, 0, 255), 4, 8, 0);
+
+		if (cco_vSrPattern_isSquare(pattern_parent) != 0
+				&& cco_vSrPattern_isRectangle1to2(pattern_parent) != 0)
+			continue;
+
+		/* Checks child squares in a parent square. */
+		list_pattern_in_build = cco_arraylist_new();
+		for (seq_conturs_child = seq_conturs; seq_conturs_child != NULL
+				&& cco_arraylist_length(list_pattern_in_build) < 3; seq_conturs_child
+				= seq_conturs_child->h_next)
+		{
+			/* Checks candidate square. */
+			if (seq_conturs_parent == seq_conturs_child)
+				continue;
+			rect_child = cvBoundingRect(seq_conturs_child, 0);
+			cco_vSrPattern_set(pattern_child, rect_child.x, rect_child.y, rect_child.width,
+					rect_child.height);
+			if (!cco_vSrPattern_isInside(pattern_parent, pattern_child))
+				continue;
+			/* if (!cco_vSrPattern_isSquare(pattern_child))
+				continue; */
+			if (cco_vSrPattern_isSquare(pattern_child) != 0
+					&& cco_vSrPattern_isRectangle1to2(pattern_child) != 0)
+				continue;
+
+			/* Adds a child square to build a pattern. */
+			candidate_pattern = cco_vSrPattern_new();
+			cco_vSrPattern_set(candidate_pattern, rect_child.x, rect_child.y, rect_child.width,
+					rect_child.height);
+			cco_arraylist_addAtBack(list_pattern_in_build, candidate_pattern);
+			cco_release(candidate_pattern);
+		}
+		/* Checks double square pattern. */
+		if (cco_arraylist_length(list_pattern_in_build) == CCOSRANALYZER_PATTERN_STYLE)
+		{
+			/* TODO: Examines scale of square and proportion. */
+			parent_pattern = cco_vSrPattern_new();
+			cco_vSrPattern_set(parent_pattern, rect_parent.x, rect_parent.y, rect_parent.width,
+					rect_parent.height);
+			if (cco_vSrPattern_isPattern(parent_pattern, list_pattern_in_build))
+			{
+				/* Draws pattern to image. */
+				cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
+						rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
+						CV_RGB(255, 0, 0), 4, 8, 0);
+
+				/* Adds pattern to list of candidate. */
+				candidate_pattern = cco_vSrPattern_new();
+				cco_vSrPattern_setInInt(candidate_pattern, rect_parent.x, rect_parent.y,
+						rect_parent.width, rect_parent.height);
+				cco_arraylist_addAtBack(list_candidate_pattern, candidate_pattern);
+				cco_release(candidate_pattern);
+			}
+			cco_release(parent_pattern);
+		}
+		cco_release(list_pattern_in_build);
+	}
+	/* Shows images. */
+	if (obj->srAnalyzer_debug >= 2)
+	{
+		cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "findPatterns: found patterns",
+				img_tmp, 3);
+	}
+}
+
 
 /**
  *
@@ -1524,7 +1660,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 							2,
 							CV_RGB(255, 0, 0), 4, 8, 0);
 					cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "ocr: try to find a survey box from a list of found boxes.",
-							img_tmp, 2);
+							img_tmp, 4);
 				}
 				cco_safeRelease(pattern);
 				/* creates an ocr engine. */
