@@ -892,7 +892,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 		cvReleaseImage(&img_tmp);
 
 		/* Examines an image to find square patterns. */
-		img_tmp = cvCloneImage(image);
+		if (obj->srAnalyzer_debug >= 2)
+		{
+			img_tmp = cvCloneImage(image);
+		}
 		pattern_parent = cco_vSrPattern_new();
 		pattern_child = cco_vSrPattern_new();
 		for (seq_conturs_parent = seq_conturs; seq_conturs_parent != NULL; seq_conturs_parent
@@ -902,9 +905,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 			cco_vSrPattern_set(pattern_parent, rect_parent.x, rect_parent.y, rect_parent.width,
 					rect_parent.height);
 
-			cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
-					rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
-					CV_RGB(0, 0, 255), 4, 8, 0);
+			if (obj->srAnalyzer_debug >= 2)
+			{
+				cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
+						rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
+						CV_RGB(0, 0, 255), 4, 8, 0);
+			}
 
 			if (cco_vSrPattern_isSquare(pattern_parent) != 0
 					&& cco_vSrPattern_isRectangle1to2(pattern_parent) != 0)
@@ -947,9 +953,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatterns(cco_srAnalyzer *obj, IplImage *
 				if (cco_vSrPattern_isPattern(parent_pattern, list_pattern_in_build))
 				{
 					/* Draws pattern to image. */
-					cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
-							rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
-							CV_RGB(255, 0, 0), 4, 8, 0);
+					if (obj->srAnalyzer_debug >= 2)
+					{
+						cvRectangle(img_tmp, cvPoint(rect_parent.x, rect_parent.y), cvPoint(
+								rect_parent.x + rect_parent.width, rect_parent.y + rect_parent.height),
+								CV_RGB(255, 0, 0), 4, 8, 0);
+					}
 
 					/* Adds pattern to list of candidate. */
 					candidate_pattern = cco_vSrPattern_new();
