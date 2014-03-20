@@ -1133,7 +1133,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_examineImageToFindPattern(cco_srAnalyzer *ob
 
 		list_top3_candidate_pattern = cco_arraylist_new();
 		result = cco_srAnalyzer_countPatterns(obj, list_candidate_pattern);
-		if (result != CCOSRANALYZER_STATUS_SUCCESS)
+		if (result == CCOSRANALYZER_STATUS_NOT_FOUND_ADJUSTPATTERN)
+		{
+			break;
+		}
+		else if (result == CCOSRANALYZER_STATUS_MANY_FOUND_ADJUSTPATTERN)
 		{
 			if (obj->srAnalyzer_debug >= 1)
 				printf("use top 3 patterns from %d patterns\n", cco_arraylist_length(list_candidate_pattern));
