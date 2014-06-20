@@ -371,9 +371,16 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToLOcr(cco_srAnalyzer *ob
 		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 		IplImage *tmp_img;
 
-		tmp_img = cvCreateImage(cvSize(width * 2, height * 2), obj->srAnalyzer_img->depth, obj->srAnalyzer_img->nChannels);
-		cvRectangle(tmp_img, cvPoint(0,0), cvPoint(width * 2, height * 2), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
-		cvSetImageROI(tmp_img, cvRect(width / 2, height / 2, width, height));
+		if (1) {
+			tmp_img = cvCreateImage(cvSize(width * 2, height * 2), obj->srAnalyzer_img->depth, obj->srAnalyzer_img->nChannels);
+			cvRectangle(tmp_img, cvPoint(0,0), cvPoint(width * 2, height * 2), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
+			cvSetImageROI(tmp_img, cvRect(width / 2, height / 2, width, height));
+		}
+		else {	// for debug
+			tmp_img = cvCreateImage(cvSize(width, height), obj->srAnalyzer_img->depth, obj->srAnalyzer_img->nChannels);
+			cvRectangle(tmp_img, cvPoint(0,0), cvPoint(width, height), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
+			cvSetImageROI(tmp_img, cvRect(0, 0, width, height));
+		}
 		result = cco_srAnalyzer_ThresholdImageToOcr(obj, obj->srAnalyzer_img, tmp_img, smooth, threshold);
 		cvResetImageROI(tmp_img);
 		cvSaveImage(file, tmp_img);
@@ -1565,11 +1572,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			} else {
 				attr_colspan = 1;
 			}
-			current_cell_width_scaled  = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list,  attr_x) * scale_x;
-			current_cell_height_scaled = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y;
 			recognized_string = cco_vString_new("");
 			for (index_colspan = 0; index_colspan < attr_colspan; index_colspan++)
 			{
+				current_cell_width_scaled  = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list,  attr_x + index_colspan) * scale_x;
+				current_cell_height_scaled = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y;
 
 				/* makes the path of image. */
 				tmp_string = cco_vString_newWithFormat("%s-%@-%d.png", tmpfile, xml_attr_name,
@@ -1650,18 +1657,21 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					}
 				} else {
 					/* did not find a target. */
+					int scale = 0;
+					int margin_width = (int) (current_cell_width_scaled * scale / 100.0);
+					int margin_height = (int) (current_cell_height_scaled * scale / 100.0);
 					cco_srAnalyzer_writeImageWithPlaceToLOcr(obj, tmp_cstring,
-							(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x),
-							(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y),
-							current_cell_width_scaled,
-							current_cell_height_scaled,
+							(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * scale_x + offset_x + margin_width),
+							(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + margin_height),
+							current_cell_width_scaled - margin_width * 2,
+							current_cell_height_scaled - margin_height * 2,
 							7, 250);
 					if (obj->srAnalyzer_debug >= 2) {
 						cvRectangle(img_tmp,
-								cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x),
-									(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y)),
-								cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x + current_cell_width_scaled),
-									(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + current_cell_height_scaled)),
+								cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * scale_x + offset_x + margin_width),
+									(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + margin_height)),
+								cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * scale_x + offset_x + current_cell_width_scaled - margin_width),
+									(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + current_cell_height_scaled - margin_height)),
 								CV_RGB(255, 0, 0), 4, 8, 0);
 					}
 				}
