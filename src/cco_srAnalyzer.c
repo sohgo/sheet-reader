@@ -1946,6 +1946,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetSheetAndSurveyIds(cco_srAnalyzer *ob
 		{
 			break;
 		}
+#ifdef KOCR
+		cco_srAnalyzer_setOcrEngine(obj, "kocr");
+#endif
 	} while (0);
 	return result;
 }
