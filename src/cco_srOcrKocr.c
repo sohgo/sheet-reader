@@ -216,24 +216,34 @@ CCOSROCR_STATUS cco_srOcrKocr_setOption(void *obj, char *option)
 
 	if (strcmp(option, "number") == 0)
 	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
 		ocr->srOcrKocr_option = strdup("0-9");
 		ocr->srOcrKocr_db = (char *) db_num;
 	}
 	else if (strcmp(option, "rating") == 0)
 	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
 		ocr->srOcrKocr_option = strdup("mbsc");
 		ocr->srOcrKocr_db = (char *) db_mbs;
 	}
 	else if (strcmp(option, "ids") == 0)
 	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
 		ocr->srOcrKocr_option = strdup("0-9");
 		ocr->srOcrKocr_db = (char *) db_ocrb;
 	}
 	else if (strcmp(option, "idocrbs") == 0)
 	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
 		ocr->srOcrKocr_option = strdup("0-9");
 		ocr->srOcrKocr_db = (char *) db_ocrb;
 	} else {
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
 		ocr->srOcrKocr_option = strdup("0-9");
 		ocr->srOcrKocr_db = (char *) db_num;
 	}
