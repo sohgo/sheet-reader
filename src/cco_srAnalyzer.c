@@ -1456,12 +1456,120 @@ double cco_srAnalyzer_get_size_of_the_cell_withoutMarker(cco_arraylist *cell_siz
 	return cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list,  index + 1));
 }
 
+int cco_srAnalyzer_getCellXnumberByColspan(cco_srMlSheet *sheet, int start_x, int start_y, int index_colspan)
+{
+	int x;
+	int y;
+	int i;
+
+	x = start_x;
+	y = start_y;
+	for (i = 0; i < index_colspan; i++)
+	{
+		int cell_merging_colspan = sheet->srMlSheet_cellColspan[sheet->srMlSheet_blockWidth * y + x];
+		if (cell_merging_colspan <= 1)
+		{
+			cell_merging_colspan = 1;
+		}
+		x += cell_merging_colspan;
+	}
+
+	return x;
+}
+
+double cco_srAnalyzer_getCurrentMergedCellWidth(cco_srMlSheet *sheet, int cell_x, int cell_y, int index_colspan)
+{
+	int x;
+	int cell_merging_colspan;
+	double current_merged_cell_width = 0.0;
+	int i;
+
+	x = cco_srAnalyzer_getCellXnumberByColspan(sheet, cell_x, cell_y, index_colspan);
+	cell_merging_colspan = sheet->srMlSheet_cellColspan[sheet->srMlSheet_blockWidth * cell_y + x];
+	for (i = 0; i < cell_merging_colspan; i++)
+	{
+		current_merged_cell_width += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, x + i);
+	}
+
+	return current_merged_cell_width;
+}
+
+double cco_srAnalyzer_getCurrentMergedCellHeight(cco_srMlSheet *sheet, int cell_x, int cell_y, int index_colspan)
+{
+	int x;
+	int cell_merging_rowspan;
+	double current_merged_cell_height = 0.0;
+	int i;
+
+	x = cco_srAnalyzer_getCellXnumberByColspan(sheet, cell_x, cell_y, index_colspan);
+	cell_merging_rowspan = sheet->srMlSheet_cellRowspan[sheet->srMlSheet_blockWidth * cell_y + x];
+	for (i = 0; i < cell_merging_rowspan; i++)
+	{
+		current_merged_cell_height += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, cell_y + i);
+	}
+	assert(current_merged_cell_height != 0.0);
+
+	return current_merged_cell_height;
+}
+
+/*
+ * Get the position of top-left corner
+ *
+ */
+double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(cco_arraylist *cell_size_list, cco_srMlSheet *sheet, int cell_x, int cell_y, int index_colspan)
+{
+	double position = 0;
+	int i;
+	int x;
+
+	x = cco_srAnalyzer_getCellXnumberByColspan(sheet, cell_x, cell_y, index_colspan);
+
+	for (i = 0; i < x; i++)
+	{
+		position += cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
+	}
+
+	return position;
+}
+
+CCOSRANALYZER_STATUS cco_srAnalyzer_getCandidateFromContourList(
+	cco_srAnalyzer *obj,
+	int first_callP,
+	cco_arraylist *list_candidate_pattern,
+	int (*func)(cco_vSrPattern *pattern),
+	cco_vSrPattern **out_pattern)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	cco_vSrPattern *pattern = NULL;
+	int found = 0;
+
+	if (first_callP == 1)
+	{
+		cco_arraylist_setCursorAtBack(list_candidate_pattern);
+	}
+	while (pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
+	{
+		found = func(pattern);
+		if (found == 1)
+		{
+			break;
+		}
+		cco_arraylist_setCursorAtPrevious(list_candidate_pattern);
+		cco_safeRelease(pattern);
+	}
+	*out_pattern = pattern;
+
+	return result;
+}
+
 CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srMlSheet *sheet,
 		cco_redblacktree *keyval)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 	double marker_width;
 	double marker_height;
+	double current_cell_x;
+	double current_cell_y;
 	double current_cell_width_scaled;
 	double current_cell_height_scaled;
 	int offset_x;
@@ -1575,32 +1683,29 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			recognized_string = cco_vString_new("");
 			for (index_colspan = 0; index_colspan < attr_colspan; index_colspan++)
 			{
-				current_cell_width_scaled  = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list,  attr_x + index_colspan) * scale_x;
-				current_cell_height_scaled = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y;
-
-				/* makes the path of image. */
-				tmp_string = cco_vString_newWithFormat("%s-%@-%d.png", tmpfile, xml_attr_name,
-						index_colspan);
-				tmp_cstring = tmp_string->v_getCstring(tmp_string);
-				cco_safeRelease(tmp_string);
+				/* */
+				int cell_merging_colspan = sheet->srMlSheet_cellColspan[sheet->srMlSheet_blockWidth * attr_y + cco_srAnalyzer_getCellXnumberByColspan(sheet, attr_x, attr_y, index_colspan)];
+				current_cell_width_scaled  = cco_srAnalyzer_getCurrentMergedCellWidth(sheet, attr_x, attr_y, index_colspan) * scale_x;
+				current_cell_height_scaled = cco_srAnalyzer_getCurrentMergedCellHeight(sheet, attr_x, attr_y, index_colspan) * scale_y;
+				current_cell_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(sheet->srMlSheet_cellWidth_list, sheet, attr_x, attr_y, index_colspan);
+				current_cell_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y);
 
 				/* discovers the box of target. */
-				cco_arraylist_setCursorAtFront(list_candidate_pattern);
-				pattern_x  = 0;
-				pattern_x += cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x);
-				for (i = 0; i < index_colspan; i++) {
-					pattern_x += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + i);
-				}
-				pattern_x += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * 0.5;
-				pattern_x *= scale_x;
-				pattern_x += offset_x;
-				pattern_y  = 0;
-				pattern_y += cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y);
-				pattern_y += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * 0.5;
-				pattern_y *= scale_y;
-				pattern_y += offset_y;
-				while (pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
+				cco_arraylist_setCursorAtBack(list_candidate_pattern);
+				int oneCharInOneCell(cco_vSrPattern *pattern)
 				{
+					pattern_x  = 0;
+					pattern_x += current_cell_x;
+					pattern_x += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * 0.5;
+					pattern_x *= scale_x;
+					pattern_x += offset_x;
+					pattern_y  = 0;
+					pattern_y += current_cell_y;
+					pattern_y += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * 0.5;
+					pattern_y *= scale_y;
+					pattern_y += offset_y;
+
+
 					/* First, check the position */
 					if (pattern->vSrPattern_x < pattern_x
 							&& (pattern->vSrPattern_x + pattern->vSrPattern_width) > pattern_x
@@ -1608,7 +1713,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 							&& (pattern->vSrPattern_y + pattern->vSrPattern_height) > pattern_y)
 					{
 						if (obj->srAnalyzer_debug >= 1) {
-							printf("%s:%s\n", __func__, "find a target within an expected area.");
+							printf("\t%s:%s\n", __func__, "find a target within an expected area.");
 						}
 						/* Second, check the size of pattern. If it is small(rate is less than 85%), it will be ignored. */
 						float rate_width  = 0.0;
@@ -1625,91 +1730,150 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 						if (rate_height < 0.5)
 						{
 							if (obj->srAnalyzer_debug >= 1) {
-								printf("%s:%s\n", __func__, "find a target. But it's small. I'll ignore this pattern.");
+								printf("\t%s:%s\n", __func__, "find a target. But it's small. I'll ignore this pattern.");
 							}
 						} else {
 							/* it is a target. */
 							if (obj->srAnalyzer_debug >= 1) {
-								printf("%s:%s\n", __func__, "FOUND a target.");
+								printf("\t%s:%s\n", __func__, "FOUND a target.");
 							}
-							break;
+							return 1;
 						}
 					}
-					cco_arraylist_setCursorAtNext(list_candidate_pattern);
-					cco_safeRelease(pattern);
+					return 0;
 				}
-				if (pattern != NULL)
+				int multipleCharsInMergedCell(cco_vSrPattern *pattern)
 				{
-					/* found a target. */
-					cco_srAnalyzer_writeImageWithPlaceToLOcr(obj, tmp_cstring,
-							(int) (pattern->vSrPattern_x),
-							(int) (pattern->vSrPattern_y),
-							(int) (pattern->vSrPattern_width),
-							(int) (pattern->vSrPattern_height),
-							3, 250);
-					if (obj->srAnalyzer_debug >= 2) {
-						cvRectangle(img_tmp,
-								cvPoint((int) (pattern->vSrPattern_x),
-									(int) (pattern->vSrPattern_y)),
-								cvPoint((int) (pattern->vSrPattern_x + pattern->vSrPattern_width),
-									(int) (pattern->vSrPattern_y + pattern->vSrPattern_height)),
-								CV_RGB(0, 0, 255), 4, 8, 0);
+					int found_flag = 0;
+					float height_ratio = 0.0;
+					float width_ratio = 0.0;
+					float area_ratio = 0.0;
+
+					cco_vSrPattern *current_merged_cell = cco_vSrPattern_new();
+					current_merged_cell->vSrPattern_x = current_cell_x * scale_x + offset_x;
+					current_merged_cell->vSrPattern_y = current_cell_y * scale_y + offset_y;
+					current_merged_cell->vSrPattern_width = current_cell_width_scaled;
+					current_merged_cell->vSrPattern_height = current_cell_height_scaled;
+
+					area_ratio = (pattern->vSrPattern_width * pattern->vSrPattern_height) / (current_cell_width_scaled * current_cell_height_scaled);
+
+					height_ratio = pattern->vSrPattern_height / current_cell_height_scaled;
+					width_ratio  = pattern->vSrPattern_width / current_cell_width_scaled;
+
+					/* First, check the position */
+					if (cco_vSrPattern_isInside(current_merged_cell, pattern) && height_ratio > 0.4 && height_ratio < 1.0 && area_ratio < 0.8)
+					{
+						found_flag = 1;
+						if (obj->srAnalyzer_debug >= 1) {
+							printf("\t%s:%s %f\n", __func__, "FOUND a target.", area_ratio);
+						}
+					} else {
+						if (obj->srAnalyzer_debug >= 1) {
+							printf("\t%s:%s height ratio=%f, area_ratio=%f\n", __func__, "find a target. But it's small or area is small. I'll ignore this pattern.", height_ratio, area_ratio);
+						}
 					}
-				} else {
-					/* did not find a target. */
-					int scale = 0;
-					int margin_width = (int) (current_cell_width_scaled * scale / 100.0);
-					int margin_height = (int) (current_cell_height_scaled * scale / 100.0);
-					cco_srAnalyzer_writeImageWithPlaceToLOcr(obj, tmp_cstring,
-							(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * scale_x + offset_x + margin_width),
-							(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + margin_height),
-							current_cell_width_scaled - margin_width * 2,
-							current_cell_height_scaled - margin_height * 2,
-							7, 250);
+					cco_release(current_merged_cell);
+					return found_flag;
+				}
+
+				int char_no_in_cell, loop_exit_flag = 0, first_call_flag = 1;
+				for (char_no_in_cell = 0; loop_exit_flag == 0; char_no_in_cell++, first_call_flag = 0)
+				{
+
+					/* makes the path of image. */
+					tmp_string = cco_vString_newWithFormat("%s-%@-%d-%d.png", tmpfile, xml_attr_name,
+							index_colspan, char_no_in_cell);
+					tmp_cstring = tmp_string->v_getCstring(tmp_string);
+					cco_safeRelease(tmp_string);
+					if (obj->srAnalyzer_debug >= 1) {
+						printf("*** trying to analyze x:%d, y:%d, colspan=%d, index_colspan=%d, cell_merging_colspan=%d, char_no=%d\n", attr_x, attr_y, attr_colspan, index_colspan, cell_merging_colspan, char_no_in_cell);
+					}
+					if (cell_merging_colspan == 1)
+					{
+						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &oneCharInOneCell, &pattern);
+						loop_exit_flag = 1;
+					} else if (cell_merging_colspan > 1) {
+						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &multipleCharsInMergedCell, &pattern);
+						if (pattern == NULL)
+						{
+							loop_exit_flag = 1;
+						}
+					}
+					if (pattern != NULL)
+					{
+						/* found a target. */
+						cco_srAnalyzer_writeImageWithPlaceToLOcr(obj, tmp_cstring,
+								(int) (pattern->vSrPattern_x),
+								(int) (pattern->vSrPattern_y),
+								(int) (pattern->vSrPattern_width),
+								(int) (pattern->vSrPattern_height),
+								3, 250);
+						if (obj->srAnalyzer_debug >= 2) {
+							cvRectangle(img_tmp,
+									cvPoint((int) (pattern->vSrPattern_x),
+										(int) (pattern->vSrPattern_y)),
+									cvPoint((int) (pattern->vSrPattern_x + pattern->vSrPattern_width),
+										(int) (pattern->vSrPattern_y + pattern->vSrPattern_height)),
+									CV_RGB(0, 0, 255), 4, 8, 0);
+						}
+					} else if (pattern == NULL && first_call_flag == 1) {
+						/* did not find a target. */
+						int scale = 10;
+						int margin_width = (int) (current_cell_width_scaled * scale / 100.0);
+						int margin_height = (int) (current_cell_height_scaled * scale / 100.0);
+						cco_srAnalyzer_writeImageWithPlaceToLOcr(obj, tmp_cstring,
+								(int) (current_cell_x * scale_x + offset_x + margin_width),
+								(int) (current_cell_y * scale_y + offset_y + margin_height),
+								current_cell_width_scaled - margin_width * 2,
+								current_cell_height_scaled - margin_height * 2,
+								7, 250);
+						if (obj->srAnalyzer_debug >= 2) {
+							cvRectangle(img_tmp,
+									cvPoint((int) (current_cell_x * scale_x + offset_x + margin_width),
+										(int) (current_cell_y * scale_y + offset_y + margin_height)),
+									cvPoint((int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled - margin_width),
+										(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled - margin_height)),
+									CV_RGB(255, 0, 0), 4, 8, 0);
+						}
+						loop_exit_flag = 1;
+					} else {
+						break;
+					}
 					if (obj->srAnalyzer_debug >= 2) {
-						cvRectangle(img_tmp,
-								cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * scale_x + offset_x + margin_width),
-									(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + margin_height)),
-								cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * scale_x + offset_x + current_cell_width_scaled - margin_width),
-									(int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + current_cell_height_scaled - margin_height)),
+						cvCircle(img_tmp,
+							cvPoint((int) (pattern_x),
+								(int) (pattern_y)),
+								2,
 								CV_RGB(255, 0, 0), 4, 8, 0);
+						cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "ocr: try to find a survey box from a list of found boxes.",
+								img_tmp, 4);
 					}
-				}
-				if (obj->srAnalyzer_debug >= 2)
-				{
-					cvCircle(img_tmp,
-						cvPoint((int) (pattern_x),
-							(int) (pattern_y)),
-							2,
-							CV_RGB(255, 0, 0), 4, 8, 0);
-					cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "ocr: try to find a survey box from a list of found boxes.",
-							img_tmp, 4);
-				}
-				cco_safeRelease(pattern);
-				/* creates an ocr engine. */
-				ocr = obj->srAnalyzer_ocr_obj;
-				ocr->srOcr_setImage(ocr, tmp_cstring);
-				if (xml_attr_option != NULL)
-				{
-					attr_option_cstring = xml_attr_option->v_getCstring(xml_attr_option);
-					ocr->srOcr_setOption(ocr, attr_option_cstring);
-					free(attr_option_cstring);
-				}
-				ocr->srOcr_getRecognizeString(ocr, &tmp_string);
-				cco_vString_catenate(recognized_string, tmp_string);
-				remove(tmp_cstring);
-				free(tmp_cstring);
-				cco_release(tmp_string);
+					cco_safeRelease(pattern);
+					cco_arraylist_setCursorAtPrevious(list_candidate_pattern);
+					/* creates an ocr engine. */
+					ocr = obj->srAnalyzer_ocr_obj;
+					ocr->srOcr_setImage(ocr, tmp_cstring);
+					if (xml_attr_option != NULL)
+					{
+						attr_option_cstring = xml_attr_option->v_getCstring(xml_attr_option);
+						ocr->srOcr_setOption(ocr, attr_option_cstring);
+						free(attr_option_cstring);
+					}
+					ocr->srOcr_getRecognizeString(ocr, &tmp_string);
+					cco_vString_catenate(recognized_string, tmp_string);
+					remove(tmp_cstring);
+					free(tmp_cstring);
+					cco_release(tmp_string);
 
-				/*
-				 *cvRectangle(img_tmp,
-				 *                cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x),
-				 *                        (int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y)),
-				 *                cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x + current_cell_width_scaled),
-				 *                        (int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + current_cell_height_scaled)),
-				 *                CV_RGB(255, 0, 0), 4, 8, 0);
-				 */
-
+					/*
+					 *cvRectangle(img_tmp,
+					 *                cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x),
+					 *                        (int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y)),
+					 *                cvPoint((int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x + current_cell_width_scaled),
+					 *                        (int) (cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y + current_cell_height_scaled)),
+					 *                CV_RGB(255, 0, 0), 4, 8, 0);
+					 */
+				}
 			}
 			valuekey = cco_vString_new("blockOcr");
 			valuestree = (cco_redblacktree *)cco_redblacktree_get(keyval, (cco_v*) xml_attr_name);

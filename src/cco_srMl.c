@@ -95,18 +95,33 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 	cco_vXml *curxml = NULL;
 	cco_vXml *cursor_xmlCellWidth = NULL;
 	cco_vXml *cursor_xmlCellHeight = NULL;
+	cco_vXml *cursor_xmlCellRowspan = NULL;
+	cco_vXml *cursor_xmlCellColspan = NULL;
 	cco_vXml *elexml = NULL;
 	cco_vString *id_string = NULL;
 	cco_vString *width_string = NULL;
 	cco_vString *height_string = NULL;
 	cco_vString *xml_attr_cell_number = NULL;
 	cco_vString *xml_attr_cell_length = NULL;
+	cco_vString *xml_attr_cell_row = NULL;
+	cco_vString *xml_attr_cell_col = NULL;
+	cco_vString *xml_attr_cell_rowspan = NULL;
+	cco_vString *xml_attr_cell_colspan = NULL;
 	cco_arraylist *list = NULL;
 	cco_srMlSheet *sheet = NULL;
 	cco_arraylist *xml_cellWidths = NULL;
 	cco_arraylist *xml_cellHeights = NULL;
+	cco_arraylist *xml_cellRowspan = NULL;
+	cco_arraylist *xml_cellColspan = NULL;
+	int attr_cell_row;
+	int attr_cell_col;
 	int cell_number = 0;
 	int cell_length = 0;
+	int cell_rowspan = 1;
+	int cell_colspan = 1;
+	int block_width;
+	int block_height;
+	int i, j;
 
 	do {
 		curxml = cco_vXml_getElementAtFront(xml->srMl_xml, "srMl");
@@ -127,9 +142,11 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 			elexml = cco_vXml_getElementAtFront(curxml, "blockWidth");
 			width_string = (cco_vString *)cco_vXml_getContent(elexml);
 			cco_safeRelease(elexml);
+			block_width = cco_vString_toInt(width_string);
 			elexml = cco_vXml_getElementAtFront(curxml, "blockHeight");
 			height_string = (cco_vString *)cco_vXml_getContent(elexml);
 			cco_safeRelease(elexml);
+			block_height = cco_vString_toInt(height_string);
 
 			xml_cellWidths = cco_vXml_getElements(curxml, "cellWidth/cellAttribute");
 			cco_arraylist_setCursorAtFront(xml_cellWidths);
@@ -196,6 +213,103 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 
 			}
 			cco_safeRelease(xml_cellHeights);
+
+			xml_cellColspan = cco_vXml_getElements(curxml, "cellColspan/cellAttribute");
+			cco_arraylist_setCursorAtFront(xml_cellColspan);
+			int *colspans = malloc(sizeof(int) * (block_height + 1) * (block_width + 1));
+			for (i = 0; i < (block_height + 1) * (block_width + 1); i++)
+			{
+				colspans[i] = 1;
+			}
+			while ((cursor_xmlCellColspan = (cco_vXml *) cco_arraylist_getAtCursor(xml_cellColspan)) != NULL)
+			{
+				int satisfied_flag = 1;
+
+				xml_attr_cell_row     = cco_vXml_getAttribute(cursor_xmlCellColspan, "row");
+				xml_attr_cell_col     = cco_vXml_getAttribute(cursor_xmlCellColspan, "col");
+				xml_attr_cell_colspan = cco_vXml_getAttribute(cursor_xmlCellColspan, "colspan");
+
+				attr_cell_row = cco_vString_toInt(xml_attr_cell_row);
+				attr_cell_col = cco_vString_toInt(xml_attr_cell_col);
+
+				if (xml_attr_cell_row == NULL)
+				{
+					satisfied_flag = 0;
+				}
+				if (xml_attr_cell_col == NULL)
+				{
+					satisfied_flag = 0;
+				}
+				if (xml_attr_cell_colspan == NULL)
+				{
+					satisfied_flag = 0;
+				} else {
+					cell_colspan = cco_vString_toInt(xml_attr_cell_colspan);
+				}
+
+				if (satisfied_flag == 0)
+				{
+					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was ignored.\n");
+				} else {
+					colspans[block_width * attr_cell_row + attr_cell_col] = cell_colspan;
+				}
+
+				cco_safeRelease(xml_attr_cell_row);
+				cco_safeRelease(xml_attr_cell_col);
+				cco_safeRelease(xml_attr_cell_colspan);
+				cco_arraylist_setCursorAtNext(xml_cellColspan);
+			}
+			cco_safeRelease(xml_cellColspan);
+			cco_srMlSheet_setCellColspan(sheet, colspans);
+
+			xml_cellRowspan = cco_vXml_getElements(curxml, "cellRowspan/cellAttribute");
+			cco_arraylist_setCursorAtFront(xml_cellRowspan);
+			int *rowspans = malloc(sizeof(int) * (block_height + 1) * (block_width + 1));
+			for (i = 0; i < (block_height + 1) * (block_width + 1); i++)
+			{
+				rowspans[i] = 1;
+			}
+			while ((cursor_xmlCellRowspan = (cco_vXml *) cco_arraylist_getAtCursor(xml_cellRowspan)) != NULL)
+			{
+				int satisfied_flag = 1;
+
+				xml_attr_cell_row     = cco_vXml_getAttribute(cursor_xmlCellRowspan, "row");
+				xml_attr_cell_col     = cco_vXml_getAttribute(cursor_xmlCellRowspan, "col");
+				xml_attr_cell_rowspan = cco_vXml_getAttribute(cursor_xmlCellRowspan, "rowspan");
+
+				attr_cell_row = cco_vString_toInt(xml_attr_cell_row);
+				attr_cell_col = cco_vString_toInt(xml_attr_cell_col);
+
+				if (xml_attr_cell_row == NULL)
+				{
+					satisfied_flag = 0;
+				}
+				if (xml_attr_cell_col == NULL)
+				{
+					satisfied_flag = 0;
+				}
+				if (xml_attr_cell_rowspan == NULL)
+				{
+					satisfied_flag = 0;
+				} else {
+					cell_rowspan = cco_vString_toInt(xml_attr_cell_rowspan);
+				}
+
+				if (satisfied_flag == 0)
+				{
+					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was ignored.\n");
+				} else {
+					rowspans[block_width * attr_cell_row + attr_cell_col] = cell_rowspan;
+				}
+
+				cco_safeRelease(xml_attr_cell_row);
+				cco_safeRelease(xml_attr_cell_col);
+				cco_safeRelease(xml_attr_cell_rowspan);
+				cco_arraylist_setCursorAtNext(xml_cellRowspan);
+
+			}
+			cco_safeRelease(xml_cellRowspan);
+			cco_srMlSheet_setCellRowspan(sheet, rowspans);
 
 			cco_srMlSheet_setXml(sheet, curxml);
 			cco_srMlSheet_setId(sheet, id_string);

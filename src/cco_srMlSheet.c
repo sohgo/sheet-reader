@@ -60,6 +60,8 @@ void cco_srMlSheet_baseInitialize(cco_srMlSheet *o)
 	o->srMlSheet_blockHeight = 0;
 	o->srMlSheet_cellWidth_list = cco_arraylist_new();
 	o->srMlSheet_cellHeight_list = cco_arraylist_new();
+	o->srMlSheet_cellRowspan = NULL;
+	o->srMlSheet_cellColspan = NULL;
 	return;
 }
 
@@ -69,6 +71,8 @@ void cco_srMlSheet_baseFinalize(cco_srMlSheet *o)
 	cco_safeRelease(o->srMlSheet_xml);
 	cco_arraylist_release(o->srMlSheet_cellWidth_list);
 	cco_arraylist_release(o->srMlSheet_cellHeight_list);
+	free(o->srMlSheet_cellRowspan);
+	free(o->srMlSheet_cellColspan);
 	return;
 }
 
@@ -127,5 +131,17 @@ int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *str, int index)
 int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *str, int index)
 {
 	cco_arraylist_addDynamicAt(obj->srMlSheet_cellHeight_list, str, index);
+	return 0;
+}
+
+int cco_srMlSheet_setCellRowspan(cco_srMlSheet *obj, int *rowspans)
+{
+	obj->srMlSheet_cellRowspan = rowspans;
+	return 0;
+}
+
+int cco_srMlSheet_setCellColspan(cco_srMlSheet *obj, int *colspans)
+{
+	obj->srMlSheet_cellColspan = colspans;
 	return 0;
 }

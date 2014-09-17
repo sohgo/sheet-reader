@@ -33,6 +33,8 @@
 	int srMlSheet_blockHeight;\
 	cco_arraylist *srMlSheet_cellWidth_list;\
 	cco_arraylist *srMlSheet_cellHeight_list;\
+	int *srMlSheet_cellRowspan;\
+	int *srMlSheet_cellColspan;\
 
 typedef struct cco_srMlSheet cco_srMlSheet;
 
@@ -54,6 +56,8 @@ int cco_srMlSheet_setWidth(cco_srMlSheet *obj, cco_vString *str);
 int cco_srMlSheet_setHeight(cco_srMlSheet *obj, cco_vString *str);
 int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *str, int index);
 int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *str, int index);
+int cco_srMlSheet_setCellRowspan(cco_srMlSheet *obj, int *rowspans);
+int cco_srMlSheet_setCellColspan(cco_srMlSheet *obj, int *colspans);
 
 /* Don't touch following comment.
 CCOINHERITANCE:CCO_PROPERTIES
