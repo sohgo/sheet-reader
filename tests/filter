@@ -37,7 +37,15 @@ while(<>){
 
     if (/'x(\d)'/) {
 	if (/'x(\d)','×'/) {
-	    print "(checked) -> ×\tOK\n";
+	    print "(cross) -> ×\tOK\n";
+	} else {
+	    print "(cross) -> .\tNG\n";
+	}
+    }
+
+    if (/'chk(\d)'/) {
+	if (/'chk(\d)','✓'/) {
+	    print "(checked) -> ✓\tOK\n";
 	} else {
 	    print "(checked) -> .\tNG\n";
 	}

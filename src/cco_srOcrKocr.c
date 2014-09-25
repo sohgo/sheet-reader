@@ -37,7 +37,7 @@ void *db_mbs;
 void *db_ocrb;
 
 #define DB_FILE_NUM "list-num.xml"
-#define DB_FILE_MBS "list-mbs.xml"
+#define DB_FILE_MBS "list-mbsc.xml"
 #define DB_FILE_OCRB "list-ocrb.xml"
 
 #else	/* USE_SVM */
@@ -50,7 +50,7 @@ feature_db *db_mbs;
 feature_db *db_ocrb;
 
 #define DB_FILE_NUM "list-num.db"
-#define DB_FILE_MBS "list-mbs.db"
+#define DB_FILE_MBS "list-mbsc.db"
 #define DB_FILE_OCRB "list-ocrb.db"
 
 #endif	/* USE_SVM */
@@ -221,7 +221,7 @@ CCOSROCR_STATUS cco_srOcrKocr_setOption(void *obj, char *option)
 	}
 	else if (strcmp(option, "rating") == 0)
 	{
-		ocr->srOcrKocr_option = strdup("mbs");
+		ocr->srOcrKocr_option = strdup("mbsc");
 		ocr->srOcrKocr_db = (char *) db_mbs;
 	}
 	else if (strcmp(option, "ids") == 0)
@@ -306,6 +306,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 				cco_vString_replaceWithCstring(tmp1_string, "m", "○");
 				cco_vString_replaceWithCstring(tmp1_string, "b", "×");
 				cco_vString_replaceWithCstring(tmp1_string, "s", "△");
+				cco_vString_replaceWithCstring(tmp1_string, "c", "✓");
 				*recognizedString =
 				  cco_vString_getReplacedStringWithCstring(tmp1_string,
 									   " ", "");

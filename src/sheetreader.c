@@ -48,7 +48,7 @@ void sheetreader_usage()
 	printf(" -p set prefix of directory to save images.\n");
 	printf(" -u force set user-id.\n");
 	printf(" -i force set sheet-id.\n");
-	printf(" -l KOCR character database {list-num.db, list-mbs.db, list-ocrb.db} dir.\n");
+	printf(" -l KOCR character database {list-num.db, list-mbsc.db, list-ocrb.db} dir.\n");
 }
 
 

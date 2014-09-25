@@ -111,7 +111,9 @@
     <blockHeight>14</blockHeight>
     <properties>
       <blockOcr name="echo_request_and_send_analyzed_data" x="21" y="14" colspan="1" option="rating"/>
+      <blockOcr name="chk1" x="7" y="10" colspan="1" option="rating"/>
       <blockImg name="chk1" x="7" y="10" colspan="1" margin="15"/>
+      <blockOcr name="chk2" x="7" y="12" colspan="1" option="rating"/>
       <blockImg name="chk2" x="7" y="12" colspan="1" margin="15"/>
       <blockOcr name="circle1" x="1" y="10" colspan="1" option="rating"/>
       <blockImg name="circle1" x="1" y="10" colspan="1" margin="15"/>
