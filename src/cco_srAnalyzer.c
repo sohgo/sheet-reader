@@ -2046,12 +2046,12 @@ void cco_srAnalyzer_outXml_sub(cco *callbackobject, cco_v *key, cco *object)
 	}
 	cco_safeRelease(tmp_string);
 	tmp_string = cco_vString_newWithFormat(
-			" <value>\n"
-			"  <ocrName>%@</ocrName>\n"
-			"  <ocrValue><![CDATA[%@]]></ocrValue>\n"
-			"  <ocrImg><![CDATA[%@]]></ocrImg>\n"
-			"  <humanCheck>no</humanCheck>\n"
-			" </value>\n", ocrName_string, ocrValue_string, ocrImage_string);
+			"  <value>\n"
+			"   <ocrName>%@</ocrName>\n"
+			"   <ocrValue><![CDATA[%@]]></ocrValue>\n"
+			"   <ocrImg><![CDATA[%@]]></ocrImg>\n"
+			"   <humanCheck>no</humanCheck>\n"
+			"  </value>\n", ocrName_string, ocrValue_string, ocrImage_string);
 	cco_vString_catenate((cco_vString *)((cco_srAnalyzer *)callbackobject)->srAnalyzer_outXml, tmp_string);
 	cco_safeRelease(tmp_string);
 	cco_safeRelease(values);
@@ -2067,9 +2067,17 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_outXml(cco_srAnalyzer *obj)
 	char *tmp_cstring;
 
 	cco_safeRelease(obj->srAnalyzer_outXml);
-	obj->srAnalyzer_outXml = cco_vString_new("<valueList>\n");
+	obj->srAnalyzer_outXml = cco_vString_new("<ocrResult>\n");
+	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, " <sheetId>");
+	cco_vString_catenate(obj->srAnalyzer_outXml, obj->srAnalyzer_sid);
+	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, "</sheetId>\n");
+	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, " <surveyTargetId>");
+	cco_vString_catenate(obj->srAnalyzer_outXml, obj->srAnalyzer_uid);
+	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, "</surveyTargetId>\n");
+	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, " <valueList>\n");
 	cco_redblacktree_traversePreorder(obj->srAnalyzer_analyzedData, (cco *)obj, cco_srAnalyzer_outXml_sub);
-	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, "</valueList>\n");
+	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, " </valueList>\n");
+	cco_vString_catenateWithFormat(obj->srAnalyzer_outXml, "</ocrResult>\n");
 	tmp_cstring = obj->srAnalyzer_outXml->v_getCstring(obj->srAnalyzer_outXml);
 	printf("%s\n", tmp_cstring);
 	free(tmp_cstring);
