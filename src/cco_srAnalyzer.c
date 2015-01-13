@@ -1572,6 +1572,15 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			} else {
 				attr_colspan = 1;
 			}
+			/* create dir */
+			tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
+					obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+					obj->srAnalyzer_date_string);
+			tmp_cstring = tmp_string->v_getCstring(tmp_string);
+			utility_mkdir(tmp_cstring);
+			free(tmp_cstring);
+			cco_safeRelease(tmp_string);
+
 			recognized_string = cco_vString_new("");
 			for (index_colspan = 0; index_colspan < attr_colspan; index_colspan++)
 			{
@@ -1579,7 +1588,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				current_cell_height_scaled = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y;
 
 				/* makes the path of image. */
-				tmp_string = cco_vString_newWithFormat("%s-%@-%d.png", tmpfile, xml_attr_name,
+				tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s/ocrImg-%@-%d.png",
+						obj->srAnalyzer_save_prefix,
+						obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+						obj->srAnalyzer_date_string, xml_attr_name,
 						index_colspan);
 				tmp_cstring = tmp_string->v_getCstring(tmp_string);
 				cco_safeRelease(tmp_string);
@@ -1697,7 +1709,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				}
 				ocr->srOcr_getRecognizeString(ocr, &tmp_string);
 				cco_vString_catenate(recognized_string, tmp_string);
-				remove(tmp_cstring);
 				free(tmp_cstring);
 				cco_release(tmp_string);
 
@@ -1711,6 +1722,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				 */
 
 			}
+			/* insert result of OCRed value */
 			valuekey = cco_vString_new("blockOcr");
 			valuestree = (cco_redblacktree *)cco_redblacktree_get(keyval, (cco_v*) xml_attr_name);
 			if (valuestree == NULL) {
