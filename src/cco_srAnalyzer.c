@@ -1456,6 +1456,25 @@ double cco_srAnalyzer_get_size_of_the_cell_withoutMarker(cco_arraylist *cell_siz
 	return cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list,  index + 1));
 }
 
+int cco_srAnalyzer_concat_preOcrImageFiles(
+		cco_vString *src_file_pattern,
+		cco_vString *output_filename)
+{
+	cco_vString *cmd_string = NULL;
+	char *cmd_cstring = NULL;
+	int return_value = 0;
+
+	cmd_string = cco_vString_newWithFormat(
+			"montage %@ -tile x1 %@",
+			src_file_pattern, output_filename);
+	cmd_cstring = cmd_string->v_getCstring(cmd_string);
+	cco_release(cmd_string);
+	return_value = system(cmd_cstring);
+	free(cmd_cstring);
+
+	return return_value;
+}
+
 CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srMlSheet *sheet,
 		cco_redblacktree *keyval)
 {
@@ -1588,7 +1607,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				current_cell_height_scaled = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y;
 
 				/* makes the path of image. */
-				tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s/ocrImg-%@-%d.png",
+				tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s/preOcrImg-%@-%d.png",
 						obj->srAnalyzer_save_prefix,
 						obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
 						obj->srAnalyzer_date_string, xml_attr_name,
@@ -1741,6 +1760,49 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				free(tmp_cstring);
 				cco_safeRelease(tmp_string);
 			}
+			/* pre-ocr image file hangling */
+			do {
+				cco_vString *preOcrImgFileNamePrefix = NULL;
+
+				if (index_colspan >= 2)
+				{	// concatenate the multiple image files to one image file for the cell having colspan
+					cco_vString *mergedPreOcrImgFileName = NULL;
+					cco_vString *allPreOcrImgFiles = NULL;
+					mergedPreOcrImgFileName = cco_vString_newWithFormat("%@R%@/S%@/%s/preOcrImg-%@-concat.png",
+							obj->srAnalyzer_save_prefix,
+							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+							obj->srAnalyzer_date_string, xml_attr_name);
+					allPreOcrImgFiles = cco_vString_newWithFormat("%@R%@/S%@/%s/preOcrImg-%@-*.png",
+							obj->srAnalyzer_save_prefix,
+							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+							obj->srAnalyzer_date_string, xml_attr_name);
+					cco_srAnalyzer_concat_preOcrImageFiles(allPreOcrImgFiles, mergedPreOcrImgFileName);
+					cco_release(allPreOcrImgFiles);
+					cco_release(mergedPreOcrImgFileName);
+
+					preOcrImgFileNamePrefix = cco_vString_newWithFormat("R%@/S%@/%s/preOcrImg-%@-concat.png",
+							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+							obj->srAnalyzer_date_string, xml_attr_name);
+				} else {
+					preOcrImgFileNamePrefix = cco_vString_newWithFormat("R%@/S%@/%s/preOcrImg-%@-%d.png",
+							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+							obj->srAnalyzer_date_string, xml_attr_name,
+							index_colspan - 1);
+				}
+
+				/* save the path information of pre ocr image file */
+				valuekey = cco_vString_new("blockPreOcr");
+				valuestree = (cco_redblacktree *)cco_redblacktree_get(keyval, (cco_v*) xml_attr_name);
+				if (valuestree == NULL) {
+					valuestree = cco_redblacktree_new();
+					cco_redblacktree_insert(keyval, (cco_v*) xml_attr_name, (cco*) valuestree);
+				}
+				cco_redblacktree_insert(valuestree, (cco_v*) valuekey, (cco*) preOcrImgFileNamePrefix);
+				cco_safeRelease(valuestree);
+				cco_safeRelease(valuekey);
+				cco_release(preOcrImgFileNamePrefix);
+			} while(0);
+
 			cco_safeRelease(recognized_string);
 			cco_safeRelease(xml_attr_name);
 			cco_safeRelease(xml_attr_colspan);
@@ -2042,7 +2104,8 @@ void cco_srAnalyzer_outXml_sub(cco *callbackobject, cco_v *key, cco *object)
 	cco_vString *tmp_string;
 	cco_vString *ocrName_string;
 	cco_vString *ocrValue_string;
-	cco_vString *ocrImage_string;
+	cco_vString *preOcrImage_string;
+	cco_vString *blockImage_string;
 
 	values = (cco_redblacktree *)cco_get(object);
 	ocrName_string = (cco_vString *)cco_get(key);
@@ -2053,11 +2116,18 @@ void cco_srAnalyzer_outXml_sub(cco *callbackobject, cco_v *key, cco *object)
 		ocrValue_string = cco_vString_new("");
 	}
 	cco_safeRelease(tmp_string);
-	tmp_string = cco_vString_new("blockImg");
-	ocrImage_string = (cco_vString *)cco_redblacktree_get(values, (cco_v*)tmp_string);
-	if (ocrImage_string == NULL)
+	tmp_string = cco_vString_new("blockPreOcr");
+	preOcrImage_string = (cco_vString *)cco_redblacktree_get(values, (cco_v*)tmp_string);
+	if (preOcrImage_string == NULL)
 	{
-		ocrImage_string = cco_vString_new("");
+		preOcrImage_string = cco_vString_new("");
+	}
+	cco_safeRelease(tmp_string);
+	tmp_string = cco_vString_new("blockImg");
+	blockImage_string = (cco_vString *)cco_redblacktree_get(values, (cco_v*)tmp_string);
+	if (blockImage_string == NULL)
+	{
+		blockImage_string = cco_vString_new("");
 	}
 	cco_safeRelease(tmp_string);
 	tmp_string = cco_vString_newWithFormat(
@@ -2065,14 +2135,16 @@ void cco_srAnalyzer_outXml_sub(cco *callbackobject, cco_v *key, cco *object)
 			"   <ocrName>%@</ocrName>\n"
 			"   <ocrValue><![CDATA[%@]]></ocrValue>\n"
 			"   <ocrImg><![CDATA[%@]]></ocrImg>\n"
+			"   <preOcrImg><![CDATA[%@]]></preOcrImg>\n"
 			"   <humanCheck>no</humanCheck>\n"
-			"  </value>\n", ocrName_string, ocrValue_string, ocrImage_string);
+			"  </value>\n", ocrName_string, ocrValue_string, blockImage_string, preOcrImage_string);
 	cco_vString_catenate((cco_vString *)((cco_srAnalyzer *)callbackobject)->srAnalyzer_outXml, tmp_string);
 	cco_safeRelease(tmp_string);
 	cco_safeRelease(values);
 	cco_safeRelease(ocrName_string);
 	cco_safeRelease(ocrValue_string);
-	cco_safeRelease(ocrImage_string);
+	cco_safeRelease(preOcrImage_string);
+	cco_safeRelease(blockImage_string);
 	return;
 }
 
