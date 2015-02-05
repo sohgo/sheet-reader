@@ -1466,7 +1466,7 @@ int cco_srAnalyzer_getCellXnumberByColspan(cco_srMlSheet *sheet, int start_x, in
 	y = start_y;
 	for (i = 0; i < index_colspan; i++)
 	{
-		int cell_merging_colspan = sheet->srMlSheet_cellColspan[sheet->srMlSheet_blockWidth * y + x];
+		int cell_merging_colspan = cco_srMlSheet_getCellColspan(sheet, y, x);
 		if (cell_merging_colspan <= 1)
 		{
 			cell_merging_colspan = 1;
@@ -1477,6 +1477,27 @@ int cco_srAnalyzer_getCellXnumberByColspan(cco_srMlSheet *sheet, int start_x, in
 	return x;
 }
 
+int cco_srAnalyzer_getCellXnumberByRowspan(cco_srMlSheet *sheet, int start_x, int start_y, int index_rowspan)
+{
+	int x;
+	int y;
+	int i;
+
+	x = start_x;
+	y = start_y;
+	for (i = 0; i < index_rowspan; i++)
+	{
+		int cell_merging_rowspan = cco_srMlSheet_getCellRowspan(sheet, y, x);
+		if (cell_merging_rowspan <= 1)
+		{
+			cell_merging_rowspan = 1;
+		}
+		y += cell_merging_rowspan;
+	}
+
+	return y;
+}
+
 double cco_srAnalyzer_getCurrentMergedCellWidth(cco_srMlSheet *sheet, int cell_x, int cell_y, int index_colspan)
 {
 	int x;
@@ -1485,11 +1506,12 @@ double cco_srAnalyzer_getCurrentMergedCellWidth(cco_srMlSheet *sheet, int cell_x
 	int i;
 
 	x = cco_srAnalyzer_getCellXnumberByColspan(sheet, cell_x, cell_y, index_colspan);
-	cell_merging_colspan = sheet->srMlSheet_cellColspan[sheet->srMlSheet_blockWidth * cell_y + x];
+	cell_merging_colspan = cco_srMlSheet_getCellColspan(sheet, cell_y, x);
 	for (i = 0; i < cell_merging_colspan; i++)
 	{
 		current_merged_cell_width += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, x + i);
 	}
+	assert(current_merged_cell_width != 0.0);
 
 	return current_merged_cell_width;
 }
@@ -1502,7 +1524,7 @@ double cco_srAnalyzer_getCurrentMergedCellHeight(cco_srMlSheet *sheet, int cell_
 	int i;
 
 	x = cco_srAnalyzer_getCellXnumberByColspan(sheet, cell_x, cell_y, index_colspan);
-	cell_merging_rowspan = sheet->srMlSheet_cellRowspan[sheet->srMlSheet_blockWidth * cell_y + x];
+	cell_merging_rowspan = cco_srMlSheet_getCellRowspan(sheet, cell_y, x);
 	for (i = 0; i < cell_merging_rowspan; i++)
 	{
 		current_merged_cell_height += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, cell_y + i);
@@ -1525,6 +1547,22 @@ double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(cco_arra
 	x = cco_srAnalyzer_getCellXnumberByColspan(sheet, cell_x, cell_y, index_colspan);
 
 	for (i = 0; i < x; i++)
+	{
+		position += cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
+	}
+
+	return position;
+}
+
+double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_rowspan(cco_arraylist *cell_size_list, cco_srMlSheet *sheet, int cell_x, int cell_y, int index_rowspan)
+{
+	double position = 0;
+	int i;
+	int y;
+
+	y = cco_srAnalyzer_getCellXnumberByRowspan(sheet, cell_x, cell_y, index_rowspan);
+
+	for (i = 0; i < y; i++)
 	{
 		position += cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
 	}
@@ -1602,6 +1640,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	cco_arraylist *xml_blockOcrs = NULL;
 	cco_vString *xml_attr_name = NULL;
 	cco_vString *xml_attr_colspan = NULL;
+	cco_vString *xml_attr_rowspan = NULL;
 	cco_vString *xml_attr_x = NULL;
 	cco_vString *xml_attr_y = NULL;
 	cco_vString *xml_attr_option = NULL;
@@ -1611,6 +1650,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	cco_redblacktree *valuestree;
 	char *tmp_cstring;
 	int attr_colspan;
+	int attr_rowspan;
 	int attr_x;
 	int attr_y;
 	int index_colspan;
@@ -1673,6 +1713,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 		{
 			xml_attr_name = cco_vXml_getAttribute(xml, "name");
 			xml_attr_colspan = cco_vXml_getAttribute(xml, "colspan");
+			xml_attr_rowspan = cco_vXml_getAttribute(xml, "rowspan");
 			xml_attr_x = cco_vXml_getAttribute(xml, "x");
 			xml_attr_y = cco_vXml_getAttribute(xml, "y");
 			xml_attr_option = cco_vXml_getAttribute(xml, "option");
@@ -1699,6 +1740,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			} else {
 				attr_colspan = 1;
 			}
+			if (xml_attr_rowspan != NULL)
+			{
+				attr_rowspan = cco_vString_toInt(xml_attr_rowspan);
+			} else {
+				attr_rowspan = 1;
+			}
 			/* create dir */
 			tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
 					obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
@@ -1712,11 +1759,23 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			for (index_colspan = 0; index_colspan < attr_colspan; index_colspan++)
 			{
 				/* */
-				int cell_merging_colspan = sheet->srMlSheet_cellColspan[sheet->srMlSheet_blockWidth * attr_y + cco_srAnalyzer_getCellXnumberByColspan(sheet, attr_x, attr_y, index_colspan)];
-				current_cell_width_scaled  = cco_srAnalyzer_getCurrentMergedCellWidth(sheet, attr_x, attr_y, index_colspan) * scale_x;
-				current_cell_height_scaled = cco_srAnalyzer_getCurrentMergedCellHeight(sheet, attr_x, attr_y, index_colspan) * scale_y;
+				int cell_merging_colspan = cco_srMlSheet_getCellColspan(
+						sheet,
+						attr_y,
+						cco_srAnalyzer_getCellXnumberByColspan(sheet, attr_x, attr_y, index_colspan)
+				);
 				current_cell_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(sheet->srMlSheet_cellWidth_list, sheet, attr_x, attr_y, index_colspan);
 				current_cell_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y);
+				current_cell_width_scaled = cco_srAnalyzer_getCurrentMergedCellWidth(sheet, attr_x, attr_y, index_colspan) * scale_x;
+				if (index_colspan == 0)
+				{
+					current_cell_height_scaled = (
+						cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_rowspan(
+							sheet->srMlSheet_cellHeight_list,
+							sheet, attr_x, attr_y, attr_rowspan
+						) - current_cell_y
+					) * scale_y;
+				}
 
 				/* discovers the box of target. */
 				cco_arraylist_setCursorAtBack(list_candidate_pattern);
@@ -1819,11 +1878,20 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					if (obj->srAnalyzer_debug >= 1) {
 						printf("*** trying to analyze x:%d, y:%d, colspan=%d, index_colspan=%d, cell_merging_colspan=%d, char_no=%d\n", attr_x, attr_y, attr_colspan, index_colspan, cell_merging_colspan, char_no_in_cell);
 					}
+					/*
+					 * determine the way how to find the target to be passed to OCR engine
+					 */
 					if (cell_merging_colspan == 1)
 					{
+						/* try to get a target as assuming one character is written in the in the rectangle cell by using a list of contours */
 						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &oneCharInOneCell, &pattern);
 						loop_exit_flag = 1;
 					} else if (cell_merging_colspan > 1) {
+						/* just pass the rectangle cell to the OCR engine by not using a list of contours */
+						pattern == NULL;
+						loop_exit_flag = 1;
+					} else if (0) {	// currently disabled
+						/* try to get a target from a list of contours in the rectangle cell */
 						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &multipleCharsInMergedCell, &pattern);
 						if (pattern == NULL)
 						{
@@ -1995,6 +2063,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	double current_cell_position_x;
 	double current_cell_position_y;
 	double current_cell_position_plus_colspan_x;
+	double current_cell_position_plus_colspan_y;
 	int offset_x;
 	int offset_y;
 	int offset_width;
@@ -2010,6 +2079,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	cco_arraylist *xml_blockOcrs = NULL;
 	cco_vString *xml_attr_name = NULL;
 	cco_vString *xml_attr_colspan = NULL;
+	cco_vString *xml_attr_rowspan = NULL;
 	cco_vString *xml_attr_x = NULL;
 	cco_vString *xml_attr_y = NULL;
 	cco_vString *xml_attr_margin = NULL;
@@ -2018,6 +2088,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	cco_redblacktree *valuestree;
 	char *tmp_cstring;
 	int attr_colspan;
+	int attr_rowspan;
 	int attr_x;
 	int attr_y;
 	int attr_margen;
@@ -2039,6 +2110,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	{
 		xml_attr_name = cco_vXml_getAttribute(xml, "name");
 		xml_attr_colspan = cco_vXml_getAttribute(xml, "colspan");
+		xml_attr_rowspan = cco_vXml_getAttribute(xml, "rowspan");
 		xml_attr_x = cco_vXml_getAttribute(xml, "x");
 		xml_attr_y = cco_vXml_getAttribute(xml, "y");
 		xml_attr_margin = cco_vXml_getAttribute(xml, "margin");
@@ -2059,7 +2131,13 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		{
 			attr_colspan = cco_vString_toInt(xml_attr_colspan);
 		} else {
-			attr_colspan = 0;
+			attr_colspan = 1;
+		}
+		if (xml_attr_rowspan != NULL)
+		{
+			attr_rowspan = cco_vString_toInt(xml_attr_rowspan);
+		} else {
+			attr_rowspan = 1;
 		}
 		if (xml_attr_margin != NULL)
 		{
@@ -2085,19 +2163,28 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		current_cell_height_scaled = cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y;
 		current_cell_position_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x;
 		current_cell_position_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y;
-		current_cell_position_plus_colspan_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + attr_colspan) * scale_x + offset_x;
+		current_cell_position_plus_colspan_x =
+			cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(
+				sheet->srMlSheet_cellWidth_list,
+				sheet, attr_x, attr_y, attr_colspan
+			) * scale_x + offset_x;
+		current_cell_position_plus_colspan_y =
+			cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_rowspan(
+				sheet->srMlSheet_cellHeight_list,
+				sheet, attr_x, attr_y, attr_rowspan
+			) * scale_y + offset_y;
 
 		tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s/blockImg-%@.png",
 				obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
 				obj->srAnalyzer_date_string, xml_attr_name);
 		tmp_cstring = tmp_string->v_getCstring(tmp_string);
 		margin_width = ((current_cell_position_plus_colspan_x - current_cell_position_x) * (attr_margen / 100.0)) / 2.0;
-		margin_height = (current_cell_height_scaled * (attr_margen / 100.0)) / 2.0;
+		margin_height = ((current_cell_position_plus_colspan_y - current_cell_position_y) * (attr_margen / 100.0)) / 2.0;
 		cco_srAnalyzer_writeImageWithPlace(obj, tmp_cstring,
 				(int) (current_cell_position_x + margin_width),
 				(int) (current_cell_position_y + margin_height),
 				(current_cell_position_plus_colspan_x - current_cell_position_x) - (margin_width * 2.0),
-				current_cell_height_scaled - (margin_height * 2.0));
+				(current_cell_position_plus_colspan_y - current_cell_position_y) - (margin_height * 2.0));
 		cco_safeRelease(tmp_string);
 		free(tmp_cstring);
 

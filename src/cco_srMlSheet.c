@@ -60,8 +60,8 @@ void cco_srMlSheet_baseInitialize(cco_srMlSheet *o)
 	o->srMlSheet_blockHeight = 0;
 	o->srMlSheet_cellWidth_list = cco_arraylist_new();
 	o->srMlSheet_cellHeight_list = cco_arraylist_new();
-	o->srMlSheet_cellRowspan = NULL;
-	o->srMlSheet_cellColspan = NULL;
+	o->srMlSheet_cellRowspan = cco_redblacktree_new();
+	o->srMlSheet_cellColspan = cco_redblacktree_new();
 	return;
 }
 
@@ -71,8 +71,8 @@ void cco_srMlSheet_baseFinalize(cco_srMlSheet *o)
 	cco_safeRelease(o->srMlSheet_xml);
 	cco_arraylist_release(o->srMlSheet_cellWidth_list);
 	cco_arraylist_release(o->srMlSheet_cellHeight_list);
-	free(o->srMlSheet_cellRowspan);
-	free(o->srMlSheet_cellColspan);
+	cco_redblacktree_release(o->srMlSheet_cellRowspan);
+	cco_redblacktree_release(o->srMlSheet_cellColspan);
 	return;
 }
 
@@ -134,14 +134,60 @@ int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *str, int index)
 	return 0;
 }
 
-int cco_srMlSheet_setCellRowspan(cco_srMlSheet *obj, int *rowspans)
+int cco_srMlSheet_setCellRowspan(cco_srMlSheet *obj, cco_vString *row_num, cco_vString *col_num, cco_vString *rowspan)
 {
-	obj->srMlSheet_cellRowspan = rowspans;
+	cco_redblacktree_status status;
+	cco_vString *row_col_str = cco_vString_newWithFormat("%@/%@", row_num, col_num);
+
+	status = cco_redblacktree_insert(obj->srMlSheet_cellRowspan, (cco_v *)row_col_str, (cco *)rowspan);
+	if (status != CCO_REDBLACKTREE_STATUS_INSERTED)
+	{
+		fprintf(stderr, "%s:the key(%s) already exists\n", __func__, cco_vString_getCstring(row_col_str));
+	}
+	cco_safeRelease(row_col_str);
 	return 0;
 }
 
-int cco_srMlSheet_setCellColspan(cco_srMlSheet *obj, int *colspans)
+int cco_srMlSheet_setCellColspan(cco_srMlSheet *obj, cco_vString *row_num, cco_vString *col_num, cco_vString *colspan)
 {
-	obj->srMlSheet_cellColspan = colspans;
+	cco_redblacktree_status status;
+	cco_vString *row_col_str = cco_vString_newWithFormat("%@/%@", row_num, col_num);
+
+	status = cco_redblacktree_insert(obj->srMlSheet_cellColspan, (cco_v *)row_col_str, (cco *)colspan);
+	if (status != CCO_REDBLACKTREE_STATUS_INSERTED)
+	{
+		fprintf(stderr, "%s:the key(%s) already exists\n", __func__, cco_vString_getCstring(row_col_str));
+	}
+	cco_safeRelease(row_col_str);
 	return 0;
+}
+
+int cco_srMlSheet_getCellRowspan(cco_srMlSheet *obj, int row_num, int col_num)
+{
+	cco_vString *row_col_str = cco_vString_newWithFormat("%d/%d", row_num, col_num);
+	cco_vString *result_str;
+
+	result_str = (cco_vString *)cco_redblacktree_get(obj->srMlSheet_cellRowspan, (cco_v *)row_col_str);
+	cco_safeRelease(row_col_str);
+	if (result_str == NULL)
+	{
+		return 1;
+	} else {
+		return cco_vString_toInt(result_str);
+	}
+}
+
+int cco_srMlSheet_getCellColspan(cco_srMlSheet *obj, int row_num, int col_num)
+{
+	cco_vString *row_col_str = cco_vString_newWithFormat("%d/%d", row_num, col_num);
+	cco_vString *result_str;
+
+	result_str = (cco_vString *)cco_redblacktree_get(obj->srMlSheet_cellColspan, (cco_v *)row_col_str);
+	cco_safeRelease(row_col_str);
+	if (result_str == NULL)
+	{
+		return 1;
+	} else {
+		return cco_vString_toInt(result_str);
+	}
 }

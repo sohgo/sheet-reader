@@ -29,7 +29,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <string.h>
 
 cco_defineClass(cco_srMl);
 
@@ -251,7 +250,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 				{
 					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was ignored.\n");
 				} else {
-					colspans[block_width * attr_cell_row + attr_cell_col] = cell_colspan;
+					cco_srMlSheet_setCellColspan(sheet, xml_attr_cell_row, xml_attr_cell_col, xml_attr_cell_colspan);
 				}
 
 				cco_safeRelease(xml_attr_cell_row);
@@ -260,7 +259,6 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 				cco_arraylist_setCursorAtNext(xml_cellColspan);
 			}
 			cco_safeRelease(xml_cellColspan);
-			cco_srMlSheet_setCellColspan(sheet, colspans);
 
 			xml_cellRowspan = cco_vXml_getElements(curxml, "cellRowspan/cellAttribute");
 			cco_arraylist_setCursorAtFront(xml_cellRowspan);
@@ -299,7 +297,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 				{
 					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was ignored.\n");
 				} else {
-					rowspans[block_width * attr_cell_row + attr_cell_col] = cell_rowspan;
+					cco_srMlSheet_setCellRowspan(sheet, xml_attr_cell_row, xml_attr_cell_col, xml_attr_cell_rowspan);
 				}
 
 				cco_safeRelease(xml_attr_cell_row);
@@ -309,7 +307,6 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 
 			}
 			cco_safeRelease(xml_cellRowspan);
-			cco_srMlSheet_setCellRowspan(sheet, rowspans);
 
 			cco_srMlSheet_setXml(sheet, curxml);
 			cco_srMlSheet_setId(sheet, id_string);
