@@ -1625,14 +1625,6 @@ int cco_srAnalyzer_get_margin_from_xml_attribute(cco_vString *xml_attr_margin, i
 	if (xml_attr_margin != NULL)
 	{
 		result_margin = cco_vString_toInt(xml_attr_margin);
-		if (result_margin >= 100)
-		{
-			result_margin = 99;
-		}
-		if (result_margin < 0)
-		{
-			result_margin = 0;
-		}
 	} else {
 		result_margin = default_margin;
 	}
