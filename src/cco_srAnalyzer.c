@@ -1435,13 +1435,13 @@ double cco_srAnalyzer_vString_toDouble(cco_vString *string)
  *
  * Input: index: cell number: 0 origin without marker
  */
-double cco_srAnalyzer_get_position_of_the_cell_withoutMarker(cco_arraylist *cell_size_list, int index)
+double cco_srAnalyzer_get_position_of_the_cell_withoutMarker(cco_redblacktree *cell_size_list, int index)
 {
 	double position = 0;
 	int i;
 
 	for (i = 0; i < index; i++) {
-		position += cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
+		position += cco_srMlSheet_getCellWidthOrHeight(cell_size_list, i + 1);
 	}
 
 	return position;
@@ -1451,9 +1451,9 @@ double cco_srAnalyzer_get_position_of_the_cell_withoutMarker(cco_arraylist *cell
  *
  * Input: index: cell number: 0 origin without marker
  */
-double cco_srAnalyzer_get_size_of_the_cell_withoutMarker(cco_arraylist *cell_size_list, int index)
+double cco_srAnalyzer_get_size_of_the_cell_withoutMarker(cco_redblacktree *cell_size_list, int index)
 {
-	return cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list,  index + 1));
+	return cco_srMlSheet_getCellWidthOrHeight(cell_size_list, index + 1);
 }
 
 int cco_srAnalyzer_getCellXnumberByColspan(cco_srMlSheet *sheet, int start_x, int start_y, int index_colspan)
@@ -1538,7 +1538,7 @@ double cco_srAnalyzer_getCurrentMergedCellHeight(cco_srMlSheet *sheet, int cell_
  * Get the position of top-left corner
  *
  */
-double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(cco_arraylist *cell_size_list, cco_srMlSheet *sheet, int cell_x, int cell_y, int index_colspan)
+double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(cco_redblacktree *cell_size_list, cco_srMlSheet *sheet, int cell_x, int cell_y, int index_colspan)
 {
 	double position = 0;
 	int i;
@@ -1548,13 +1548,13 @@ double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_colspan(cco_arra
 
 	for (i = 0; i < x; i++)
 	{
-		position += cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
+		position += cco_srMlSheet_getCellWidthOrHeight(cell_size_list, i + 1);
 	}
 
 	return position;
 }
 
-double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_rowspan(cco_arraylist *cell_size_list, cco_srMlSheet *sheet, int cell_x, int cell_y, int index_rowspan)
+double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_rowspan(cco_redblacktree *cell_size_list, cco_srMlSheet *sheet, int cell_x, int cell_y, int index_rowspan)
 {
 	double position = 0;
 	int i;
@@ -1564,7 +1564,7 @@ double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_rowspan(cco_arra
 
 	for (i = 0; i < y; i++)
 	{
-		position += cco_srAnalyzer_vString_toDouble((cco_vString *)cco_arraylist_getAt(cell_size_list, i + 1));
+		position += cco_srMlSheet_getCellWidthOrHeight(cell_size_list, i + 1);
 	}
 
 	return position;
