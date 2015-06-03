@@ -226,7 +226,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 
 				xml_attr_cell_row     = cco_vXml_getAttribute(cursor_xmlCellColspan, "row");
 				xml_attr_cell_col     = cco_vXml_getAttribute(cursor_xmlCellColspan, "col");
-				xml_attr_cell_colspan = cco_vXml_getAttribute(cursor_xmlCellColspan, "colspan");
+				xml_attr_cell_colspan = cco_vXml_getAttribute(cursor_xmlCellColspan, "span");
 
 				attr_cell_row = cco_vString_toInt(xml_attr_cell_row);
 				attr_cell_col = cco_vString_toInt(xml_attr_cell_col);
@@ -273,7 +273,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 
 				xml_attr_cell_row     = cco_vXml_getAttribute(cursor_xmlCellRowspan, "row");
 				xml_attr_cell_col     = cco_vXml_getAttribute(cursor_xmlCellRowspan, "col");
-				xml_attr_cell_rowspan = cco_vXml_getAttribute(cursor_xmlCellRowspan, "rowspan");
+				xml_attr_cell_rowspan = cco_vXml_getAttribute(cursor_xmlCellRowspan, "span");
 
 				attr_cell_row = cco_vString_toInt(xml_attr_cell_row);
 				attr_cell_col = cco_vString_toInt(xml_attr_cell_col);
