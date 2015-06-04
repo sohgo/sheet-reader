@@ -170,7 +170,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 				if (satisfied_flag == 0) {
 					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was igrenored.\n");
 				} else {
-					cco_srMlSheet_setCellWidth(sheet, xml_attr_cell_length, cell_number);
+					cco_srMlSheet_setCellWidth(sheet, xml_attr_cell_number, xml_attr_cell_length);
 				}
 
 				cco_safeRelease(xml_attr_cell_number);
@@ -203,7 +203,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 				if (satisfied_flag == 0) {
 					printf("Format ERROR: Not satisfied with specification of srML: this cellAttribute line was igrenored.\n");
 				} else {
-					cco_srMlSheet_setCellHeight(sheet, xml_attr_cell_length, cell_number);
+					cco_srMlSheet_setCellHeight(sheet, xml_attr_cell_number, xml_attr_cell_length);
 				}
 
 				cco_safeRelease(xml_attr_cell_number);

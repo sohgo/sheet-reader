@@ -58,8 +58,8 @@ void cco_srMlSheet_baseInitialize(cco_srMlSheet *o)
 	o->srMlSheet_id = NULL;
 	o->srMlSheet_blockWidth = 0;
 	o->srMlSheet_blockHeight = 0;
-	o->srMlSheet_cellWidth_list = cco_arraylist_new();
-	o->srMlSheet_cellHeight_list = cco_arraylist_new();
+	o->srMlSheet_cellWidth_list = cco_redblacktree_new();
+	o->srMlSheet_cellHeight_list = cco_redblacktree_new();
 	o->srMlSheet_cellRowspan = cco_redblacktree_new();
 	o->srMlSheet_cellColspan = cco_redblacktree_new();
 	return;
@@ -69,8 +69,8 @@ void cco_srMlSheet_baseFinalize(cco_srMlSheet *o)
 {
 	cco_safeRelease(o->srMlSheet_xml);
 	cco_safeRelease(o->srMlSheet_xml);
-	cco_arraylist_release(o->srMlSheet_cellWidth_list);
-	cco_arraylist_release(o->srMlSheet_cellHeight_list);
+	cco_redblacktree_release(o->srMlSheet_cellWidth_list);
+	cco_redblacktree_release(o->srMlSheet_cellHeight_list);
 	cco_redblacktree_release(o->srMlSheet_cellRowspan);
 	cco_redblacktree_release(o->srMlSheet_cellColspan);
 	return;
@@ -122,15 +122,27 @@ int cco_srMlSheet_setHeight(cco_srMlSheet *obj, cco_vString *str)
 	return 0;
 }
 
-int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *str, int index)
+int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *index, cco_vString *str)
 {
-	cco_arraylist_addDynamicAt(obj->srMlSheet_cellWidth_list, str, index);
+	cco_redblacktree_status status;
+
+	status = cco_redblacktree_insert(obj->srMlSheet_cellWidth_list, (cco_v *)index, (cco *)str);
+	if (status != CCO_REDBLACKTREE_STATUS_INSERTED)
+	{
+		fprintf(stderr, "%s:the key(%s) already exists\n", __func__, cco_vString_getCstring(index));
+	}
 	return 0;
 }
 
-int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *str, int index)
+int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *index, cco_vString *str)
 {
-	cco_arraylist_addDynamicAt(obj->srMlSheet_cellHeight_list, str, index);
+	cco_redblacktree_status status;
+
+	status = cco_redblacktree_insert(obj->srMlSheet_cellHeight_list, (cco_v *)index, (cco *)str);
+	if (status != CCO_REDBLACKTREE_STATUS_INSERTED)
+	{
+		fprintf(stderr, "%s:the key(%s) already exists\n", __func__, cco_vString_getCstring(index));
+	}
 	return 0;
 }
 
@@ -160,6 +172,26 @@ int cco_srMlSheet_setCellColspan(cco_srMlSheet *obj, cco_vString *row_num, cco_v
 	}
 	cco_safeRelease(row_col_str);
 	return 0;
+}
+
+double cco_srMlSheet_getCellWidthOrHeight(cco_redblacktree *obj, int index)
+{
+	cco_vString *index_str = cco_vString_newWithFormat("%d", index);
+	cco_vString *result_str;
+	char *cstring;
+	double size;
+
+	result_str = (cco_vString *)cco_redblacktree_get(obj, (cco_v *)index_str);
+	cco_safeRelease(index_str);
+	if (result_str == NULL)
+	{
+		return 1;
+	} else {
+		cstring = cco_vString_getCstring(result_str);
+		size = atof(cstring);
+		free(cstring);
+		return size;
+	}
 }
 
 int cco_srMlSheet_getCellRowspan(cco_srMlSheet *obj, int row_num, int col_num)

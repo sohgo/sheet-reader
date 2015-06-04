@@ -31,8 +31,8 @@
 	cco_vString *srMlSheet_id;\
 	int srMlSheet_blockWidth;\
 	int srMlSheet_blockHeight;\
-	cco_arraylist *srMlSheet_cellWidth_list;\
-	cco_arraylist *srMlSheet_cellHeight_list;\
+	cco_redblacktree *srMlSheet_cellWidth_list;\
+	cco_redblacktree *srMlSheet_cellHeight_list;\
 	cco_redblacktree *srMlSheet_cellRowspan;\
 	cco_redblacktree *srMlSheet_cellColspan;\
 
@@ -54,11 +54,12 @@ int cco_srMlSheet_setXml(cco_srMlSheet *obj, cco_vXml *xml);
 int cco_srMlSheet_setId(cco_srMlSheet *obj, cco_vString *str);
 int cco_srMlSheet_setWidth(cco_srMlSheet *obj, cco_vString *str);
 int cco_srMlSheet_setHeight(cco_srMlSheet *obj, cco_vString *str);
-int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *str, int index);
-int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *str, int index);
+int cco_srMlSheet_setCellWidth(cco_srMlSheet *obj, cco_vString *index, cco_vString *str);
+int cco_srMlSheet_setCellHeight(cco_srMlSheet *obj, cco_vString *index, cco_vString *str);
 int cco_srMlSheet_setCellRowspan(cco_srMlSheet *obj, cco_vString *row_num, cco_vString *col_num, cco_vString *rowspan);
 int cco_srMlSheet_setCellColspan(cco_srMlSheet *obj, cco_vString *row_num, cco_vString *col_num, cco_vString *colspan);
 
+double cco_srMlSheet_getCellWidthOrHeight(cco_redblacktree *obj, int index);
 int cco_srMlSheet_getCellRowspan(cco_srMlSheet *obj, int row_num, int col_num);
 int cco_srMlSheet_getCellColspan(cco_srMlSheet *obj, int row_num, int col_num);
 

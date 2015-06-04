@@ -317,6 +317,8 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 				cco_vString_replaceWithCstring(tmp1_string, "b", "×");
 				cco_vString_replaceWithCstring(tmp1_string, "s", "△");
 				cco_vString_replaceWithCstring(tmp1_string, "c", "✓");
+				cco_vString_replaceWithCstring(tmp1_string, "p", "+");
+				cco_vString_replaceWithCstring(tmp1_string, "n", "-");
 				cco_vString_replaceWithCstring(tmp1_string, "z", " ");
 				*recognizedString =
 				  cco_vString_getReplacedStringWithCstring(tmp1_string,
