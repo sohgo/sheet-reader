@@ -2237,6 +2237,62 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	return result;
 }
 
+/*
+ * View a grid by using cell width and height info in SrML
+ */
+CCOSRANALYZER_STATUS cco_srAnalyzer_viewGrid(cco_srAnalyzer *obj, cco_srMlSheet *sheet)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	double current_cell_position_x;
+	double current_cell_position_y;
+	double start_cell_position_x;
+	double start_cell_position_y;
+	int offset_x;
+	int offset_y;
+	int offset_width;
+	int offset_height;
+	int col, row;
+	double offset_width_excel;
+	double offset_height_excel;
+	double scale_x;
+	double scale_y;
+	IplImage *grid_img = NULL;
+
+	offset_x = obj->srAnalyzer_pattern_upperleft->vSrPattern_x
+			+ obj->srAnalyzer_pattern_upperleft->vSrPattern_width;
+	offset_y = obj->srAnalyzer_pattern_upperleft->vSrPattern_y
+			+ obj->srAnalyzer_pattern_upperleft->vSrPattern_height;
+	offset_width = obj->srAnalyzer_pattern_upperright->vSrPattern_x - offset_x;
+	offset_height = obj->srAnalyzer_pattern_bottomleft->vSrPattern_y - offset_y;
+	offset_width_excel = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, sheet->srMlSheet_blockWidth);
+	offset_height_excel = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, sheet->srMlSheet_blockHeight);
+	scale_x = offset_width / offset_width_excel;
+	scale_y = offset_height / offset_height_excel;
+
+	grid_img = cvClone(obj->srAnalyzer_img);
+
+	start_cell_position_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, 0) * scale_x + offset_x;
+	start_cell_position_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, 0) * scale_y + offset_y;
+	// draw horizontal lines
+	current_cell_position_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, sheet->srMlSheet_blockWidth) * scale_x + offset_x;
+	for (row = 0; row < sheet->srMlSheet_blockHeight + 1; row++)
+	{
+		current_cell_position_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, row) * scale_y + offset_y;
+		cvLine(grid_img, cvPoint(start_cell_position_x, current_cell_position_y), cvPoint(current_cell_position_x, current_cell_position_y), CV_RGB(0, 255, 0), 2, 8, 0);
+	}
+	// draw vertical lines
+	current_cell_position_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, sheet->srMlSheet_blockHeight) * scale_y + offset_y;
+	for (col = 0; col < sheet->srMlSheet_blockWidth + 1; col++)
+	{
+		current_cell_position_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, col) * scale_x + offset_x;
+		cvLine(grid_img, cvPoint(current_cell_position_x, start_cell_position_y), cvPoint(current_cell_position_x, current_cell_position_y), CV_RGB(0, 255, 0), 2, 8, 0);
+	}
+	cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "Grid by using CellWidth and CellHeight in SrML", grid_img, 2);
+
+	cvReleaseImage(&grid_img);
+	return result;
+}
+
 CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetIdsFromImage(cco_srAnalyzer *obj, char *ocr_db, int force_set_uid, int force_set_sid)
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
@@ -2329,6 +2385,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocr(cco_srAnalyzer *obj)
 			fprintf(stderr, "ERROR: CCOSRANALYZER_STATUS_NOT_FOUND_SRML\n");
 			result = CCOSRANALYZER_STATUS_NOT_FOUND_SRML;
 			break;
+		}
+		if (obj->srAnalyzer_debug >= 2)
+		{
+			cco_srAnalyzer_viewGrid(obj, sheet);
 		}
 		cco_srAnalyzer_ocrProcBlockOcr(obj, sheet, obj->srAnalyzer_analyzedData);
 		cco_srAnalyzer_ocrProcBlockImg(obj, sheet, obj->srAnalyzer_analyzedData);
