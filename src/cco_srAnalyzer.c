@@ -1928,12 +1928,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					if (pattern != NULL)
 					{
 						/* found a target. */
-						cco_srAnalyzer_writeImageWithPlaceToLOcr(obj, tmp_cstring,
+						cco_srAnalyzer_writeImageWithPlace(obj, tmp_cstring,
 								(int) (pattern->vSrPattern_x),
 								(int) (pattern->vSrPattern_y),
 								(int) (pattern->vSrPattern_width),
-								(int) (pattern->vSrPattern_height),
-								3, 250);
+								(int) (pattern->vSrPattern_height));
 						if (obj->srAnalyzer_debug >= 2) {
 							cvRectangle(img_tmp,
 									cvPoint((int) (pattern->vSrPattern_x),
@@ -1944,12 +1943,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 						}
 					} else if (pattern == NULL && first_call_flag == 1) {
 						/* did not find a target. */
-						cco_srAnalyzer_writeImageWithPlaceToLOcr(obj, tmp_cstring,
+						cco_srAnalyzer_writeImageWithPlace(obj, tmp_cstring,
 								(int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
 								(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled * attr_margin_top / 100.0),
 								current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
-								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0,
-								7, 250);
+								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
 						if (obj->srAnalyzer_debug >= 2) {
 							cvRectangle(img_tmp,
 									cvPoint((int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
