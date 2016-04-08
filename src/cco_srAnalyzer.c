@@ -1773,6 +1773,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			xml_attr_margin_bottom = cco_vXml_getAttribute(xml, "margin-bottom");
 			xml_attr_margin_right  = cco_vXml_getAttribute(xml, "margin-right");
 			xml_attr_margin_left   = cco_vXml_getAttribute(xml, "margin-left");
+			attr_margin        = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin, 0);
+			attr_margin_top    = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_top, attr_margin);
+			attr_margin_bottom = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_bottom, attr_margin);
+			attr_margin_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_right, attr_margin);
+			attr_margin_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_left, attr_margin);
 			/* create dir */
 			tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
 					obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
