@@ -1913,7 +1913,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 						loop_exit_flag = 1;
 					} else if (cell_merging_colspan > 1) {
 						/* just pass the rectangle cell to the OCR engine by not using a list of contours */
-						pattern == NULL;
+						pattern = NULL;
 						loop_exit_flag = 1;
 					} else if (0) {	// currently disabled
 						/* try to get a target from a list of contours in the rectangle cell */
