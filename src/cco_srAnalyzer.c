@@ -837,6 +837,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatternsInSpecifiedArea(
 		cco_srAnalyzer_showShrinkedImageNow_withImage(obj, "findPatterns: found patterns",
 				img_tmp, 3);
 	}
+	return result;
 }
 
 
