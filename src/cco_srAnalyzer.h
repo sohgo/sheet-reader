@@ -101,6 +101,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_outXml(cco_srAnalyzer *obj);
 CCOSRANALYZER_STATUS cco_srAnalyzer_outSql(cco_srAnalyzer *obj);
 CCOSRANALYZER_STATUS cco_srAnalyzer_backupImage(cco_srAnalyzer *obj);
 void cco_srAnalyzer_resultPrint(cco_srAnalyzer *obj, char *mode, char *sr_result);
+CCOSRANALYZER_STATUS cco_srAnalyzer_setMarkerSampleImageFile(char *filename);
 
 int cco_srAnalyzer_showImage_createWindow(cco_srAnalyzer *obj, char* windowname, IplImage *img);
 int cco_srAnalyzer_showImage_destroyWindow(cco_srAnalyzer *obj, char* windowname);
