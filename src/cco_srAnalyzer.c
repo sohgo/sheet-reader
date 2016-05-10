@@ -293,7 +293,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_readImage(cco_srAnalyzer *obj, char *file)
 		cvResetImageROI(obj->srAnalyzer_img);
 	} while (0);
 	cvReleaseImage(&read_img);
-	return CCOSRANALYZER_STATUS_SUCCESS;
+	return result;
 }
 
 int cco_srAnalyzer_writeImage(cco_srAnalyzer *obj, char *file)
