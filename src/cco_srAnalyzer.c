@@ -2351,13 +2351,13 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetSheetAndSurveyIds(cco_srAnalyzer *ob
 		/* try ocr by using gocr */
 		cco_srAnalyzer_setOcrEngine(obj, "gocr");
 		cco_srAnalyzer_ocrToGetIdsFromImage(obj, "number", !is_uid_specified_in_cmd_line, !is_sid_specified_in_cmd_line);
+#ifdef KOCR
+		cco_srAnalyzer_setOcrEngine(obj, "kocr");
+#endif
 		if (cco_vString_length(obj->srAnalyzer_sid) == 5)
 		{
 			break;
 		}
-#ifdef KOCR
-		cco_srAnalyzer_setOcrEngine(obj, "kocr");
-#endif
 	} while (0);
 	return result;
 }
