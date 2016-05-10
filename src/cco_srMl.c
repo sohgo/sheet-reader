@@ -120,7 +120,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 	int cell_colspan = 1;
 	int block_width;
 	int block_height;
-	int i, j;
+	int i;
 
 	do {
 		curxml = cco_vXml_getElementAtFront(xml->srMl_xml, "srMl");

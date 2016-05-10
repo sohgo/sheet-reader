@@ -341,11 +341,6 @@ int cco_srAnalyzer_writeImageWithPlace(cco_srAnalyzer *obj, char *file, int x, i
 CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToOcr(cco_srAnalyzer *obj, char *file,
 		int x, int y, int width, int height, int smooth, int threshold)
 {
-	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
-	CvRect save_rect;
-	CvRect set_rect;
-	IplImage *tmp_img;
-
 	int action(IplImage *image)
 	{
 		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
@@ -744,7 +739,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_findPatternsInSpecifiedArea(
 {
 	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
 	IplImage *img_tmp = NULL;
-	IplImage *img_prebinarized = NULL;
 	IplImage *img_binarized = NULL;
 	CvMemStorage *strage_conturs = cvCreateMemStorage(0);
 	CvSeq *seq_conturs;
@@ -1690,8 +1684,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	double scale_x;
 	double scale_y;
 
-
-	int i;
 
 	img_tmp = cvClone(obj->srAnalyzer_img);
 
