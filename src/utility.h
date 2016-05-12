@@ -22,5 +22,6 @@
 #define UTILITY_H_
 
 int utility_mkdir(char *str);
+char *utility_get_tmp_file(char *prefix);
 
 #endif

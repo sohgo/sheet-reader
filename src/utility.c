@@ -135,3 +135,43 @@ int utility_mkdir(char *str) {
 	}
 	return(0);
 }
+
+extern char *tmpdir_prefix;
+
+/*
+ * Get a writable temporary file name
+ *
+ * Return NULL on error
+ *
+ * Caller must free the allocated memory space after use
+ *
+ */
+char *utility_get_tmp_file(const char *prefix)
+{
+	char *tmpfile = NULL;
+	int tmpfilefd;
+	int r = 0;
+
+	tmpfile = (char *)calloc(PATH_MAX, sizeof(char));
+	if (tmpfile == NULL)
+	{
+		// fprintf(stderr, "ERROR: Cannot allocate a memory in %s.\n", __func__);
+		return NULL;
+	}
+
+	r = snprintf(tmpfile, PATH_MAX * sizeof(char), "%s/%s_XXXXXX", tmpdir_prefix, prefix);
+	if (r < 0)
+	{
+		return NULL;
+	}
+	tmpfilefd = mkstemp(tmpfile);
+	if (tmpfilefd == -1)
+	{
+		// fprintf(stderr, "ERROR: Cannot create a temporary file in %s.\n", __func__);
+		return NULL;
+	}
+	close(tmpfilefd);
+	remove(tmpfile);
+
+	return tmpfile;
+}
