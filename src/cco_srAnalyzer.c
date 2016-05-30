@@ -2318,7 +2318,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetIdsFromImage(cco_srAnalyzer *obj, ch
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetSheetAndSurveyIds(cco_srAnalyzer *obj)
 {
-	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_NOT_FOUND_ID;
 	int is_uid_specified_in_cmd_line = 0;
 	int is_sid_specified_in_cmd_line = 0;
 
@@ -2338,6 +2338,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetSheetAndSurveyIds(cco_srAnalyzer *ob
 		cco_srAnalyzer_ocrToGetIdsFromImage(obj, "idocrbs", !is_uid_specified_in_cmd_line, !is_sid_specified_in_cmd_line);
 		if (cco_vString_length(obj->srAnalyzer_sid) == 5)
 		{
+			result = CCOSRANALYZER_STATUS_SUCCESS;
+			if (obj->srAnalyzer_debug >= 1)
+			{
+				fprintf(stderr, "Found SID by kocr\n");
+			}
 			break;
 		}
 #endif
@@ -2349,6 +2354,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrToGetSheetAndSurveyIds(cco_srAnalyzer *ob
 #endif
 		if (cco_vString_length(obj->srAnalyzer_sid) == 5)
 		{
+			result = CCOSRANALYZER_STATUS_SUCCESS;
+			if (obj->srAnalyzer_debug >= 1)
+			{
+				fprintf(stderr, "Found SID by gocr\n");
+			}
 			break;
 		}
 	} while (0);
