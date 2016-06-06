@@ -22,6 +22,7 @@
 #ifndef CCO_SROCR_H_
 #define CCO_SROCR_H_
 
+#include <opencv/cv.h>
 #include <cluscore/cco.h>
 #include <cluscore/cco_vString.h>
 
@@ -38,7 +39,7 @@ typedef enum CCOSROCR_STATUS CCOSROCR_STATUS;
 
 #define CCO_SROCR_PROPERTIES \
 	CCOSROCR_STATUS (*srOcr_initialize)(void *cco_srOcr, char *configfile);\
-	CCOSROCR_STATUS (*srOcr_setImage)(void *cco_srOcr, char *imagefile);\
+	CCOSROCR_STATUS (*srOcr_setImage)(void *cco_srOcr, IplImage *image);\
 	CCOSROCR_STATUS (*srOcr_getRecognizeString)(void *cco_srOcr, cco_vString **recognizedString);\
 	CCOSROCR_STATUS (*srOcr_setOption)(void *cco_srOcr, char *option);
 
@@ -57,7 +58,7 @@ cco_srOcr *cco_srOcr_new();
 void cco_srOcr_release(void *cco);
 
 CCOSROCR_STATUS cco_srOcr_initialize(void *cco_srOcr, char *configfile);
-CCOSROCR_STATUS cco_srOcr_setImage(void *cco_srOcr, char *imagefile);
+CCOSROCR_STATUS cco_srOcr_setImage(void *cco_srOcr, IplImage *imagefile);
 CCOSROCR_STATUS cco_srOcr_getRecognizeString(void *cco_srOcr, cco_vString **recognizedString);
 CCOSROCR_STATUS cco_srOcr_setOption(void *obj, char *option);
 

@@ -26,6 +26,8 @@
 #include <opencv/highgui.h>
 #include <opencv/cv.h>
 
+#include "utility.h"
+
 #define cvSaveImage(x, y) cvSaveImage(x, y, 0)
 
 cco_defineClass(cco_srOcrGocr);
@@ -62,7 +64,7 @@ void cco_srOcrGocr_baseInitialize(cco_srOcrGocr *o)
 	o->srOcr_setImage = &cco_srOcrGocr_setImage;
 	o->srOcr_setOption = &cco_srOcrGocr_setOption;
 	o->srOcr_getRecognizeString = &cco_srOcrGocr_getRecognizeString;
-	o->srOcrGocr_filename = NULL;
+	o->srOcrGocr_image = NULL;
 	o->srOcrGocr_option = strdup("0-9");
 	o->srOcrGocr_db = strdup("handwrite_09db");
 	o->srOcrGocr_dustsize = strdup("50");
@@ -72,10 +74,10 @@ void cco_srOcrGocr_baseInitialize(cco_srOcrGocr *o)
 
 void cco_srOcrGocr_baseFinalize(cco_srOcrGocr *o)
 {
-	if (o->srOcrGocr_filename != NULL)
+	if (o->srOcrGocr_image != NULL)
 	{
-		free(o->srOcrGocr_filename);
-		o->srOcrGocr_filename = NULL;
+		cvReleaseImage(&o->srOcrGocr_image);
+		o->srOcrGocr_image = NULL;
 		free(o->srOcrGocr_option);
 		o->srOcrGocr_option = NULL;
 		free(o->srOcrGocr_db);
@@ -107,15 +109,15 @@ CCOSROCR_STATUS cco_srOcrGocr_initialize(void *obj, char *configfile)
 	return CCOSROCR_STATUS_SUCCESS;
 }
 
-CCOSROCR_STATUS cco_srOcrGocr_setImage(void *obj, char *imagefile)
+CCOSROCR_STATUS cco_srOcrGocr_setImage(void *obj, IplImage *image)
 {
 	cco_srOcrGocr *ocr;
 	ocr = obj;
-	if (ocr->srOcrGocr_filename != NULL)
+	if (ocr->srOcrGocr_image != NULL)
 	{
-		free(ocr->srOcrGocr_filename);
+		cvReleaseImage(&ocr->srOcrGocr_image);
 	}
-	ocr->srOcrGocr_filename = strdup(imagefile);
+	ocr->srOcrGocr_image = cvCloneImage(image);
 	return CCOSROCR_STATUS_SUCCESS;
 }
 
@@ -181,17 +183,15 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 {
 	CCOSROCR_STATUS result = CCOSROCR_STATUS_SUCCESS;
 	cco_srOcrGocr *ocrobj;
-	cco_vString *tmpppm_string = NULL;
 	cco_vString *tmppgm_string = NULL;
 	cco_vString *tmptxt_string = NULL;
-	cco_vString *cmdppmtopgm_string = NULL;
 	cco_vString *cmdnhocr_string = NULL;
 	cco_vString *tmp1_string = NULL;
 	char *tmp1_cstring;
-	IplImage *ppm_img = NULL;
 	FILE *fp = NULL;
 	int read_length;
 	char recognize_buff[124];
+	char *tmpfile_prefix = NULL;
 
 	ocrobj = obj;
 	recognize_buff[0] = 0;
@@ -203,25 +203,24 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 			result = CCOSROCR_STATUS_DONOTRECOGNIZE;
 			break;
 		}
-		if (ocrobj->srOcrGocr_filename == NULL)
+		if (ocrobj->srOcrGocr_image == NULL)
 		{
 			result = CCOSROCR_STATUS_UNSUPPORTIMAGE;
 			break;
 		}
-		tmpppm_string = cco_vString_newWithFormat("%s.ppm", ocrobj->srOcrGocr_filename);
-		tmppgm_string = cco_vString_newWithFormat("%s.pgm", ocrobj->srOcrGocr_filename);
-		tmptxt_string = cco_vString_newWithFormat("%s.txt", ocrobj->srOcrGocr_filename);
 
-		tmp1_cstring = tmpppm_string->v_getCstring(tmpppm_string);
-		ppm_img = cvLoadImage(ocrobj->srOcrGocr_filename, CV_LOAD_IMAGE_COLOR);
-		cvResetImageROI(ppm_img);
-		cvSaveImage(tmp1_cstring, ppm_img);
-		free(tmp1_cstring);
-		tmp1_cstring = NULL;
+		tmpfile_prefix = utility_get_tmp_file("srgocr");
+		if (tmpfile_prefix == NULL)
+		{
+			fprintf(stderr, "ERROR: Cannot create a temporary file in %s.\n", __func__);
+			result = CCOSROCR_STATUS_DONOTRECOGNIZE;
+			break;
+		}
+		tmppgm_string = cco_vString_newWithFormat("%s.pgm", tmpfile_prefix);
+		tmptxt_string = cco_vString_newWithFormat("%s.txt", tmpfile_prefix);
 
-		cmdppmtopgm_string = cco_vString_newWithFormat("ppmtopgm --quiet %@ > %@", tmpppm_string, tmppgm_string);
-		tmp1_cstring = cmdppmtopgm_string->v_getCstring(cmdppmtopgm_string);
-		system(tmp1_cstring);
+		tmp1_cstring = tmppgm_string->v_getCstring(tmppgm_string);
+		cvSaveImage(tmp1_cstring, ocrobj->srOcrGocr_image);
 		free(tmp1_cstring);
 		tmp1_cstring = NULL;
 
@@ -281,10 +280,11 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 	{
 		fclose(fp);
 	}
+	if (tmpfile_prefix != NULL)
+	{
+		free(tmpfile_prefix);
+	}
 	/* Deletes files.. */
-	tmp1_cstring = tmpppm_string->v_getCstring(tmpppm_string);
-	remove(tmp1_cstring);
-	free(tmp1_cstring);
 	tmp1_cstring = tmppgm_string->v_getCstring(tmppgm_string);
 	remove(tmp1_cstring);
 	free(tmp1_cstring);
@@ -292,12 +292,9 @@ CCOSROCR_STATUS cco_srOcrGocr_getRecognizeString(void *obj, cco_vString **recogn
 	remove(tmp1_cstring);
 	free(tmp1_cstring);
 
-	cco_release(tmpppm_string);
 	cco_release(tmppgm_string);
 	cco_release(tmptxt_string);
-	cco_release(cmdppmtopgm_string);
 	cco_release(cmdnhocr_string);
-	cvReleaseImage(&ppm_img);
 	return result;
 }
 

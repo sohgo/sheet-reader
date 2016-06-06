@@ -25,7 +25,7 @@
 #include "cco_srOcr.h"
 
 #define CCO_SROCRNHOCR_PROPERTIES \
-	char *srOcrNhocr_filename;\
+	IplImage *srOcrNhocr_image;\
 	char *srOcrNhocr_option;
 
 typedef struct cco_srOcrNhocr cco_srOcrNhocr;
@@ -44,7 +44,7 @@ cco_srOcrNhocr *cco_srOcrNhocr_new();
 void cco_srOcrNhocr_release(void *cco);
 
 CCOSROCR_STATUS cco_srOcrNhocr_initialize(void *cco_srOcr, char *configfile);
-CCOSROCR_STATUS cco_srOcrNhocr_setImage(void *cco_srOcr, char *imagefile);
+CCOSROCR_STATUS cco_srOcrNhocr_setImage(void *cco_srOcr, IplImage *image);
 CCOSROCR_STATUS cco_srOcrNhocr_setOption(void *obj, char *option);
 CCOSROCR_STATUS cco_srOcrNhocr_getRecognizeString(void *cco_srOcr, cco_vString **recognizedString);
 

@@ -81,7 +81,7 @@ CCOSROCR_STATUS cco_srOcr_initialize(void *obj, char *configfile)
 	return CCOSROCR_STATUS_EMPTYCLASS;
 }
 
-CCOSROCR_STATUS cco_srOcr_setImage(void *obj, char *imagefile)
+CCOSROCR_STATUS cco_srOcr_setImage(void *obj, IplImage *imagefile)
 {
 	return CCOSROCR_STATUS_EMPTYCLASS;
 }

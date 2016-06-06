@@ -101,7 +101,7 @@ void cco_srOcrKocr_baseInitialize(cco_srOcrKocr *o)
 	o->srOcr_setImage = &cco_srOcrKocr_setImage;
 	o->srOcr_setOption = &cco_srOcrKocr_setOption;
 	o->srOcr_getRecognizeString = &cco_srOcrKocr_getRecognizeString;
-	o->srOcrKocr_filename = NULL;
+	o->srOcrKocr_image = NULL;
 	o->srOcrKocr_option = strdup("0-9");
 	o->srOcrKocr_db = strdup("handwrite_09db");
 	o->srOcrKocr_dustsize = strdup("50");
@@ -111,10 +111,10 @@ void cco_srOcrKocr_baseInitialize(cco_srOcrKocr *o)
 
 void cco_srOcrKocr_baseFinalize(cco_srOcrKocr *o)
 {
-	if (o->srOcrKocr_filename != NULL)
+	if (o->srOcrKocr_image != NULL)
 	{
-		free(o->srOcrKocr_filename);
-		o->srOcrKocr_filename = NULL;
+		cvReleaseImage(&o->srOcrKocr_image);
+		o->srOcrKocr_image = NULL;
 		free(o->srOcrKocr_option);
 		o->srOcrKocr_option = NULL;
 		free(o->srOcrKocr_db);
@@ -197,15 +197,15 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 	return CCOSROCR_STATUS_SUCCESS;
 }
 
-CCOSROCR_STATUS cco_srOcrKocr_setImage(void *obj, char *imagefile)
+CCOSROCR_STATUS cco_srOcrKocr_setImage(void *obj, IplImage *image)
 {
 	cco_srOcrKocr *ocr;
 	ocr = obj;
-	if (ocr->srOcrKocr_filename != NULL)
+	if (ocr->srOcrKocr_image != NULL)
 	{
-		free(ocr->srOcrKocr_filename);
+		cvReleaseImage(&ocr->srOcrKocr_image);
 	}
-	ocr->srOcrKocr_filename = strdup(imagefile);
+	ocr->srOcrKocr_image = cvCloneImage(image);
 	return CCOSROCR_STATUS_SUCCESS;
 }
 
@@ -255,15 +255,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 {
 	CCOSROCR_STATUS result = CCOSROCR_STATUS_SUCCESS;
 	cco_srOcrKocr *ocrobj;
-	cco_vString *tmpppm_string = NULL;
-	cco_vString *tmpbmp_string = NULL;
-	cco_vString *tmptxt_string = NULL;
-	cco_vString *cmdppmtobmp_string = NULL;
-	cco_vString *cmdkocr_string = NULL;
 	cco_vString *tmp1_string = NULL;
-	char *tmp1_cstring;
-	IplImage *ppm_img = NULL;
-	FILE *fp = NULL;
 
 	ocrobj = obj;
 
@@ -274,41 +266,20 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 			result = CCOSROCR_STATUS_DONOTRECOGNIZE;
 			break;
 		}
-		if (ocrobj->srOcrKocr_filename == NULL)
+		if (ocrobj->srOcrKocr_image == NULL)
 		{
 			result = CCOSROCR_STATUS_UNSUPPORTIMAGE;
 			break;
 		}
 
 		/*
-		 * ppm to bmp conversion (what's the original format here?)
-		 */
-		tmpppm_string = cco_vString_newWithFormat("%s.ppm", ocrobj->srOcrKocr_filename);
-		tmpbmp_string = cco_vString_newWithFormat("%s.bmp", ocrobj->srOcrKocr_filename);
-		tmptxt_string = cco_vString_newWithFormat("%s.txt", ocrobj->srOcrKocr_filename);
-
-		tmp1_cstring = tmpppm_string->v_getCstring(tmpppm_string);
-		ppm_img = cvLoadImage(ocrobj->srOcrKocr_filename, CV_LOAD_IMAGE_COLOR);
-		cvResetImageROI(ppm_img);
-		cvSaveImage(tmp1_cstring, ppm_img);
-		free(tmp1_cstring);
-		tmp1_cstring = NULL;
-
-		cmdppmtobmp_string = cco_vString_newWithFormat("ppmtobmp --quiet %@ > %@", tmpppm_string, tmpbmp_string);
-		tmp1_cstring = cmdppmtobmp_string->v_getCstring(cmdppmtobmp_string);
-		system(tmp1_cstring);
-		free(tmp1_cstring);
-		tmp1_cstring = NULL;
-
-		/*
 		 * OCR processing
 		 */
 		{
-			char *fn = tmpbmp_string->v_getCstring(tmpbmp_string);
 #ifdef USE_SVM
-			char *rc = kocr_recognize_image(ocrobj->srOcrKocr_db, (char *) fn);
+			char *rc = kocr_recognize_Image(ocrobj->srOcrKocr_db, ocrobj->srOcrKocr_image);
 #else
-			char *rc = kocr_recognize_image((feature_db *) ocrobj->srOcrKocr_db, (char *) fn);
+			char *rc = kocr_recognize_Image((feature_db *) ocrobj->srOcrKocr_db, ocrobj->srOcrKocr_image);
 #endif
 			cco_release(*recognizedString); /* needed? */
 			if (rc) {
@@ -329,31 +300,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 			}
 		}
 	} while (0);
-	if (tmp1_cstring != NULL)
-	{
-		free(tmp1_cstring);
-	}
-	if (fp != NULL)
-	{
-		fclose(fp);
-	}
-	/* Deletes files.. */
-	tmp1_cstring = tmpppm_string->v_getCstring(tmpppm_string);
-	remove(tmp1_cstring);
-	free(tmp1_cstring);
-	tmp1_cstring = tmpbmp_string->v_getCstring(tmpbmp_string);
-	remove(tmp1_cstring);
-	free(tmp1_cstring);
-	tmp1_cstring = tmptxt_string->v_getCstring(tmptxt_string);
-	remove(tmp1_cstring);
-	free(tmp1_cstring);
 
-	cco_release(tmpppm_string);
-	cco_release(tmpbmp_string);
-	cco_release(tmptxt_string);
-	cco_release(cmdppmtobmp_string);
-	cco_release(cmdkocr_string);
-	cvReleaseImage(&ppm_img);
 	return result;
 }
 

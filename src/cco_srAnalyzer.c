@@ -153,8 +153,6 @@ void cco_srAnalyzer_release(void *o)
 	cco_release(o);
 }
 
-extern char *tmpdir_prefix;
-
 struct ocr_engine
 {
 	char *ocr_type_name;
@@ -335,6 +333,54 @@ int cco_srAnalyzer_writeImageWithPlace(cco_srAnalyzer *obj, char *file, int x, i
 			obj,
 			x, y, width, height,
 			0,
+			action);
+}
+
+int cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(cco_srAnalyzer *obj, int x, int y, int width, int height, int threshold)
+{
+	int action(IplImage *image)
+	{
+		cco_srOcr *ocr = NULL;
+		IplImage *gray_img = NULL;
+		IplImage *gray_thresholded_img = NULL;
+
+		gray_img             = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 1);
+		gray_thresholded_img = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 1);
+		cvCvtColor(image, gray_img, CV_BGR2GRAY);
+		cvThreshold(gray_img, gray_thresholded_img, threshold, 255, CV_THRESH_BINARY);
+
+		ocr = obj->srAnalyzer_ocr_obj;
+		ocr->srOcr_setImage(ocr, gray_thresholded_img);
+
+		cvReleaseImage(&gray_thresholded_img);
+		cvReleaseImage(&gray_img);
+
+		return 0;
+	}
+
+	return cco_srAnalyzer_doSomeActionToROI(
+			obj,
+			x, y, width, height,
+			1,
+			action);
+}
+
+int cco_srAnalyzer_setRegionToOcrEngine(cco_srAnalyzer *obj, int x, int y, int width, int height)
+{
+	int action(IplImage *image)
+	{
+		cco_srOcr *ocr = NULL;
+
+		ocr = obj->srAnalyzer_ocr_obj;
+		ocr->srOcr_setImage(ocr, image);
+
+		return 0;
+	}
+
+	return cco_srAnalyzer_doSomeActionToROI(
+			obj,
+			x, y, width, height,
+			1,
 			action);
 }
 
@@ -1286,10 +1332,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getIdFromImage(cco_srAnalyzer *obj, cco_vSrP
 	cco_srOcr *ocr = NULL;
 	float width;
 	float height;
-	char tmpfile[512];
-	char tmpfiletif[512];
-	int tmpfilefd;
-	int smooth;
 
 	do {
 		ocr = (cco_srOcr *) cco_srOcrGocr_new();
@@ -1298,32 +1340,19 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getIdFromImage(cco_srAnalyzer *obj, cco_vSrP
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
 				+ upperright->vSrPattern_height) / 3.0;
 
-		snprintf(tmpfile, sizeof(tmpfile), "%s/srgetid_XXXXXX", tmpdir_prefix);
-		tmpfilefd = mkstemp(tmpfile);
-		if (tmpfilefd == -1)
-		{
-			result = CCOSRANALYZER_STATUS_NOT_CREATE_TMPFILE;
-			break;
-		}
-		close(tmpfilefd);
-		snprintf(tmpfiletif, sizeof(tmpfiletif), "%s-1.tif", tmpfile);
-
-		smooth = 7;
 		/* Gets ID.*/
 		cco_safeRelease(*out_uid);
-		cco_srAnalyzer_writeImageWithPlaceToOcr(obj, tmpfiletif, upperleft->vSrPattern_x + (width * 2),
-				upperleft->vSrPattern_y + (height * 0.05), (width * 5), height * 0.4, smooth, 150);
-		ocr->srOcr_setImage(ocr, tmpfiletif);
+		cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+				upperleft->vSrPattern_x + (width * 2),
+				upperleft->vSrPattern_y + (height * 0.05), (width * 5), height * 0.4, 150);
 		ocr->srOcr_setOption(ocr, "ids");
 		ocr->srOcr_getRecognizeString(ocr, out_uid);
-		remove(tmpfiletif);
 
-		snprintf(tmpfiletif, sizeof(tmpfiletif), "%s-2.tif", tmpfile);
 		/* Gets SheetID.*/
 		cco_safeRelease(*out_sid);
-		cco_srAnalyzer_writeImageWithPlaceToOcr(obj, tmpfiletif, upperleft->vSrPattern_x + (width * 2),
-				upperleft->vSrPattern_y + (height * 0.55), (width * 5), height * 0.4, smooth, 150);
-		ocr->srOcr_setImage(ocr, tmpfiletif);
+		cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+				upperleft->vSrPattern_x + (width * 2),
+				upperleft->vSrPattern_y + (height * 0.55), (width * 5), height * 0.4, 150);
 		ocr->srOcr_setOption(ocr, "ids");
 		ocr->srOcr_getRecognizeString(ocr, out_sid);
 		if (obj->srAnalyzer_debug >= 1)
@@ -1334,8 +1363,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getIdFromImage(cco_srAnalyzer *obj, cco_vSrP
 			free(tmp_cstring);
 			cco_safeRelease(tmp_string);
 		}
-		remove(tmpfiletif);
-		remove(tmpfile);
 	} while (0);
 	cco_safeRelease(ocr);
 	cco_safeRelease(tmp_string);
@@ -1352,9 +1379,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 	cco_srOcr *ocr = NULL;
 	float width;
 	float height;
-	char tmpfile[512];
+	char *tmpfile_prefix = NULL;
 	char tmpfiletif[512];
-	int tmpfilefd;
 	int smooth;
 
 	do {
@@ -1364,36 +1390,48 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 		height = (upperleft->vSrPattern_height + bottomleft->vSrPattern_height
 				+ upperright->vSrPattern_height) / 3.0;
 
-		snprintf(tmpfile, sizeof(tmpfile), "%s/srgetid_XXXXXX", tmpdir_prefix);
-		tmpfilefd = mkstemp(tmpfile);
-		if (tmpfilefd == -1)
+		tmpfile_prefix = utility_get_tmp_file("srgetid");
+		if (tmpfile_prefix == NULL)
 		{
+			fprintf(stderr, "ERROR: Cannot create a temporary file in %s.\n", __func__);
 			result = CCOSRANALYZER_STATUS_NOT_CREATE_TMPFILE;
 			break;
 		}
-		close(tmpfilefd);
-		snprintf(tmpfiletif, sizeof(tmpfiletif), "%s-1.tif", tmpfile);
+		snprintf(tmpfiletif, sizeof(tmpfiletif), "%s-1.tif", tmpfile_prefix);
 
 		smooth = 7;
 		/* Gets ID.*/
 		cco_safeRelease(*out_uid);
-		cco_srAnalyzer_writeImageWithPlaceToOcr(obj, tmpfiletif,
+		if (obj->srAnalyzer_debug >= 1)
+		{
+			cco_srAnalyzer_writeImageWithPlaceToOcr(obj, tmpfiletif,
+					upperleft->vSrPattern_x + (width * 1.5),
+					upperleft->vSrPattern_y,
+					(width * 5), height, smooth, 150);
+			remove(tmpfiletif);
+		}
+		cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
 				upperleft->vSrPattern_x + (width * 1.5),
 				upperleft->vSrPattern_y,
-				(width * 5), height, smooth, 150);
-		ocr->srOcr_setImage(ocr, tmpfiletif);
+				(width * 5), height, 150);
 		ocr->srOcr_setOption(ocr, ocr_db);
 		ocr->srOcr_getRecognizeString(ocr, out_uid);
-		remove(tmpfiletif);
 
-		snprintf(tmpfiletif, sizeof(tmpfiletif), "%s-2.tif", tmpfile);
+		snprintf(tmpfiletif, sizeof(tmpfiletif), "%s-2.tif", tmpfile_prefix);
 		/* Gets SheetID.*/
 		cco_safeRelease(*out_sid);
-		cco_srAnalyzer_writeImageWithPlaceToOcr(obj, tmpfiletif,
+		if (obj->srAnalyzer_debug >= 1)
+		{
+			cco_srAnalyzer_writeImageWithPlaceToOcr(obj, tmpfiletif,
+					bottomleft->vSrPattern_x + (width * 1.5),
+					bottomleft->vSrPattern_y,
+					(width * 5), height, smooth, 150);
+			remove(tmpfiletif);
+		}
+		cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
 				bottomleft->vSrPattern_x + (width * 1.5),
 				bottomleft->vSrPattern_y,
-				(width * 5), height, smooth, 150);
-		ocr->srOcr_setImage(ocr, tmpfiletif);
+				(width * 5), height, 150);
 		ocr->srOcr_setOption(ocr, ocr_db);
 		ocr->srOcr_getRecognizeString(ocr, out_sid);
 		if (obj->srAnalyzer_debug >= 1)
@@ -1404,10 +1442,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 			free(tmp_cstring);
 			cco_safeRelease(tmp_string);
 		}
-		remove(tmpfiletif);
-		remove(tmpfile);
 	} while (0);
 	cco_safeRelease(tmp_string);
+	if (tmpfile_prefix != NULL)
+	{
+		free(tmpfile_prefix);
+	}
 	return result;
 }
 
@@ -1675,9 +1715,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	cco_vString *recognized_string = NULL;
 	IplImage *img_tmp = NULL;
 
-	char tmpfile[512];
-	int tmpfilefd;
-
 	cco_arraylist *list_candidate_pattern = NULL;
 	cco_vSrPattern *pattern = NULL;
 	float pattern_x;
@@ -1711,16 +1748,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 		{
 			break;
 		}
-
-		snprintf(tmpfile, sizeof(tmpfile), "%s/srocr_XXXXXX", tmpdir_prefix);
-		tmpfilefd = mkstemp(tmpfile);
-		if (tmpfilefd == -1)
-		{
-			/* LOG */
-			fprintf(stderr, "ERROR: Cannot create a temporary file in cco_srAnalyzer_getIdFromImage.\n");
-			break;
-		}
-		close(tmpfilefd);
 
 		xml_blockOcrs = cco_vXml_getElements(sheet->srMlSheet_xml, "properties/blockOcr");
 		cco_arraylist_setCursorAtFront(xml_blockOcrs);
@@ -1931,6 +1958,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 								(int) (pattern->vSrPattern_y),
 								(int) (pattern->vSrPattern_width),
 								(int) (pattern->vSrPattern_height));
+						cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+								(int) (pattern->vSrPattern_x),
+								(int) (pattern->vSrPattern_y),
+								(int) (pattern->vSrPattern_width),
+								(int) (pattern->vSrPattern_height),
+								120);
 						if (obj->srAnalyzer_debug >= 2) {
 							cvRectangle(img_tmp,
 									cvPoint((int) (pattern->vSrPattern_x),
@@ -1946,6 +1979,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 								(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled * attr_margin_top / 100.0),
 								current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
 								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
+						cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+								(int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
+								(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled * attr_margin_top / 100.0),
+								current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
+								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0,
+								120);
 						if (obj->srAnalyzer_debug >= 2) {
 							cvRectangle(img_tmp,
 									cvPoint((int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
@@ -1971,7 +2010,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					cco_arraylist_setCursorAtPrevious(list_candidate_pattern);
 					/* creates an ocr engine. */
 					ocr = obj->srAnalyzer_ocr_obj;
-					ocr->srOcr_setImage(ocr, tmp_cstring);
 					if (xml_attr_option != NULL)
 					{
 						attr_option_cstring = xml_attr_option->v_getCstring(xml_attr_option);
@@ -2062,7 +2100,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			cco_safeRelease(xml_attr_y);
 			cco_arraylist_setCursorAtNext(xml_blockOcrs);
 		}
-		remove(tmpfile);
 		cco_safeRelease(xml_blockOcrs);
 	} while (0);
 	cco_safeRelease(list_candidate_pattern);
