@@ -24,6 +24,8 @@ while(<>){
         } else {
             print "($1) -> _\tNG\n";
         }
+    } elsif (/num(\d)(\d)','/) {
+        print STDERR "Warning: Unexpected character found: " . $_, "\n";
     }
 
     if (/circle/) {
