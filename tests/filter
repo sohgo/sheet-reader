@@ -2,6 +2,13 @@
 
 use strict;
 use warnings;
+use utf8;
+
+# The input must be utf8
+binmode(STDIN,  ":utf8");   # convert the utf8 input to the internal expression
+# convert internal expression to utf8 for output
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 
 while(<>){
     chomp $_;
