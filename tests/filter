@@ -13,7 +13,7 @@ binmode(STDERR, ":utf8");
 while(<>){
     chomp $_;
 
-    if (/num(\d)(\d)','(\d)*?'/) {
+    if (/num(\d)(\d)','(\d)*?'/o) {
         if (defined $3) {
             print "($1) -> $3\t";
             if ($1 == $3) {
@@ -24,12 +24,12 @@ while(<>){
         } else {
             print "($1) -> _\tNG\n";
         }
-    } elsif (/num(\d)(\d)','/) {
+    } elsif (/num(\d)(\d)','/o) {
         print STDERR "Warning: Unexpected character found: " . $_, "\n";
     }
 
     if (/circle/) {
-        if (/circle(\d)','○'/) {
+        if (/circle(\d)','○'/o) {
             print "(circle) -> ○\tOK\n";
         } else {
             print "(circle) -> .\tNG\n";
@@ -37,7 +37,7 @@ while(<>){
     }
 
     if (/triangle/) {
-        if (/triangle(\d)','△'/) {
+        if (/triangle(\d)','△'/o) {
             print "(triangle) -> △\tOK\n";
         } else {
             print "(triangle) -> .\tNG\n";
@@ -45,15 +45,15 @@ while(<>){
     }
 
     if (/'x(\d)'/) {
-        if (/'x(\d)','×'/) {
+        if (/'x(\d)','×'/o) {
             print "(cross) -> ×\tOK\n";
         } else {
             print "(cross) -> .\tNG\n";
         }
     }
 
-    if (/'chk(\d)'/) {
-        if (/'chk(\d)','✓'/) {
+    if (/'chk(\d)'/o) {
+        if (/'chk(\d)','✓'/o) {
             print "(checked) -> ✓\tOK\n";
         } else {
             print "(checked) -> .\tNG\n";
