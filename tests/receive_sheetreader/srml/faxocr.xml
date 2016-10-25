@@ -264,7 +264,7 @@
       <blockImg name="num51" x="12" y="11" colspan="1" margin="15"/>
       <blockOcr name="num61" x="12" y="14" colspan="1" option="number"/>
       <blockImg name="num61" x="12" y="14" colspan="1" margin="15"/>
-      <blockOcr name="num01" x="12" y="16" colspan="1" option="rating"/>
+      <blockOcr name="num01" x="12" y="16" colspan="1" option="number"/>
       <blockImg name="num01" x="12" y="16" colspan="1" margin="15"/>
       <blockOcr name="num11" x="12" y="1" colspan="1" option="number"/>
       <blockImg name="num11" x="12" y="1" colspan="1" margin="15"/>
