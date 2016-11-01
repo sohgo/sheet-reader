@@ -6,7 +6,7 @@
    ディレクトリにおいて下記のコマンドを実行し、コンパイルして下さい
    これで、必要なライブラリ libkocr.a が作成されます
 
-$ git clone https://code.google.com/p/kocr/
+$ git clone https://github.com/faxocr/kocr.git
 $ cd kocr/src
 $ make all library
 $ sudo make install
