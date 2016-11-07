@@ -28,7 +28,20 @@
 #ifdef KOCR
 #include "cco_srOcrKocr.h"
 
-#ifdef USE_SVM
+#ifdef USE_CNN
+extern void *kocr_cnn_init(char *);			/* fake declaration: Network* -> void* */
+extern char *kocr_recognize_image(void *, char *);	/* fake declaration: Network* -> void* */
+extern char *kocr_recognize_Image(void *, IplImage *);	/* fake declaration: Network* -> void* */
+
+void *db_num;
+void *db_mbs;
+void *db_ocrb;
+
+#define DB_FILE_NUM "cnn-num.txt"
+#define DB_FILE_MBS "cnn-mbscpn.txt"
+#define DB_FILE_OCRB "cnn-num.txt"
+
+#elif defined(USE_SVM)
 extern void *kocr_svm_init(char *);			/* fake declaration: CvSVM* -> void* */
 extern char *kocr_recognize_image(void *, char *);	/* fake declaration: CvSVM* -> void* */
 
@@ -171,21 +184,27 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 
 	/* load databases */
 	if (db_num == NULL)
-#ifdef USE_SVM
+#ifdef USE_CNN
+		db_num = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_NUM));
+#elif defined(USE_SVM)
 		db_num = kocr_svm_init(dircat(ocrdb_dir, DB_FILE_NUM));
 #else
 		db_num = kocr_init(dircat(ocrdb_dir, DB_FILE_NUM));
 #endif
 
 	if (db_mbs == NULL)
-#ifdef USE_SVM
+#ifdef USE_CNN
+		db_mbs = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_MBS));
+#elif defined(USE_SVM)
 		db_mbs = kocr_svm_init(dircat(ocrdb_dir, DB_FILE_MBS));
 #else
 		db_mbs = kocr_init(dircat(ocrdb_dir, DB_FILE_MBS));
 #endif
 
 	if (db_ocrb == NULL)
-#ifdef USE_SVM
+#ifdef USE_CNN
+		db_ocrb = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_OCRB));
+#elif defined(USE_SVM)
 		db_ocrb = kocr_svm_init(dircat(ocrdb_dir, DB_FILE_OCRB));
 #else
 		db_ocrb = kocr_init(dircat(ocrdb_dir, DB_FILE_OCRB));
@@ -276,7 +295,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 		 * OCR processing
 		 */
 		{
-#ifdef USE_SVM
+#if defined(USE_CNN) || defined (USE_SVM)
 			char *rc = kocr_recognize_Image(ocrobj->srOcrKocr_db, ocrobj->srOcrKocr_image);
 #else
 			char *rc = kocr_recognize_Image((feature_db *) ocrobj->srOcrKocr_db, ocrobj->srOcrKocr_image);
