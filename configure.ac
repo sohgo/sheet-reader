@@ -45,13 +45,21 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([gettimeofday localtime_r memset mkdir regcomp socket strdup strerror])
 
 # Set for define
-AC_ARG_ENABLE([svm],
-	      AS_HELP_STRING([--disable-svm],
-	      		     [SVM method for KOCR]),
-		[ac_cv_use_svm=$enableval], [ac_cv_use_svm=yes])
-if test "$ac_cv_use_svm" = "yes" ; then
-	SVM_CFLAGS="-DUSE_SVM"
-fi
+AC_ARG_WITH([solver],
+	      AS_HELP_STRING([--with-solver=ENGINE],
+			     [type of ENGINE(cnn, svm, or nn) (default is cnn)]),
+		[ac_cv_use_solver=$withval], [ac_cv_use_solver=cnn])
+case "$ac_cv_use_solver" in
+cnn)
+	SOLVER_CFLAGS="-DUSE_CNN"
+	;;
+svm)
+	SOLVER_CFLAGS="-DUSE_SVM"
+	;;
+*)
+	SOLVER_CFLAGS=""
+	;;
+esac
 
 AC_ARG_ENABLE([mtrace],
 	      AS_HELP_STRING([--enable-mtrace],
@@ -69,8 +77,11 @@ case "$ac_cv_use_ocr" in
 kocr|yes)
 	OCR_CFLAGS="-DKOCR"
 	OCR_LIBS="-lkocr"
-	case "$ac_cv_use_svm" in
-	yes)
+	case "$ac_cv_use_solver" in
+	cnn)
+		AC_CHECK_LIB([kocr], [kocr_cnn_init], [], AC_MSG_WARN(CNN version of KOCR not found. Please install it.))
+		;;
+	svm)
 		AC_CHECK_LIB([kocr], [kocr_svm_init], [], AC_MSG_WARN(SVM version of KOCR not found. Please install it.))
 		;;
 	*)
@@ -83,11 +94,12 @@ gocr|no)
 	OCR_LIBS=""
 
 	ac_cv_use_svm=no
-	SVM_CFLAGS=""
+	ac_cv_use_solver=nn
+	SOLVER_CFLAGS=""
 	;;
 esac
 
-AC_SUBST([SVM_CFLAGS])
+AC_SUBST([SOLVER_CFLAGS])
 AC_SUBST([MTRACE_CFLAGS])
 AC_SUBST([OCR_CFLAGS])
 AC_SUBST([OCR_LIBS])

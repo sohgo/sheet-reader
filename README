@@ -26,10 +26,11 @@ $ make
 
      --with-ocr=OCR
         OCR には kocr か gocr を指定します。default は kocr です。
-     --disable-svm
-        SVM法を利用した KOCR を利用するか、最近傍法を利用した KOCR を
-        利用するかを指定します。標準で SVM 法を利用した KOCR を使います。
-        最近傍法を利用した KOCR を使いたい場合にこのオプションを指定します。
+     --with-solver=ENGINE
+        OCRエンジンに KOCR をを用いる際に利用する認識アルゴリズムを指定します。
+        --with-solver オプションを省略した場合は、標準で CNN を利用します。
+        SVM法または最近傍法を利用したい場合に、本オプションを指定します。
+        SVM法の場合は SVM を、最近傍法の場合は NN をENGINEに指定します。
 
  - 最適化、デバッグオプション
    CFLAGS に標準で -g -O2 フラグがついています。
