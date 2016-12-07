@@ -1410,10 +1410,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 					(width * 5), height, smooth, 150);
 			remove(tmpfiletif);
 		}
-		cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+		cco_srAnalyzer_setRegionToOcrEngine(obj,
 				upperleft->vSrPattern_x + (width * 1.5),
 				upperleft->vSrPattern_y,
-				(width * 5), height, 150);
+				(width * 5), height);
 		ocr->srOcr_setOption(ocr, ocr_db);
 		ocr->srOcr_getRecognizeString(ocr, out_uid);
 
@@ -1428,10 +1428,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getOcrbIdFromImage(cco_srAnalyzer *obj, cco_
 					(width * 5), height, smooth, 150);
 			remove(tmpfiletif);
 		}
-		cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+		cco_srAnalyzer_setRegionToOcrEngine(obj,
 				bottomleft->vSrPattern_x + (width * 1.5),
 				bottomleft->vSrPattern_y,
-				(width * 5), height, 150);
+				(width * 5), height);
 		ocr->srOcr_setOption(ocr, ocr_db);
 		ocr->srOcr_getRecognizeString(ocr, out_sid);
 		if (obj->srAnalyzer_debug >= 1)
@@ -1958,12 +1958,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 								(int) (pattern->vSrPattern_y),
 								(int) (pattern->vSrPattern_width),
 								(int) (pattern->vSrPattern_height));
-						cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+						cco_srAnalyzer_setRegionToOcrEngine(obj,
 								(int) (pattern->vSrPattern_x),
 								(int) (pattern->vSrPattern_y),
 								(int) (pattern->vSrPattern_width),
-								(int) (pattern->vSrPattern_height),
-								120);
+								(int) (pattern->vSrPattern_height));
 						if (obj->srAnalyzer_debug >= 2) {
 							cvRectangle(img_tmp,
 									cvPoint((int) (pattern->vSrPattern_x),
@@ -1979,12 +1978,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 								(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled * attr_margin_top / 100.0),
 								current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
 								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
-						cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(obj,
+						cco_srAnalyzer_setRegionToOcrEngine(obj,
 								(int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
 								(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled * attr_margin_top / 100.0),
 								current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
-								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0,
-								120);
+								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
 						if (obj->srAnalyzer_debug >= 2) {
 							cvRectangle(img_tmp,
 									cvPoint((int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
