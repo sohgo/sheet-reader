@@ -290,4 +290,268 @@
       <blockImg name="num48" x="12" y="8" colspan="1" margin="15"/>
     </properties>
   </sheet>
+  <sheet>
+    <id>00011</id>
+    <blockWidth>17</blockWidth>
+    <blockHeight>35</blockHeight>
+    <cellWidth>
+      <cellAttribute number="0" length="35"/>
+      <cellAttribute number="1" length="42"/>
+      <cellAttribute number="2" length="38"/>
+      <cellAttribute number="3" length="38"/>
+      <cellAttribute number="4" length="38"/>
+      <cellAttribute number="5" length="40"/>
+      <cellAttribute number="6" length="40"/>
+      <cellAttribute number="7" length="40"/>
+      <cellAttribute number="8" length="39"/>
+      <cellAttribute number="9" length="39"/>
+      <cellAttribute number="10" length="40"/>
+      <cellAttribute number="11" length="40"/>
+      <cellAttribute number="12" length="40"/>
+      <cellAttribute number="13" length="41"/>
+      <cellAttribute number="14" length="39"/>
+      <cellAttribute number="15" length="40"/>
+      <cellAttribute number="16" length="40"/>
+      <cellAttribute number="17" length="40"/>
+      <cellAttribute number="18" length="33"/>
+    </cellWidth>
+    <cellHeight>
+      <cellAttribute number="0" length="34"/>
+      <cellAttribute number="1" length="15"/>
+      <cellAttribute number="2" length="15"/>
+      <cellAttribute number="3" length="15"/>
+      <cellAttribute number="4" length="47"/>
+      <cellAttribute number="5" length="45"/>
+      <cellAttribute number="6" length="35"/>
+      <cellAttribute number="7" length="35"/>
+      <cellAttribute number="8" length="26"/>
+      <cellAttribute number="9" length="26"/>
+      <cellAttribute number="10" length="18"/>
+      <cellAttribute number="11" length="34"/>
+      <cellAttribute number="12" length="36"/>
+      <cellAttribute number="13" length="34"/>
+      <cellAttribute number="14" length="18"/>
+      <cellAttribute number="15" length="35"/>
+      <cellAttribute number="16" length="17"/>
+      <cellAttribute number="17" length="34"/>
+      <cellAttribute number="18" length="18"/>
+      <cellAttribute number="19" length="35"/>
+      <cellAttribute number="20" length="17"/>
+      <cellAttribute number="21" length="35"/>
+      <cellAttribute number="22" length="17"/>
+      <cellAttribute number="23" length="34"/>
+      <cellAttribute number="24" length="35"/>
+      <cellAttribute number="25" length="18"/>
+      <cellAttribute number="26" length="34"/>
+      <cellAttribute number="27" length="18"/>
+      <cellAttribute number="28" length="34"/>
+      <cellAttribute number="29" length="18"/>
+      <cellAttribute number="30" length="34"/>
+      <cellAttribute number="31" length="34"/>
+      <cellAttribute number="32" length="32"/>
+      <cellAttribute number="33" length="32"/>
+      <cellAttribute number="34" length="32"/>
+      <cellAttribute number="35" length="36"/>
+      <cellAttribute number="36" length="33"/>
+    </cellHeight>
+    <properties>
+      <blockImg name="kisaisha" x="3" y="4" colspan="6" margin="0" />
+      <blockImg name="kinkyurenrakusaki" x="12" y="4" colspan="6" margin="0" />
+
+      <blockImg name="shozokusosikimei" x="3" y="5" colspan="15" margin="0" margin-top="5" margin-bottom="2" />
+
+      <blockImg name="houkokuiryokikan" x="5" y="7" colspan="12" rowspan="2" margin="0" margin-top="5" />
+
+      <blockOcr name="nenrei" x="5" y="10" colspan="2" option="number" margin-top="5" margin-left="5" />
+      <blockImg name="nenrei" x="5" y="10" colspan="2" margin="0" margin-top="5" margin-left="5" />
+      <blockOcr name="otoko" x="11" y="10" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="otoko" x="11" y="10" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="onnna" x="14" y="10" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="onnna" x="14" y="10" colspan="1" margin="0" margin-top="5" margin-left="10" />
+
+      <blockOcr name="hasshoubi-hi" x="11" y="12" colspan="2" option="number" margin-top="5" margin-left="5" margin-bottom="5" />
+      <blockImg name="hasshoubi-hi" x="11" y="12" colspan="2" margin="0" margin-top="5" margin-left="5" margin-bottom="5" />
+      <blockOcr name="hasshoubi-nen" x="5" y="12" colspan="2" option="number" margin-top="5" margin-left="5" margin-bottom="5" />
+      <blockImg name="hasshoubi-nen" x="5" y="12" colspan="2" margin="0" margin-top="5" margin-left="5" margin-bottom="5" />
+      <blockOcr name="hasshoubi-tuki" x="8" y="12" colspan="2" option="number" margin-top="5" margin-left="5" margin-bottom="5" />
+      <blockImg name="hasshoubi-tuki" x="8" y="12" colspan="2" margin="0" margin-top="5" margin-left="5" margin-bottom="5" />
+
+      <blockOcr name="hatunetu" x="5" y="14" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="hatunetu" x="5" y="14" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="gaisou" x="8" y="14" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="gaisou" x="8" y="14" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="bijuu" x="11" y="14" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="bijuu" x="11" y="14" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="intoutuu" x="14" y="14" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="intoutuu" x="14" y="14" colspan="1" margin="0" margin-top="5" margin-left="10" />
+
+      <blockOcr name="taion-seisuu" x="5" y="16" colspan="2" option="number" margin-top="5" margin-left="5" />
+      <blockImg name="taion-seisuu" x="5" y="16" colspan="2" margin="0" margin-top="5" margin-left="5" />
+      <blockOcr name="taion-shousuu" x="8" y="16" colspan="1" option="number" margin-top="5" margin-left="10" />
+      <blockImg name="taion-shousuu" x="8" y="16" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="haien" x="14" y="16" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="haien" x="14" y="16" colspan="1" margin="0" margin-top="5" margin-left="10" />
+
+      <blockOcr name="nyuuin-ari" x="8" y="18" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="nyuuin-ari" x="8" y="18" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="nyuuin-nashi" x="5" y="18" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="nyuuin-nashi" x="5" y="18" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="sansotouyo" x="11" y="18" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="sansotouyo" x="11" y="18" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="jinkoukokyuuki" x="14" y="18" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="jinkoukokyuuki" x="14" y="18" colspan="1" margin="0" margin-top="5" margin-left="10" />
+
+      <blockOcr name="kanjasesshokureki" x="5" y="20" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="kanjasesshokureki" x="5" y="20" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="kaigaitokoureki" x="8" y="20" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="kaigaitokoureki" x="8" y="20" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="binsokukekkayousei" x="11" y="20" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="binsokukekkayousei" x="11" y="20" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="iryoujuujisha" x="14" y="20" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="iryoujuujisha" x="14" y="20" colspan="1" margin="0" margin-top="5" margin-left="10" />
+
+      <blockImg name="kisosikkan" x="5" y="22" colspan="11" rowspan="2" margin="0" margin-top="5" margin-left="2" />
+
+      <blockOcr name="kensakekka-a" x="6" y="25" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="kensakekka-a" x="6" y="25" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="kensakekka-b" x="8" y="25" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="kensakekka-b" x="8" y="25" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="kensakekka-sonota" x="10" y="25" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="kensakekka-sonota" x="10" y="25" colspan="1" margin="0" margin-top="5" margin-left="10" />
+
+      <blockOcr name="H1PDM" x="6" y="27" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="H1PDM" x="6" y="27" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="H3" x="8" y="27" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="H3" x="8" y="27" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="H5" x="10" y="27" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="H5" x="10" y="27" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="H7" x="12" y="27" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="H7" x="12" y="27" colspan="1" margin="0" margin-top="5" margin-left="10" />
+      <blockOcr name="agatafumei" x="14" y="27" colspan="1" option="rating" margin-top="5" margin-left="10" />
+      <blockImg name="agatafumei" x="14" y="27" colspan="1" margin="0" margin-top="5" margin-left="10" />
+
+      <blockImg name="tokkijikou" x="5" y="29" colspan="11" rowspan="2" margin="0" margin-top="5" margin-left="2" />
+    </properties>
+  </sheet>
+  <sheet>
+    <id>00001</id>
+    <blockWidth>17</blockWidth>
+    <blockHeight>32</blockHeight>
+    <cellWidth>
+      <cellAttribute number="0" length="32"/>
+      <cellAttribute number="1" length="45"/> <!--orig=44 -->
+      <cellAttribute number="2" length="40"/>
+      <cellAttribute number="3" length="40"/>
+      <cellAttribute number="4" length="40"/>
+      <cellAttribute number="5" length="37"/>
+      <cellAttribute number="6" length="40"/>
+      <cellAttribute number="7" length="39"/>
+      <cellAttribute number="8" length="41"/>
+      <cellAttribute number="9" length="38"/>
+      <cellAttribute number="10" length="40"/>
+      <cellAttribute number="11" length="40"/>
+      <cellAttribute number="12" length="39"/>
+      <cellAttribute number="13" length="39"/>
+      <cellAttribute number="14" length="42"/>
+      <cellAttribute number="15" length="37"/>
+      <cellAttribute number="16" length="40"/>
+      <cellAttribute number="17" length="39"/> <!--orig=40 -->
+      <cellAttribute number="18" length="31"/>
+    </cellWidth>
+    <cellHeight>
+      <cellAttribute number="0" length="30"/>
+      <cellAttribute number="1" length="31"/>
+      <cellAttribute number="2" length="31"/>
+      <cellAttribute number="3" length="31"/>
+      <cellAttribute number="4" length="31"/>
+      <cellAttribute number="5" length="31"/>
+      <cellAttribute number="6" length="35"/>
+      <cellAttribute number="7" length="32"/>
+      <cellAttribute number="8" length="32"/>
+      <cellAttribute number="9" length="29"/>
+      <cellAttribute number="10" length="35"/>
+      <cellAttribute number="11" length="33"/>
+      <cellAttribute number="12" length="31"/>
+      <cellAttribute number="13" length="33"/>
+      <cellAttribute number="14" length="31"/>
+      <cellAttribute number="15" length="33"/>
+      <cellAttribute number="16" length="31"/>
+      <cellAttribute number="17" length="32"/>
+      <cellAttribute number="18" length="32"/>
+      <cellAttribute number="19" length="32"/>
+      <cellAttribute number="20" length="32"/>
+      <cellAttribute number="21" length="32"/>
+      <cellAttribute number="22" length="31"/>
+      <cellAttribute number="23" length="33"/>
+      <cellAttribute number="24" length="31"/>
+      <cellAttribute number="25" length="32"/>
+      <cellAttribute number="26" length="33"/>
+      <cellAttribute number="27" length="31"/>
+      <cellAttribute number="28" length="31"/>
+      <cellAttribute number="29" length="32"/>
+      <cellAttribute number="30" length="28"/>
+      <cellAttribute number="31" length="28"/>
+      <cellAttribute number="32" length="28"/>
+      <cellAttribute number="33" length="30"/>
+    </cellHeight>
+    <properties>
+      <blockImg name="kisaisha" x="3" y="5" colspan="6" margin="5"/>
+      <blockImg name="kinkyurenrakusaki" x="12" y="5" colspan="6" margin="5"/>
+
+      <blockImg name="shozokusosikimei" x="3" y="6" colspan="15" margin="5"/>
+
+      <blockImg name="houkokuiryokikan" x="5" y="8" colspan="12" rowspan="2" margin="5"/>
+
+      <blockOcr name="nenrei" x="5" y="11" colspan="2" option="number"/>
+      <blockImg name="nenrei" x="5" y="11" colspan="2" margin="5"/>
+      <blockOcr name="otoko" x="11" y="11" colspan="1" option="rating"/>
+      <blockImg name="otoko" x="11" y="11" colspan="1" margin="5"/>
+      <blockOcr name="onnna" x="14" y="11" colspan="1" option="rating"/>
+      <blockImg name="onnna" x="14" y="11" colspan="1" margin="5"/>
+
+      <blockOcr name="hasshoubi-hi" x="11" y="13" colspan="2" option="number"/>
+      <blockImg name="hasshoubi-hi" x="11" y="13" colspan="2" margin="5"/>
+      <blockOcr name="hasshoubi-nen" x="5" y="13" colspan="2" option="number"/>
+      <blockImg name="hasshoubi-nen" x="5" y="13" colspan="2" margin="5"/>
+      <blockOcr name="hasshoubi-tuki" x="8" y="13" colspan="2" option="number"/>
+      <blockImg name="hasshoubi-tuki" x="8" y="13" colspan="2" margin="5"/>
+
+      <blockOcr name="hatunetu" x="5" y="15" colspan="1" option="rating"/>
+      <blockImg name="hatunetu" x="5" y="15" colspan="1" margin="5"/>
+      <blockOcr name="gaisou" x="8" y="15" colspan="1" option="rating"/>
+      <blockImg name="gaisou" x="8" y="15" colspan="1" margin="5"/>
+      <blockOcr name="bijuu" x="11" y="15" colspan="1" option="rating"/>
+      <blockImg name="bijuu" x="11" y="15" colspan="1" margin="5"/>
+      <blockOcr name="intoutuu" x="14" y="15" colspan="1" option="rating"/>
+      <blockImg name="intoutuu" x="14" y="15" colspan="1" margin="5"/>
+
+      <blockOcr name="taion-seisuu" x="5" y="17" colspan="2" option="number" margin-top="10" />
+      <blockImg name="taion-seisuu" x="5" y="17" colspan="2" margin="5" margin-top="10" />
+      <blockOcr name="taion-shousuu" x="8" y="17" colspan="1" option="number" margin-top="10" />
+      <blockImg name="taion-shousuu" x="8" y="17" colspan="1" margin="5" margin-top="10" />
+      <blockOcr name="haien" x="14" y="17" colspan="1" option="rating" margin-top="10" />
+      <blockImg name="haien" x="14" y="17" colspan="1" margin="5" margin-top="10" />
+
+      <blockOcr name="nyuuin-ari" x="8" y="19" colspan="1" option="rating"/>
+      <blockImg name="nyuuin-ari" x="8" y="19" colspan="1" margin="5"/>
+      <blockOcr name="nyuuin-nashi" x="5" y="19" colspan="1" option="rating"/>
+      <blockImg name="nyuuin-nashi" x="5" y="19" colspan="1" margin="5"/>
+      <blockOcr name="sansotouyo" x="11" y="19" colspan="1" option="rating"/>
+      <blockImg name="sansotouyo" x="11" y="19" colspan="1" margin="5"/>
+      <blockOcr name="jinkoukokyuuki" x="14" y="19" colspan="1" option="rating"/>
+      <blockImg name="jinkoukokyuuki" x="14" y="19" colspan="1" margin="5"/>
+
+      <blockOcr name="kanjasesshokureki" x="5" y="21" colspan="1" option="rating"/>
+      <blockImg name="kanjasesshokureki" x="5" y="21" colspan="1" margin="5"/>
+      <blockOcr name="kaigaitokoureki" x="8" y="21" colspan="1" option="rating"/>
+      <blockImg name="kaigaitokoureki" x="8" y="21" colspan="1" margin="5"/>
+      <blockOcr name="binsokukekkayousei" x="11" y="21" colspan="1" option="rating"/>
+      <blockImg name="binsokukekkayousei" x="11" y="21" colspan="1" margin="5"/>
+      <blockOcr name="iryoujuujisha" x="14" y="21" colspan="1" option="rating"/>
+      <blockImg name="iryoujuujisha" x="14" y="21" colspan="1" margin="5"/>
+
+      <blockImg name="kisosikkan" x="5" y="23" colspan="11" rowspan="2" margin="5"/>
+      <blockImg name="tokkijikou" x="5" y="26" colspan="11" rowspan="2" margin="5"/>
+    </properties>
+  </sheet>
 </srMl>

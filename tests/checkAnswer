@@ -1,0 +1,149 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+checkAnswer - compare the OCR result with correct data
+
+=head1 SYNOPSIS
+
+checkAnswer [--help] --correct-data correctData.csv --fax-image faxImage.png [outputFromSheetreader.txt]
+
+=head1 DESCRIPTION
+
+Compare the OCR result from sheetreader with correct data. The program requires the correct data, the filename to be checked, and the output from 'sheetreader -m sql'.
+
+=head1 OPTIONS
+
+=over
+
+=item --help
+
+Show help message and exit with 1.
+
+=item --correct-data correctData.csv
+
+A filename written in csv format that has correct data.
+
+=item --fax-image faxImage.png
+
+An image filename to be checked. The filename must be found at the first field in the correct data file.
+
+=item outputFromSheetreader.txt
+
+A filename that has an output from 'sheetreader -m sql'. If the option is omitted, it will read from STDIN.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+use Pod::Usage;
+
+use utf8;
+use open ':utf8';
+
+# The input must be utf8
+binmode(STDIN, ":utf8");    # convert the utf8 input to the internal expression
+
+# convert internal expression to utf8 for output
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
+
+exit &main();
+
+sub main()
+{
+    my (%opts, %correctData);
+
+    %opts = &analyzeArgs();
+    if (defined $opts{'help'}
+        or not defined $opts{'correct-data'}
+        or not defined $opts{'fax-image'})
+    {
+        pod2usage(-verbose => 1);
+        exit 1;
+    }
+
+    %correctData = &readCorrectData($opts{'correct-data'}, $opts{'fax-image'});
+    &checkAnswer(%correctData);
+
+    return 0;
+}
+
+sub checkAnswer()
+{
+    my %correctData = @_;
+    my @f;
+
+    while (<>) {
+        chomp;
+
+        # lines dhould be ignored
+        next if /^$/o;
+        next if /sheet_code/o;
+
+        # line handling
+        s/^.+VALUES\(//o;
+        s/'//go;
+        @f = split(/,/o);
+
+        # print result
+        print "'$correctData{$f[1]}'\t-> '$f[2]'";
+        if ($correctData{$f[1]} eq $f[2]) {
+            print "\tOK";
+        }
+        else {
+            print "\tNG";
+        }
+        print "\t$f[1]\n";
+    }
+}
+
+sub readCorrectData()
+{
+    my ($correctDataFile, $faxFilename) = @_;
+    my %result;
+    my @f;
+    my $faxFilename_meta = quotemeta($faxFilename);
+
+    open(F, "$correctDataFile") || die "cannot read correct data file: $!\n";
+    while (<F>) {
+        chomp;
+
+        # lines dhould be ignored
+        next if /^#/o;    # ignore comment line
+        next unless /^$faxFilename_meta/o;
+
+        @f = split(/,/o);
+        if (!($#f == 1 or $#f == 2)) {
+            warn "unknown format in a correct data file, ignored line: $_\n";
+            next;
+        }
+        $f[2] = '' unless defined $f[2];
+        $result{$f[1]} = $f[2];
+    }
+    close(F);
+
+    return %result;
+}
+
+sub analyzeArgs()
+{
+    my %opts;
+
+    GetOptions(
+        \%opts, qw (
+            help|h
+            correct-data=s
+            fax-image=s
+            )
+    );
+
+    return %opts;
+}
+
+# vim: set et fenc=utf-8 ff=unix sts=4 sw=4 ts=4 :
