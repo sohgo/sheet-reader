@@ -82,9 +82,8 @@ sub checkAnswer()
     while (<>) {
         chomp;
 
-        # lines dhould be ignored
-        next if /^$/o;
-        next if /sheet_code/o;
+        # lines should be handled
+        next unless / response_properties /o;
 
         # line handling
         s/^.+VALUES\(//o;
