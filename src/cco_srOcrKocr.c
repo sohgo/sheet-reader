@@ -37,9 +37,9 @@ void *db_num;
 void *db_mbs;
 void *db_ocrb;
 
-#define DB_FILE_NUM "cnn-num.txt"
-#define DB_FILE_MBS "cnn-mbscpn.txt"
-#define DB_FILE_OCRB "cnn-num.txt"
+#define DB_FILE_NUM "cnn-num.bin"
+#define DB_FILE_MBS "cnn-mbscpn.bin"
+#define DB_FILE_OCRB "cnn-num.bin"
 
 #elif defined(USE_SVM)
 extern void *kocr_svm_init(char *);			/* fake declaration: CvSVM* -> void* */
