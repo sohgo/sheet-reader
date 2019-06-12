@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <math.h>
 #include <regex.h>
 #include <ctype.h>
 #include <stdlib.h>
