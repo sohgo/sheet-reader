@@ -288,7 +288,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_readImage(cco_srAnalyzer *obj, char *file)
 		}
 		obj->srAnalyzer_img = cvCreateImage(img_size, read_img->depth, read_img->nChannels);
 		cvSetImageROI(obj->srAnalyzer_img, img_rect);
-		cvCopyImage(read_img, obj->srAnalyzer_img);
+		cvCopy(read_img, obj->srAnalyzer_img, NULL);
 		cvResetImageROI(obj->srAnalyzer_img);
 	} while (0);
 	cvReleaseImage(&read_img);
