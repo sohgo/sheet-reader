@@ -28,7 +28,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+
+#define HAVE_OPENCV_IMGCODECS
 #include <opencv/highgui.h>
+
 #include <mysql/mysql.h>
 
 #include <cluscore/cco_arraylist.h>

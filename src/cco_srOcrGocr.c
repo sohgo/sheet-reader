@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#define HAVE_OPENCV_IMGCODECS
 #include <opencv/highgui.h>
 #include <opencv/cv.h>
 

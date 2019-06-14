@@ -22,7 +22,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#define HAVE_OPENCV_IMGCODECS
 #include <opencv/highgui.h>
+
 #include <cluscore/cco_arraylist.h>
 #include <cluscore/cco_vString.h>
 #include "cco_srOcrOpencv.h"
