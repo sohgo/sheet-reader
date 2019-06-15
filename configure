@@ -4440,7 +4440,7 @@ _ACEOF
   LIBS="-lcluscore $LIBS"
 
 else
-  as_fn_error $? "cluscore not found. Please install it." "$LINENO" 5
+  as_fn_error $? "cluscore not found. Please install https://github.com/cluscore/cluscore." "$LINENO" 5
 fi
 
 

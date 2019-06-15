@@ -19,7 +19,7 @@ MYSQL_LIBS=`mysql_config --libs`
 AC_SUBST(MYSQL_LIBS)
 PKG_CHECK_MODULES([OPENCV], [opencv], [], AC_MSG_ERROR(opencv not found. Please install it.))
 AC_CHECK_LIB([xml2], [xmlParserInputRead], [], AC_MSG_ERROR(libxml2 not found. Please install it.))
-AC_CHECK_LIB([cluscore], [cc_container_new], [], AC_MSG_ERROR(cluscore not found. Please install it.))
+AC_CHECK_LIB([cluscore], [cc_container_new], [], AC_MSG_ERROR(cluscore not found. Please install https://github.com/cluscore/cluscore.))
 
 
 # Checks for header files.
