@@ -220,11 +220,16 @@ CCOSROCR_STATUS cco_srOcrKocr_setImage(void *obj, IplImage *image)
 {
 	cco_srOcrKocr *ocr;
 	ocr = obj;
+	IplImage *tmp_img;
+
 	if (ocr->srOcrKocr_image != NULL)
 	{
 		cvReleaseImage(&ocr->srOcrKocr_image);
 	}
-	ocr->srOcrKocr_image = cvCloneImage(image);
+	/* set a new image according to ROI */
+	tmp_img = cvCreateImage(cvSize(image->roi->width, image->roi->height), image->depth, image->nChannels);
+	cvCopy(image, tmp_img, NULL);
+	ocr->srOcrKocr_image = tmp_img;
 	return CCOSROCR_STATUS_SUCCESS;
 }
 
