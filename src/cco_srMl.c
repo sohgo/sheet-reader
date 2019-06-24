@@ -133,7 +133,7 @@ CCOSRML_STATUS cco_srMl_examineHeder(cco_srMl *xml)
 		cco_safeRelease(curxml);
 		list = cco_vXml_getElements(xml->srMl_xml, "srMl/sheet");
 		cco_arraylist_setCursorAtFront(list);
-		while (curxml = (cco_vXml *)cco_arraylist_getAtCursor(list))
+		while ((curxml = (cco_vXml *)cco_arraylist_getAtCursor(list)))
 		{
 			sheet = cco_srMlSheet_new();
 			elexml = cco_vXml_getElementAtFront(curxml, "id");

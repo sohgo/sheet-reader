@@ -1807,7 +1807,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getCandidateFromContourList(
 	{
 		cco_arraylist_setCursorAtBack(list_candidate_pattern);
 	}
-	while (pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
+	while ((pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern)))
 	{
 		found = func(pattern, params);
 		if (found == 1)
