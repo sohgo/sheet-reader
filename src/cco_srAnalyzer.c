@@ -194,6 +194,17 @@ int cco_srAnalyzer_setOcrObj(cco_srAnalyzer *obj, cco_vString *ocr_type)
 	return result;
 }
 
+struct env_doSomeActionToROI
+{
+	char **file;
+	cco_srAnalyzer **obj;
+	int *width;
+	int *height;
+	int *smooth;
+	int *threshold;
+	int *resize_width;
+	int *resize_height;
+};
 /**
  * save current ROI, do some action and restore the ROI
  *
@@ -204,7 +215,8 @@ int cco_srAnalyzer_setOcrObj(cco_srAnalyzer *obj, cco_vString *ocr_type)
 int cco_srAnalyzer_doSomeActionToROI(cco_srAnalyzer *obj,
 		int x, int y, int width, int height,
 		int needClone,
-		int (*doAction)(IplImage *))
+		struct env_doSomeActionToROI *params,
+		int (*doAction)(IplImage *, struct env_doSomeActionToROI *))
 {
 	int result = -1;
 	CvRect saved_rect;
@@ -219,12 +231,12 @@ int cco_srAnalyzer_doSomeActionToROI(cco_srAnalyzer *obj,
 	cvSetImageROI(obj->srAnalyzer_img, cvRect(x, y, width, height));
 	if (needClone == 1) {
 		clonedImage = (IplImage *)cvClone(obj->srAnalyzer_img);
-		result = doAction(clonedImage);
+		result = doAction(clonedImage, params);
 		cvReleaseImage(&clonedImage);
 	}
 	else
 	{
-		result = doAction(obj->srAnalyzer_img);
+		result = doAction(obj->srAnalyzer_img, params);
 	}
 	cvSetImageROI(obj->srAnalyzer_img, saved_rect);
 
@@ -324,165 +336,202 @@ int cco_srAnalyzer_writeImage(cco_srAnalyzer *obj, char *file)
 	return result;
 }
 
+static int actionToROI_saveImage(IplImage *image, struct env_doSomeActionToROI *params)
+{
+	cvSaveImage(*params->file, image);
+	return 0;
+}
+
 int cco_srAnalyzer_writeImageWithPlace(cco_srAnalyzer *obj, char *file, int x, int y, int width,
 		int height)
 {
-	int action(IplImage *image)
-	{
-		cvSaveImage(file, image);
-		return 0;
-	}
+	struct env_doSomeActionToROI p;
 
+	p.file = &file;
 	return cco_srAnalyzer_doSomeActionToROI(
 			obj,
 			x, y, width, height,
 			0,
-			action);
+			&p,
+			actionToROI_saveImage);
 }
 
+static int actionToROI_setRegionToOcrEngineWithGrayScale(IplImage *image, struct env_doSomeActionToROI *params)
+{
+	cco_srOcr *ocr = NULL;
+	IplImage *gray_img = NULL;
+	IplImage *gray_thresholded_img = NULL;
+
+	gray_img             = cvCreateImage(cvSize(*params->width, *params->height), IPL_DEPTH_8U, 1);
+	gray_thresholded_img = cvCreateImage(cvSize(*params->width, *params->height), IPL_DEPTH_8U, 1);
+	cvCvtColor(image, gray_img, CV_BGR2GRAY);
+	cvThreshold(gray_img, gray_thresholded_img, *params->threshold, 255, CV_THRESH_BINARY);
+
+	ocr = (*params->obj)->srAnalyzer_ocr_obj;
+	ocr->srOcr_setImage(ocr, gray_thresholded_img);
+
+	cvReleaseImage(&gray_thresholded_img);
+	cvReleaseImage(&gray_img);
+
+	return 0;
+}
 int cco_srAnalyzer_setRegionToOcrEngineWithGrayScale(cco_srAnalyzer *obj, int x, int y, int width, int height, int threshold)
 {
-	int action(IplImage *image)
-	{
-		cco_srOcr *ocr = NULL;
-		IplImage *gray_img = NULL;
-		IplImage *gray_thresholded_img = NULL;
+	struct env_doSomeActionToROI p;
 
-		gray_img             = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 1);
-		gray_thresholded_img = cvCreateImage(cvSize(width, height), IPL_DEPTH_8U, 1);
-		cvCvtColor(image, gray_img, CV_BGR2GRAY);
-		cvThreshold(gray_img, gray_thresholded_img, threshold, 255, CV_THRESH_BINARY);
-
-		ocr = obj->srAnalyzer_ocr_obj;
-		ocr->srOcr_setImage(ocr, gray_thresholded_img);
-
-		cvReleaseImage(&gray_thresholded_img);
-		cvReleaseImage(&gray_img);
-
-		return 0;
-	}
+	p.obj = &obj;
+	p.width = &width;
+	p.height = &height;
+	p.threshold = &threshold;
 
 	return cco_srAnalyzer_doSomeActionToROI(
 			obj,
 			x, y, width, height,
 			1,
-			action);
+			&p,
+			actionToROI_setRegionToOcrEngineWithGrayScale);
 }
 
+static int actionToROI_setImage(IplImage *image, struct env_doSomeActionToROI *params)
+{
+	cco_srOcr *ocr = NULL;
+
+	ocr = (*params->obj)->srAnalyzer_ocr_obj;
+	ocr->srOcr_setImage(ocr, image);
+
+	return 0;
+}
 int cco_srAnalyzer_setRegionToOcrEngine(cco_srAnalyzer *obj, int x, int y, int width, int height)
 {
-	int action(IplImage *image)
-	{
-		cco_srOcr *ocr = NULL;
+	struct env_doSomeActionToROI p;
 
-		ocr = obj->srAnalyzer_ocr_obj;
-		ocr->srOcr_setImage(ocr, image);
-
-		return 0;
-	}
+	p.obj = &obj;
 
 	return cco_srAnalyzer_doSomeActionToROI(
 			obj,
 			x, y, width, height,
 			1,
-			action);
+			&p,
+			actionToROI_setImage);
 }
 
+static int actionToROI_writeImageWithPlaceToOcr(IplImage *image, struct env_doSomeActionToROI *params)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+
+	result = cco_srAnalyzer_ThresholdImageToOcr(*params->obj, (*params->obj)->srAnalyzer_img, image, *params->smooth, *params->threshold);
+	cvSaveImage(*params->file, image);
+	return result;
+}
 CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToOcr(cco_srAnalyzer *obj, char *file,
 		int x, int y, int width, int height, int smooth, int threshold)
 {
-	int action(IplImage *image)
-	{
-		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	struct env_doSomeActionToROI p;
 
-		result = cco_srAnalyzer_ThresholdImageToOcr(obj, obj->srAnalyzer_img, image, smooth, threshold);
-		cvSaveImage(file, image);
-		return result;
-	}
+	p.obj = &obj;
+	p.smooth = &smooth;
+	p.threshold = &threshold;
+	p.file = &file;
 
 	return cco_srAnalyzer_doSomeActionToROI(
 			obj,
 			x, y, width, height,
 			1,
-			action);
+			&p,
+			actionToROI_writeImageWithPlaceToOcr);
 }
 
+static int actionToROI_writeImageWithPlaceToLOcr(IplImage *image, struct env_doSomeActionToROI *params)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	IplImage *tmp_img;
+
+	if (1) {
+		tmp_img = cvCreateImage(cvSize(*params->width * 2, *params->height * 2), (*params->obj)->srAnalyzer_img->depth, (*params->obj)->srAnalyzer_img->nChannels);
+		cvRectangle(tmp_img, cvPoint(0,0), cvPoint(*params->width * 2, *params->height * 2), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
+		cvSetImageROI(tmp_img, cvRect(*params->width / 2, *params->height / 2, *params->width, *params->height));
+	}
+	else {	// for debug
+		tmp_img = cvCreateImage(cvSize(*params->width, *params->height), (*params->obj)->srAnalyzer_img->depth, (*params->obj)->srAnalyzer_img->nChannels);
+		cvRectangle(tmp_img, cvPoint(0,0), cvPoint(*params->width, *params->height), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
+		cvSetImageROI(tmp_img, cvRect(0, 0, *params->width, *params->height));
+	}
+	result = cco_srAnalyzer_ThresholdImageToOcr(*params->obj, (*params->obj)->srAnalyzer_img, tmp_img, *params->smooth, *params->threshold);
+	cvResetImageROI(tmp_img);
+	cvSaveImage(*params->file, tmp_img);
+	cvReleaseImage(&tmp_img);
+
+	return result;
+}
 CCOSRANALYZER_STATUS cco_srAnalyzer_writeImageWithPlaceToLOcr(cco_srAnalyzer *obj, char *file,
 		int x, int y, int width, int height, int smooth, int threshold)
 {
+	struct env_doSomeActionToROI p;
 
-	int action(IplImage *image)
-	{
-		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
-		IplImage *tmp_img;
-
-		if (1) {
-			tmp_img = cvCreateImage(cvSize(width * 2, height * 2), obj->srAnalyzer_img->depth, obj->srAnalyzer_img->nChannels);
-			cvRectangle(tmp_img, cvPoint(0,0), cvPoint(width * 2, height * 2), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
-			cvSetImageROI(tmp_img, cvRect(width / 2, height / 2, width, height));
-		}
-		else {	// for debug
-			tmp_img = cvCreateImage(cvSize(width, height), obj->srAnalyzer_img->depth, obj->srAnalyzer_img->nChannels);
-			cvRectangle(tmp_img, cvPoint(0,0), cvPoint(width, height), cvScalar(0xff, 0xff, 0xff, 0), CV_FILLED, 0, 0);
-			cvSetImageROI(tmp_img, cvRect(0, 0, width, height));
-		}
-		result = cco_srAnalyzer_ThresholdImageToOcr(obj, obj->srAnalyzer_img, tmp_img, smooth, threshold);
-		cvResetImageROI(tmp_img);
-		cvSaveImage(file, tmp_img);
-		cvReleaseImage(&tmp_img);
-
-		return result;
-	}
+	p.obj = &obj;
+	p.width = &width;
+	p.height = &height;
+	p.smooth = &smooth;
+	p.threshold = &threshold;
+	p.file = &file;
 
 	return cco_srAnalyzer_doSomeActionToROI(
 			obj,
 			x, y, width, height,
 			0,
-			action);
+			&p,
+			actionToROI_writeImageWithPlaceToLOcr);
 }
 
+static int actionToROI_writeResizeImageWithPlace(IplImage *image, struct env_doSomeActionToROI *params)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	CvSize resize;
+	CvRect set_rect;
+	IplImage *resizeimage;
+	IplImage *resizeimage2;
+
+	*params->resize_width = 400;
+	*params->resize_height = 200;
+	resize.width = *params->resize_width;
+	resize.height = *params->resize_height;
+	resizeimage = cvCreateImage(resize, (*params->obj)->srAnalyzer_img->depth,
+			(*params->obj)->srAnalyzer_img->nChannels);
+	cvRectangle(resizeimage, cvPoint(0, 0), cvPoint(resize.width, resize.height),
+			CV_RGB(255,255,255), CV_FILLED, 8, 0);
+
+	set_rect.x = 10;
+	set_rect.y = *params->resize_height * 0.1;
+	set_rect.width = *params->resize_height * 0.8;
+	set_rect.height = *params->resize_height * 0.8;
+	cvSetImageROI(resizeimage, set_rect);
+	cvResize((*params->obj)->srAnalyzer_img, resizeimage, CV_INTER_LINEAR);
+	cvResetImageROI(resizeimage);
+	resizeimage2 = cvCloneImage(resizeimage);
+	cvSmooth(resizeimage, resizeimage2, CV_MEDIAN, 3, 0, 0, 0);
+	cvSaveImage(*params->file, resizeimage2);
+
+	cvReleaseImage(&resizeimage);
+	cvReleaseImage(&resizeimage2);
+
+	return result;
+}
 int cco_srAnalyzer_writeResizeImageWithPlace(cco_srAnalyzer *obj, char *file, int x, int y,
 		int width, int height, int resize_width, int resize_height)
 {
-	int action(IplImage *image)
-	{
-		CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
-		CvSize resize;
-		CvRect set_rect;
-		IplImage *resizeimage;
-		IplImage *resizeimage2;
+	struct env_doSomeActionToROI p;
 
-		resize_width = 400;
-		resize_height = 200;
-		resize.width = resize_width;
-		resize.height = resize_height;
-		resizeimage = cvCreateImage(resize, obj->srAnalyzer_img->depth,
-				obj->srAnalyzer_img->nChannels);
-		cvRectangle(resizeimage, cvPoint(0, 0), cvPoint(resize.width, resize.height),
-				CV_RGB(255,255,255), CV_FILLED, 8, 0);
-
-		set_rect.x = 10;
-		set_rect.y = resize_height * 0.1;
-		set_rect.width = resize_height * 0.8;
-		set_rect.height = resize_height * 0.8;
-		cvSetImageROI(resizeimage, set_rect);
-		cvResize(obj->srAnalyzer_img, resizeimage, CV_INTER_LINEAR);
-		cvResetImageROI(resizeimage);
-		resizeimage2 = cvCloneImage(resizeimage);
-		cvSmooth(resizeimage, resizeimage2, CV_MEDIAN, 3, 0, 0, 0);
-		cvSaveImage(file, resizeimage2);
-
-		cvReleaseImage(&resizeimage);
-		cvReleaseImage(&resizeimage2);
-
-		return result;
-	}
+	p.obj = &obj;
+	p.file = &file;
+	p.resize_width = &resize_width;
+	p.resize_height = &resize_height;
 
 	return cco_srAnalyzer_doSomeActionToROI(
 			obj,
 			x, y, width, height,
 			0,
-			action);
+			&p,
+			actionToROI_writeResizeImageWithPlace);
 
 }
 
@@ -696,6 +745,18 @@ int cco_srAnalyzer_compareMarkerWithSampleImage(cco_srAnalyzer *obj, IplImage *i
 	return result;
 }
 
+static int compare_accuracy(const void* v1, const void* v2)
+{
+	const double *p1 = (double *)v1;
+	const double *p2 = (double *)v2;
+	if (*p1 > *p2)
+		return 1;
+	else if (*p1 < *p2)
+		return -1;
+	else
+		return 0;
+
+}
 /**
  *
  */
@@ -713,19 +774,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_getTop3PatternByComparingWithSampleMarker(cc
 	cco_vSrPattern *pattern = NULL;
 	int i = 0;
 	int j = 0;
-
-	int compare_accuracy(const void* v1, const void* v2)
-	{
-		const double *p1 = (double *)v1;
-		const double *p2 = (double *)v2;
-		if (*p1 > *p2)
-			return 1;
-		else if (*p1 < *p2)
-			return -1;
-		else
-			return 0;
-
-	}
 
 	cco_arraylist_setCursorAtFront(list_candidate_pattern);
 	while ((pattern = (cco_vSrPattern *) cco_arraylist_getAtCursor(list_candidate_pattern)) != NULL && i < num_of_patterns)
@@ -1609,36 +1657,6 @@ double cco_srAnalyzer_get_position_of_the_cell_withoutMarker_by_rowspan(cco_redb
 	return position;
 }
 
-CCOSRANALYZER_STATUS cco_srAnalyzer_getCandidateFromContourList(
-	cco_srAnalyzer *obj,
-	int first_callP,
-	cco_arraylist *list_candidate_pattern,
-	int (*func)(cco_vSrPattern *pattern),
-	cco_vSrPattern **out_pattern)
-{
-	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
-	cco_vSrPattern *pattern = NULL;
-	int found = 0;
-
-	if (first_callP == 1)
-	{
-		cco_arraylist_setCursorAtBack(list_candidate_pattern);
-	}
-	while (pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
-	{
-		found = func(pattern);
-		if (found == 1)
-		{
-			break;
-		}
-		cco_arraylist_setCursorAtPrevious(list_candidate_pattern);
-		cco_safeRelease(pattern);
-	}
-	*out_pattern = pattern;
-
-	return result;
-}
-
 int cco_srAnalyzer_concat_preOcrImageFiles(
 		cco_vString *src_file_pattern,
 		cco_vString *output_filename)
@@ -1668,6 +1686,140 @@ int cco_srAnalyzer_get_margin_from_xml_attribute(cco_vString *xml_attr_margin, i
 		result_margin = default_margin;
 	}
 	return result_margin;
+}
+
+struct env_ocrProcBlockOcr
+{
+	float *pattern_x;
+	float *pattern_y;
+	double *current_cell_x;
+	double *current_cell_y;
+	double *current_cell_width_scaled;
+	double *current_cell_height_scaled;
+	int *attr_x;
+	int *attr_y;
+	int *index_colspan;
+	double *scale_x;
+	double *scale_y;
+	int *offset_x;
+	int *offset_y;
+	cco_srAnalyzer **obj;
+	cco_srMlSheet **sheet;
+	cco_vSrPattern **pattern;
+};
+static int oneCharInOneCell(cco_vSrPattern *pattern, struct env_ocrProcBlockOcr *params)
+	
+{
+	*params->pattern_x  = 0;
+	*params->pattern_x += *params->current_cell_x;
+	*params->pattern_x += cco_srAnalyzer_get_size_of_the_cell_withoutMarker((*params->sheet)->srMlSheet_cellWidth_list, *params->attr_x + *params->index_colspan) * 0.5;
+	*params->pattern_x *= *params->scale_x;
+	*params->pattern_x += *params->offset_x;
+	*params->pattern_y  = 0;
+	*params->pattern_y += *params->current_cell_y;
+	*params->pattern_y += cco_srAnalyzer_get_size_of_the_cell_withoutMarker((*params->sheet)->srMlSheet_cellHeight_list, *params->attr_y) * 0.5;
+	*params->pattern_y *= *params->scale_y;
+	*params->pattern_y += *params->offset_y;
+
+
+	/* First, check the position */
+	if (pattern->vSrPattern_x < *(params->pattern_x)
+			&& (pattern->vSrPattern_x + pattern->vSrPattern_width) > *params->pattern_x
+			&& pattern->vSrPattern_y < *params->pattern_y
+			&& (pattern->vSrPattern_y + pattern->vSrPattern_height) > *params->pattern_y)
+	{
+		if ((*params->obj)->srAnalyzer_debug >= 1) {
+			printf("\t%s:%s\n", __func__, "find a target within an expected area.");
+		}
+		/* Second, check the size of pattern. If it is small(rate is less than 85%), it will be ignored. */
+		float rate_width  = 0.0;
+		float rate_height = 0.0;
+		if (pattern->vSrPattern_width < *params->current_cell_width_scaled)
+		{
+			rate_width = pattern->vSrPattern_width / *params->current_cell_width_scaled;
+		}
+		if (pattern->vSrPattern_height < *params->current_cell_height_scaled)
+		{
+			rate_height = pattern->vSrPattern_height / *params->current_cell_height_scaled;
+		}
+		/* if (rate_height < 0.85 || rate_width < 0.85) */
+		if (rate_height < 0.5)
+		{
+			if ((*params->obj)->srAnalyzer_debug >= 1) {
+				printf("\t%s:%s\n", __func__, "find a target. But it's small. I'll ignore this pattern.");
+			}
+		} else {
+			/* it is a target. */
+			if ((*params->obj)->srAnalyzer_debug >= 1) {
+				printf("\t%s:%s\n", __func__, "FOUND a target.");
+			}
+			return 1;
+		}
+	}
+	return 0;
+}
+static int multipleCharsInMergedCell(cco_vSrPattern *pattern, struct env_ocrProcBlockOcr *params)
+{
+	int found_flag = 0;
+	float height_ratio = 0.0;
+	float width_ratio = 0.0;
+	float area_ratio = 0.0;
+
+	cco_vSrPattern *current_merged_cell = cco_vSrPattern_new();
+	current_merged_cell->vSrPattern_x = *(params->current_cell_x) * *(params->scale_x) + *(params->offset_x);
+	current_merged_cell->vSrPattern_y = *(params->current_cell_y) * *(params->scale_y) + *(params->offset_y);
+	current_merged_cell->vSrPattern_width = *(params->current_cell_width_scaled);
+	current_merged_cell->vSrPattern_height = *(params->current_cell_height_scaled);
+
+	area_ratio = (pattern->vSrPattern_width * pattern->vSrPattern_height) / (*(params->current_cell_width_scaled) * *(params->current_cell_height_scaled));
+
+	height_ratio = pattern->vSrPattern_height / *(params->current_cell_height_scaled);
+	width_ratio  = pattern->vSrPattern_width / *(params->current_cell_width_scaled);
+
+	/* First, check the position */
+	if (cco_vSrPattern_isInside(current_merged_cell, pattern) && height_ratio > 0.4 && height_ratio < 1.0 && area_ratio < 0.8)
+	{
+		found_flag = 1;
+		if ((*params->obj)->srAnalyzer_debug >= 1) {
+			printf("\t%s:%s %f\n", __func__, "FOUND a target.", area_ratio);
+		}
+	} else {
+		if ((*params->obj)->srAnalyzer_debug >= 1) {
+			printf("\t%s:%s height ratio=%f, area_ratio=%f\n", __func__, "find a target. But it's small or area is small. I'll ignore this pattern.", height_ratio, area_ratio);
+		}
+	}
+	cco_release(current_merged_cell);
+	return found_flag;
+}
+
+CCOSRANALYZER_STATUS cco_srAnalyzer_getCandidateFromContourList(
+	cco_srAnalyzer *obj,
+	int first_callP,
+	cco_arraylist *list_candidate_pattern,
+	int (*func)(cco_vSrPattern *pattern, struct env_ocrProcBlockOcr *params),
+	struct env_ocrProcBlockOcr *params)
+{
+	CCOSRANALYZER_STATUS result = CCOSRANALYZER_STATUS_SUCCESS;
+	cco_vSrPattern *pattern = NULL;
+	int found = 0;
+
+	if (first_callP == 1)
+	{
+		cco_arraylist_setCursorAtBack(list_candidate_pattern);
+	}
+	while (pattern = (cco_vSrPattern *)cco_arraylist_getAtCursor(list_candidate_pattern))
+	{
+		found = func(pattern, params);
+		if (found == 1)
+		{
+			break;
+		}
+		cco_arraylist_setCursorAtPrevious(list_candidate_pattern);
+		cco_safeRelease(pattern);
+	}
+	*(params->pattern) = pattern;
+
+	return result;
 }
 
 CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srMlSheet *sheet,
@@ -1726,6 +1878,23 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	double scale_x;
 	double scale_y;
 
+	struct env_ocrProcBlockOcr localEnv;
+	localEnv.pattern_x = &pattern_x;
+	localEnv.pattern_y = &pattern_y;
+	localEnv.current_cell_x = &current_cell_x;
+	localEnv.current_cell_y = &current_cell_y;
+	localEnv.current_cell_width_scaled = &current_cell_width_scaled;
+	localEnv.current_cell_height_scaled = &current_cell_height_scaled;
+	localEnv.attr_x = &attr_x;
+	localEnv.attr_y = &attr_y;
+	localEnv.index_colspan = &index_colspan;
+	localEnv.scale_x = &scale_x;
+	localEnv.scale_y = &scale_y;
+	localEnv.offset_x = &offset_x;
+	localEnv.offset_y = &offset_y;
+	localEnv.obj = &obj;
+	localEnv.sheet = &sheet;
+	localEnv.pattern = &pattern;
 
 	img_tmp = cvClone(obj->srAnalyzer_img);
 
@@ -1835,89 +2004,6 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 
 				/* discovers the box of target. */
 				cco_arraylist_setCursorAtBack(list_candidate_pattern);
-				int oneCharInOneCell(cco_vSrPattern *pattern)
-				{
-					pattern_x  = 0;
-					pattern_x += current_cell_x;
-					pattern_x += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x + index_colspan) * 0.5;
-					pattern_x *= scale_x;
-					pattern_x += offset_x;
-					pattern_y  = 0;
-					pattern_y += current_cell_y;
-					pattern_y += cco_srAnalyzer_get_size_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * 0.5;
-					pattern_y *= scale_y;
-					pattern_y += offset_y;
-
-
-					/* First, check the position */
-					if (pattern->vSrPattern_x < pattern_x
-							&& (pattern->vSrPattern_x + pattern->vSrPattern_width) > pattern_x
-							&& pattern->vSrPattern_y < pattern_y
-							&& (pattern->vSrPattern_y + pattern->vSrPattern_height) > pattern_y)
-					{
-						if (obj->srAnalyzer_debug >= 1) {
-							printf("\t%s:%s\n", __func__, "find a target within an expected area.");
-						}
-						/* Second, check the size of pattern. If it is small(rate is less than 85%), it will be ignored. */
-						float rate_width  = 0.0;
-						float rate_height = 0.0;
-						if (pattern->vSrPattern_width < current_cell_width_scaled)
-						{
-							rate_width = pattern->vSrPattern_width / current_cell_width_scaled;
-						}
-						if (pattern->vSrPattern_height < current_cell_height_scaled)
-						{
-							rate_height = pattern->vSrPattern_height / current_cell_height_scaled;
-						}
-						/* if (rate_height < 0.85 || rate_width < 0.85) */
-						if (rate_height < 0.5)
-						{
-							if (obj->srAnalyzer_debug >= 1) {
-								printf("\t%s:%s\n", __func__, "find a target. But it's small. I'll ignore this pattern.");
-							}
-						} else {
-							/* it is a target. */
-							if (obj->srAnalyzer_debug >= 1) {
-								printf("\t%s:%s\n", __func__, "FOUND a target.");
-							}
-							return 1;
-						}
-					}
-					return 0;
-				}
-				int multipleCharsInMergedCell(cco_vSrPattern *pattern)
-				{
-					int found_flag = 0;
-					float height_ratio = 0.0;
-					float width_ratio = 0.0;
-					float area_ratio = 0.0;
-
-					cco_vSrPattern *current_merged_cell = cco_vSrPattern_new();
-					current_merged_cell->vSrPattern_x = current_cell_x * scale_x + offset_x;
-					current_merged_cell->vSrPattern_y = current_cell_y * scale_y + offset_y;
-					current_merged_cell->vSrPattern_width = current_cell_width_scaled;
-					current_merged_cell->vSrPattern_height = current_cell_height_scaled;
-
-					area_ratio = (pattern->vSrPattern_width * pattern->vSrPattern_height) / (current_cell_width_scaled * current_cell_height_scaled);
-
-					height_ratio = pattern->vSrPattern_height / current_cell_height_scaled;
-					width_ratio  = pattern->vSrPattern_width / current_cell_width_scaled;
-
-					/* First, check the position */
-					if (cco_vSrPattern_isInside(current_merged_cell, pattern) && height_ratio > 0.4 && height_ratio < 1.0 && area_ratio < 0.8)
-					{
-						found_flag = 1;
-						if (obj->srAnalyzer_debug >= 1) {
-							printf("\t%s:%s %f\n", __func__, "FOUND a target.", area_ratio);
-						}
-					} else {
-						if (obj->srAnalyzer_debug >= 1) {
-							printf("\t%s:%s height ratio=%f, area_ratio=%f\n", __func__, "find a target. But it's small or area is small. I'll ignore this pattern.", height_ratio, area_ratio);
-						}
-					}
-					cco_release(current_merged_cell);
-					return found_flag;
-				}
 
 				int char_no_in_cell, loop_exit_flag = 0, first_call_flag = 1;
 				for (char_no_in_cell = 0; loop_exit_flag == 0; char_no_in_cell++, first_call_flag = 0)
@@ -1940,7 +2026,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					if (cell_merging_colspan == 1)
 					{
 						/* try to get a target as assuming one character is written in the in the rectangle cell by using a list of contours */
-						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &oneCharInOneCell, &pattern);
+						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &oneCharInOneCell, &localEnv);
 						loop_exit_flag = 1;
 					} else if (cell_merging_colspan > 1) {
 						/* just pass the rectangle cell to the OCR engine by not using a list of contours */
@@ -1948,7 +2034,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 						loop_exit_flag = 1;
 					} else if (0) {	// currently disabled
 						/* try to get a target from a list of contours in the rectangle cell */
-						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &multipleCharsInMergedCell, &pattern);
+						cco_srAnalyzer_getCandidateFromContourList(obj, first_call_flag, list_candidate_pattern, &multipleCharsInMergedCell, &localEnv);
 						if (pattern == NULL)
 						{
 							loop_exit_flag = 1;
