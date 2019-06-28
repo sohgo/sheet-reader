@@ -130,6 +130,7 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MTRACE_CFLAGS = @MTRACE_CFLAGS@
+MYSQL_CFLAGS = @MYSQL_CFLAGS@
 MYSQL_LIBS = @MYSQL_LIBS@
 OBJEXT = @OBJEXT@
 OCR_CFLAGS = @OCR_CFLAGS@
@@ -221,7 +222,7 @@ sheetreader_SOURCES = \
 	sheetreader.c\
 	sheetreader.h
 
-sheetreader_CFLAGS = $(MTRACE_CFLAGS) $(SOLVER_CFLAGS) $(OCR_CFLAGS) -DPREFIX="\"${prefix}\""
+sheetreader_CFLAGS = $(MYSQL_CFLAGS) $(MTRACE_CFLAGS) $(SOLVER_CFLAGS) $(OCR_CFLAGS) -DPREFIX="\"${prefix}\""
 sheetreader_LDADD = $(OCR_LIBS) $(OPENCV_LIBS) $(MYSQL_LIBS)
 sheetreader_LDFLAGS = \
 	-L$(top_srcdir)/../kocr/src

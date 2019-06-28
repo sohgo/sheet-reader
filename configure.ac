@@ -15,6 +15,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AM_PROG_CC_C_O
+MYSQL_CFLAGS=`mysql_config --cflags`
+AC_SUBST(MYSQL_CFLAGS)
 MYSQL_LIBS=`mysql_config --libs`
 AC_SUBST(MYSQL_LIBS)
 PKG_CHECK_MODULES([OPENCV], [opencv], [], AC_MSG_ERROR(opencv not found. Please install OpenCV 2.x or 3.x.))
