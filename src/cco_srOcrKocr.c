@@ -35,14 +35,16 @@ extern char *kocr_recognize_Image(void *, IplImage *);	/* fake declaration: Netw
 
 void *db_num;
 void *db_mbs;
-void *db_lowercase;
-void *db_uppercase;
+void *db_alphabet_lowercase;
+void *db_alphabet_uppercase;
+void *db_alphabet_number;
 void *db_ocrb;
 
 #define DB_FILE_NUM "cnn-num.txt"
 #define DB_FILE_MBS "cnn-mbscpn.txt"
-#define DB_FILE_LOWERCASE "cnn-lowercase.txt"
-#define DB_FILE_UPPERCASE "cnn-uppercase.txt"
+#define DB_FILE_ALPHABETLOWERCASE "cnn-alphabet_lowercase.txt"
+#define DB_FILE_ALPHABETUPPERCASE "cnn-alphabet_uppercase.txt"
+#define DB_FILE_ALPHABETNUMBER "cnn-alphabet_number.txt"
 #define DB_FILE_OCRB "cnn-num.txt"
 
 #elif defined(USE_SVM)
@@ -206,10 +208,12 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 #endif
 
 #ifdef USE_CNN
-	if (db_lowercase == NULL)
-		db_mbs = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_LOWERCASE));
-	if (db_uppercase == NULL)
-		db_mbs = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_UPPERCASE));
+	if (db_alphabet_lowercase == NULL)
+		db_alphabet_lowercase = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_ALPHABETLOWERCASE));
+	if (db_alphabet_uppercase == NULL)
+		db_alphabet_uppercase = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_ALPHABETUPPERCASE));
+	if (db_alphabet_number == NULL)
+		db_alphabet_number = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_ALPHABETNUMBER));
 #endif
 
 	if (db_ocrb == NULL)
@@ -264,19 +268,26 @@ CCOSROCR_STATUS cco_srOcrKocr_setOption(void *obj, char *option)
 		ocr->srOcrKocr_db = (char *) db_mbs;
 	}
 #ifdef USE_CNN
-	else if (strcmp(option, "lowercase") == 0)
+	else if (strcmp(option, "alphabet_lowercase") == 0)
 	{
 		if (ocr->srOcrKocr_option != NULL)
 			free(ocr->srOcrKocr_option);
 		ocr->srOcrKocr_option = strdup("a-z");
-		ocr->srOcrKocr_db = (char *) db_lowercase;
+		ocr->srOcrKocr_db = (char *) db_alphabet_lowercase;
 	}
-	else if (strcmp(option, "uppercase") == 0)
+	else if (strcmp(option, "alphabet_uppercase") == 0)
 	{
 		if (ocr->srOcrKocr_option != NULL)
 			free(ocr->srOcrKocr_option);
 		ocr->srOcrKocr_option = strdup("A-Z");
-		ocr->srOcrKocr_db = (char *) db_uppercase;
+		ocr->srOcrKocr_db = (char *) db_alphabet_uppercase;
+	}
+	else if (strcmp(option, "alphabet_number") == 0)
+	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
+		ocr->srOcrKocr_option = strdup("a-zA-Z0-9");
+		ocr->srOcrKocr_db = (char *) db_alphabet_number;
 	}
 #endif
 	else if (strcmp(option, "ids") == 0)
