@@ -35,10 +35,14 @@ extern char *kocr_recognize_Image(void *, IplImage *);	/* fake declaration: Netw
 
 void *db_num;
 void *db_mbs;
+void *db_lowercase;
+void *db_uppercase;
 void *db_ocrb;
 
 #define DB_FILE_NUM "cnn-num.txt"
 #define DB_FILE_MBS "cnn-mbscpn.txt"
+#define DB_FILE_LOWERCASE "cnn-lowercase.txt"
+#define DB_FILE_UPPERCASE "cnn-uppercase.txt"
 #define DB_FILE_OCRB "cnn-num.txt"
 
 #elif defined(USE_SVM)
@@ -201,6 +205,13 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 		db_mbs = kocr_init(dircat(ocrdb_dir, DB_FILE_MBS));
 #endif
 
+#ifdef USE_CNN
+	if (db_lowercase == NULL)
+		db_mbs = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_LOWERCASE));
+	if (db_uppercase == NULL)
+		db_mbs = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_UPPERCASE));
+#endif
+
 	if (db_ocrb == NULL)
 #ifdef USE_CNN
 		db_ocrb = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_OCRB));
@@ -252,6 +263,22 @@ CCOSROCR_STATUS cco_srOcrKocr_setOption(void *obj, char *option)
 		ocr->srOcrKocr_option = strdup("mbscz");
 		ocr->srOcrKocr_db = (char *) db_mbs;
 	}
+#ifdef USE_CNN
+	else if (strcmp(option, "lowercase") == 0)
+	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
+		ocr->srOcrKocr_option = strdup("a-z");
+		ocr->srOcrKocr_db = (char *) db_lowercase;
+	}
+	else if (strcmp(option, "uppercase") == 0)
+	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
+		ocr->srOcrKocr_option = strdup("A-Z");
+		ocr->srOcrKocr_db = (char *) db_uppercase;
+	}
+#endif
 	else if (strcmp(option, "ids") == 0)
 	{
 		if (ocr->srOcrKocr_option != NULL)
@@ -306,7 +333,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 			char *rc = kocr_recognize_Image((feature_db *) ocrobj->srOcrKocr_db, ocrobj->srOcrKocr_image);
 #endif
 			cco_release(*recognizedString); /* needed? */
-			if (rc) {
+			if (strcmp(ocrobj->srOcrKocr_option, "mbscz") == 0 && rc) {
 				tmp1_string = cco_vString_new(rc);
 				cco_vString_replaceWithCstring(tmp1_string, "m", "○");
 				cco_vString_replaceWithCstring(tmp1_string, "b", "×");
