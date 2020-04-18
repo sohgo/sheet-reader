@@ -40,12 +40,12 @@ void *db_alphabet_uppercase;
 void *db_alphabet_number;
 void *db_ocrb;
 
-#define DB_FILE_NUM "cnn-num.txt"
-#define DB_FILE_MBS "cnn-mbscpn.txt"
-#define DB_FILE_ALPHABETLOWERCASE "cnn-alphabet_lowercase.txt"
-#define DB_FILE_ALPHABETUPPERCASE "cnn-alphabet_uppercase.txt"
-#define DB_FILE_ALPHABETNUMBER "cnn-alphabet_number.txt"
-#define DB_FILE_OCRB "cnn-num.txt"
+#define DB_FILE_NUM "cnn-num.bin"
+#define DB_FILE_MBS "cnn-mbscpn.bin"
+#define DB_FILE_ALPHABETLOWERCASE "cnn-alphabet_lowercase.bin"
+#define DB_FILE_ALPHABETUPPERCASE "cnn-alphabet_uppercase.bin"
+#define DB_FILE_ALPHABETNUMBER "cnn-alphabet_number.bin"
+#define DB_FILE_OCRB "cnn-num.bin"
 
 #elif defined(USE_SVM)
 extern void *kocr_svm_init(char *);			/* fake declaration: CvSVM* -> void* */
