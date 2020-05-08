@@ -1852,6 +1852,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	cco_vString *xml_attr_margin_bottom = NULL;
 	cco_vString *xml_attr_margin_right = NULL;
 	cco_vString *xml_attr_margin_left = NULL;
+	cco_vString *xml_attr_margin_pixel = NULL;
+	cco_vString *xml_attr_margin_pixel_top = NULL;
+	cco_vString *xml_attr_margin_pixel_bottom = NULL;
+	cco_vString *xml_attr_margin_pixel_right = NULL;
+	cco_vString *xml_attr_margin_pixel_left = NULL;
 	char *attr_option_cstring = NULL;
 	cco_vString *tmp_string;
 	cco_vString *valuekey;
@@ -1862,6 +1867,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	int attr_margin_bottom;
 	int attr_margin_right;
 	int attr_margin_left;
+	int attr_margin_pixel;
+	int attr_margin_pixel_top;
+	int attr_margin_pixel_bottom;
+	int attr_margin_pixel_right;
+	int attr_margin_pixel_left;
 	int attr_colspan;
 	int attr_rowspan;
 	int attr_x;
@@ -1971,6 +1981,16 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			attr_margin_bottom = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_bottom, attr_margin);
 			attr_margin_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_right, attr_margin);
 			attr_margin_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_left, attr_margin);
+			xml_attr_margin_pixel        = cco_vXml_getAttribute(xml, "margin-pixel");
+			xml_attr_margin_pixel_top    = cco_vXml_getAttribute(xml, "margin-pixel-top");
+			xml_attr_margin_pixel_bottom = cco_vXml_getAttribute(xml, "margin-pixel-bottom");
+			xml_attr_margin_pixel_right  = cco_vXml_getAttribute(xml, "margin-pixel-right");
+			xml_attr_margin_pixel_left   = cco_vXml_getAttribute(xml, "margin-pixel-left");
+			attr_margin_pixel        = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel, 0);
+			attr_margin_pixel_top    = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_top, attr_margin_pixel);
+			attr_margin_pixel_bottom = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_bottom, attr_margin_pixel);
+			attr_margin_pixel_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_right, attr_margin_pixel);
+			attr_margin_pixel_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_left, attr_margin_pixel);
 			/* create dir */
 			tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
 					obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
@@ -2064,15 +2084,15 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					} else if (pattern == NULL && first_call_flag == 1) {
 						/* did not find a target. */
 						cco_srAnalyzer_writeImageWithPlace(obj, tmp_cstring,
-								(int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
-								(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled * attr_margin_top / 100.0),
-								current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
-								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
+								(int) (current_cell_x * scale_x + offset_x + attr_margin_pixel_left + current_cell_width_scaled * attr_margin_left / 100.0),
+								(int) (current_cell_y * scale_y + offset_y + attr_margin_pixel_top + current_cell_height_scaled * attr_margin_top / 100.0),
+								current_cell_width_scaled - (attr_margin_pixel_left + attr_margin_pixel_right) - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
+								current_cell_height_scaled - (attr_margin_pixel_left + attr_margin_pixel_right) - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
 						cco_srAnalyzer_setRegionToOcrEngine(obj,
-								(int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
-								(int) (current_cell_y * scale_y + offset_y + current_cell_height_scaled * attr_margin_top / 100.0),
-								current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
-								current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
+								(int) (current_cell_x * scale_x + offset_x + attr_margin_pixel_left + current_cell_width_scaled * attr_margin_left / 100.0),
+								(int) (current_cell_y * scale_y + offset_y + attr_margin_pixel_top + current_cell_height_scaled * attr_margin_top / 100.0),
+								current_cell_width_scaled - (attr_margin_pixel_left + attr_margin_pixel_right) - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
+								current_cell_height_scaled - (attr_margin_pixel_top + attr_margin_pixel_bottom) - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
 						if (obj->srAnalyzer_debug >= 2) {
 							cvRectangle(img_tmp,
 									cvPoint((int) (current_cell_x * scale_x + offset_x + current_cell_width_scaled * attr_margin_left / 100.0),
@@ -2230,6 +2250,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	cco_vString *xml_attr_margin_bottom = NULL;
 	cco_vString *xml_attr_margin_right = NULL;
 	cco_vString *xml_attr_margin_left = NULL;
+	cco_vString *xml_attr_margin_pixel = NULL;
+	cco_vString *xml_attr_margin_pixel_top = NULL;
+	cco_vString *xml_attr_margin_pixel_bottom = NULL;
+	cco_vString *xml_attr_margin_pixel_right = NULL;
+	cco_vString *xml_attr_margin_pixel_left = NULL;
 	cco_vString *tmp_string;
 	cco_vString *valuekey;
 	cco_redblacktree *valuestree;
@@ -2243,6 +2268,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	int attr_margin_bottom;
 	int attr_margin_right;
 	int attr_margin_left;
+	int attr_margin_pixel;
+	int attr_margin_pixel_top;
+	int attr_margin_pixel_bottom;
+	int attr_margin_pixel_right;
+	int attr_margin_pixel_left;
 
 	offset_x = obj->srAnalyzer_pattern_upperleft->vSrPattern_x
 			+ obj->srAnalyzer_pattern_upperleft->vSrPattern_width;
@@ -2269,6 +2299,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		xml_attr_margin_bottom = cco_vXml_getAttribute(xml, "margin-bottom");
 		xml_attr_margin_right = cco_vXml_getAttribute(xml, "margin-right");
 		xml_attr_margin_left = cco_vXml_getAttribute(xml, "margin-left");
+		xml_attr_margin_pixel        = cco_vXml_getAttribute(xml, "margin-pixel");
+		xml_attr_margin_pixel_top    = cco_vXml_getAttribute(xml, "margin-pixel-top");
+		xml_attr_margin_pixel_bottom = cco_vXml_getAttribute(xml, "margin-pixel-bottom");
+		xml_attr_margin_pixel_right  = cco_vXml_getAttribute(xml, "margin-pixel-right");
+		xml_attr_margin_pixel_left   = cco_vXml_getAttribute(xml, "margin-pixel-left");
 
 		if (xml_attr_x != NULL)
 		{
@@ -2299,6 +2334,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		attr_margin_bottom = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_bottom, attr_margin);
 		attr_margin_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_right, attr_margin);
 		attr_margin_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_left, attr_margin);
+		attr_margin_pixel        = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel, 0);
+		attr_margin_pixel_top    = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_top, attr_margin_pixel);
+		attr_margin_pixel_bottom = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_bottom, attr_margin_pixel);
+		attr_margin_pixel_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_right, attr_margin_pixel);
+		attr_margin_pixel_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_left, attr_margin_pixel);
 		tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
 				obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
 				obj->srAnalyzer_date_string);
@@ -2327,10 +2367,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 				obj->srAnalyzer_date_string, xml_attr_name);
 		tmp_cstring = tmp_string->v_getCstring(tmp_string);
 		cco_srAnalyzer_writeImageWithPlace(obj, tmp_cstring,
-				(int) (current_cell_position_x + current_cell_width_scaled * attr_margin_left / 100.0),
-				(int) (current_cell_position_y + current_cell_height_scaled * attr_margin_top / 100.0),
-				current_cell_width_scaled - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
-				current_cell_height_scaled - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
+				(int) (current_cell_position_x + attr_margin_pixel_left + current_cell_width_scaled * attr_margin_left / 100.0),
+				(int) (current_cell_position_y + attr_margin_pixel_top + current_cell_height_scaled * attr_margin_top / 100.0),
+				current_cell_width_scaled - (attr_margin_pixel_left + attr_margin_pixel_right) - current_cell_width_scaled * (attr_margin_left + attr_margin_right) / 100.0,
+				current_cell_height_scaled - (attr_margin_pixel_top + attr_margin_pixel_bottom) - current_cell_height_scaled * (attr_margin_top + attr_margin_bottom) / 100.0);
 		cco_safeRelease(tmp_string);
 		free(tmp_cstring);
 
