@@ -229,6 +229,22 @@ static cco_vString *get_save_directory_path(cco_srAnalyzer *obj, int append_save
 	}
 }
 
+/*
+ * Create a directory for saving data
+ *
+ */
+static int create_save_directory(cco_vString *save_dir)
+{
+	int r = 0;
+	char *tmp_cstring;
+
+	tmp_cstring = save_dir->v_getCstring(save_dir);
+	r = utility_mkdir(tmp_cstring);
+	free(tmp_cstring);
+
+	return r;
+}
+
 struct env_doSomeActionToROI
 {
 	char **file;
@@ -2032,9 +2048,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			attr_margin_pixel_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_right, attr_margin_pixel);
 			attr_margin_pixel_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_left, attr_margin_pixel);
 			/* create dir */
-			tmp_cstring = save_dir->v_getCstring(save_dir);
-			utility_mkdir(tmp_cstring);
-			free(tmp_cstring);
+			create_save_directory(save_dir);
 
 			recognized_string = cco_vString_new("");
 			for (index_colspan = 0; index_colspan < attr_colspan; index_colspan++)
@@ -2374,9 +2388,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		attr_margin_pixel_bottom = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_bottom, attr_margin_pixel);
 		attr_margin_pixel_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_right, attr_margin_pixel);
 		attr_margin_pixel_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_left, attr_margin_pixel);
-		tmp_cstring = save_dir->v_getCstring(save_dir);
-		utility_mkdir(tmp_cstring);
-		free(tmp_cstring);
+		create_save_directory(save_dir);
 
 		current_cell_position_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x;
 		current_cell_position_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y;
@@ -2612,9 +2624,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_backupImage(cco_srAnalyzer *obj)
 		save_dir = get_save_directory_path(obj, 1);
 		save_dir_without_prefix = get_save_directory_path(obj, 0);
 
-		tmp_cstring = save_dir->v_getCstring(save_dir);
-		utility_mkdir(tmp_cstring);
-		free(tmp_cstring);
+		create_save_directory(save_dir);
 
 		tmp_string = cco_vString_newWithFormat("%@/image.png",
 				save_dir);
