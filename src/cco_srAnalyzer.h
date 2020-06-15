@@ -46,6 +46,7 @@
 	cco_vString *srAnalyzer_save_prefix;\
 	cco_vString *srAnalyzer_backup_image;\
 	char *srAnalyzer_date_string;\
+	cco_vString *srAnalyzer_pid;\
 	cco_vString *srAnalyzer_outXml;\
 	cco_vString *srAnalyzer_outSql;\
 	cco_vString *srAnalyzer_outProp;\

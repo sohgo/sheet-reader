@@ -84,6 +84,8 @@ void cco_srAnalyzer_baseRelease(void *o)
 
 void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 {
+#define PID_STRING_LEN 8
+	char pid_string[PID_STRING_LEN];
 	char time_str[32];
 	time_t time_val;
 	struct tm tm_val;
@@ -112,6 +114,8 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 	localtime_r(&time_val, &tm_val);
     strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", &tm_val);
 	o->srAnalyzer_date_string = strdup(time_str);
+	snprintf(pid_string, PID_STRING_LEN, "%07d", getpid());
+	o->srAnalyzer_pid = cco_vString_newWithFormat("%s", pid_string);
 	o->srAnalyzer_outSql = NULL;
 	o->srAnalyzer_outXml = NULL;
 	o->srAnalyzer_out = NULL;
@@ -144,6 +148,7 @@ void cco_srAnalyzer_baseFinalize(cco_srAnalyzer *o)
 	cco_release(o->srAnalyzer_outProp);
 	cco_release(o->srAnalyzer_analyzedData);
 	free(o->srAnalyzer_date_string);
+	cco_release(o->srAnalyzer_pid);
 	return;
 }
 
@@ -192,6 +197,36 @@ int cco_srAnalyzer_setOcrObj(cco_srAnalyzer *obj, cco_vString *ocr_type)
 		result = CCOSRANALYZER_STATUS_UNSUPPORTED_OCR_ENGINE;
 	}
 	return result;
+}
+
+/*
+ * Get a path name for saving data
+ *
+ * append_save_prefix: 0: not append a save prefix
+ *                     1:     append a save prefix
+ *
+ * Caller must free the allocated memory space after use
+ *
+ */
+static cco_vString *get_save_directory_path(cco_srAnalyzer *obj, int append_save_prefix)
+{
+	assert(append_save_prefix == 1 || append_save_prefix == 0);
+	if (append_save_prefix == 1)
+	{
+		return cco_vString_newWithFormat("%@R%@/S%@/%s%@",
+			obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+			obj->srAnalyzer_date_string, obj->srAnalyzer_pid);
+	}
+	else if (append_save_prefix == 0)
+	{
+		return cco_vString_newWithFormat("R%@/S%@/%s%@",
+			obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+			obj->srAnalyzer_date_string, obj->srAnalyzer_pid);
+	}
+	else
+	{
+		return cco_vString_new("");
+	}
 }
 
 struct env_doSomeActionToROI
@@ -1859,6 +1894,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	cco_vString *xml_attr_margin_pixel_left = NULL;
 	char *attr_option_cstring = NULL;
 	cco_vString *tmp_string;
+	cco_vString *save_dir = NULL;
+	cco_vString *save_dir_without_prefix = NULL;
 	cco_vString *valuekey;
 	cco_redblacktree *valuestree;
 	char *tmp_cstring;
@@ -1909,6 +1946,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 	img_tmp = cvClone(obj->srAnalyzer_img);
 
 	do {
+		save_dir = get_save_directory_path(obj, 1);
+		save_dir_without_prefix = get_save_directory_path(obj, 0);
+
 		offset_x = obj->srAnalyzer_pattern_upperleft->vSrPattern_x
 				+ obj->srAnalyzer_pattern_upperleft->vSrPattern_width;
 		offset_y = obj->srAnalyzer_pattern_upperleft->vSrPattern_y
@@ -1992,13 +2032,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			attr_margin_pixel_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_right, attr_margin_pixel);
 			attr_margin_pixel_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_left, attr_margin_pixel);
 			/* create dir */
-			tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
-					obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-					obj->srAnalyzer_date_string);
-			tmp_cstring = tmp_string->v_getCstring(tmp_string);
+			tmp_cstring = save_dir->v_getCstring(save_dir);
 			utility_mkdir(tmp_cstring);
 			free(tmp_cstring);
-			cco_safeRelease(tmp_string);
 
 			recognized_string = cco_vString_new("");
 			for (index_colspan = 0; index_colspan < attr_colspan; index_colspan++)
@@ -2030,10 +2066,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				{
 
 					/* makes the path of image. */
-					tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s/preOcrImg-%@-%d-%d.png",
-							obj->srAnalyzer_save_prefix,
-							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-							obj->srAnalyzer_date_string, xml_attr_name,
+					tmp_string = cco_vString_newWithFormat("%@/preOcrImg-%@-%d-%d.png",
+							save_dir, xml_attr_name,
 							index_colspan, char_no_in_cell);
 					tmp_cstring = tmp_string->v_getCstring(tmp_string);
 					cco_safeRelease(tmp_string);
@@ -2166,25 +2200,19 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 				{	// concatenate the multiple image files to one image file for the cell having colspan
 					cco_vString *mergedPreOcrImgFileName = NULL;
 					cco_vString *allPreOcrImgFiles = NULL;
-					mergedPreOcrImgFileName = cco_vString_newWithFormat("%@R%@/S%@/%s/preOcrImg-%@-concat.png",
-							obj->srAnalyzer_save_prefix,
-							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-							obj->srAnalyzer_date_string, xml_attr_name);
-					allPreOcrImgFiles = cco_vString_newWithFormat("%@R%@/S%@/%s/preOcrImg-%@-*.png",
-							obj->srAnalyzer_save_prefix,
-							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-							obj->srAnalyzer_date_string, xml_attr_name);
+					mergedPreOcrImgFileName = cco_vString_newWithFormat("%@/preOcrImg-%@-concat.png",
+							save_dir, xml_attr_name);
+					allPreOcrImgFiles = cco_vString_newWithFormat("%@/preOcrImg-%@-*.png",
+							save_dir, xml_attr_name);
 					cco_srAnalyzer_concat_preOcrImageFiles(allPreOcrImgFiles, mergedPreOcrImgFileName);
 					cco_release(allPreOcrImgFiles);
 					cco_release(mergedPreOcrImgFileName);
 
-					preOcrImgFileNamePrefix = cco_vString_newWithFormat("R%@/S%@/%s/preOcrImg-%@-concat.png",
-							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-							obj->srAnalyzer_date_string, xml_attr_name);
+					preOcrImgFileNamePrefix = cco_vString_newWithFormat("%@/preOcrImg-%@-concat.png",
+							save_dir_without_prefix, xml_attr_name);
 				} else {
-					preOcrImgFileNamePrefix = cco_vString_newWithFormat("R%@/S%@/%s/preOcrImg-%@-%d.png",
-							obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-							obj->srAnalyzer_date_string, xml_attr_name,
+					preOcrImgFileNamePrefix = cco_vString_newWithFormat("%@/preOcrImg-%@-%d.png",
+							save_dir_without_prefix, xml_attr_name,
 							index_colspan - 1);
 				}
 
@@ -2208,6 +2236,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			cco_safeRelease(xml_attr_y);
 			cco_arraylist_setCursorAtNext(xml_blockOcrs);
 		}
+		cco_safeRelease(save_dir);
+		cco_safeRelease(save_dir_without_prefix);
 		cco_safeRelease(xml_blockOcrs);
 	} while (0);
 	cco_safeRelease(list_candidate_pattern);
@@ -2256,6 +2286,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	cco_vString *xml_attr_margin_pixel_right = NULL;
 	cco_vString *xml_attr_margin_pixel_left = NULL;
 	cco_vString *tmp_string;
+	cco_vString *save_dir = NULL;
+	cco_vString *save_dir_without_prefix = NULL;
 	cco_vString *valuekey;
 	cco_redblacktree *valuestree;
 	char *tmp_cstring;
@@ -2273,6 +2305,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 	int attr_margin_pixel_bottom;
 	int attr_margin_pixel_right;
 	int attr_margin_pixel_left;
+
+	save_dir = get_save_directory_path(obj, 1);
+	save_dir_without_prefix = get_save_directory_path(obj, 0);
 
 	offset_x = obj->srAnalyzer_pattern_upperleft->vSrPattern_x
 			+ obj->srAnalyzer_pattern_upperleft->vSrPattern_width;
@@ -2339,13 +2374,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		attr_margin_pixel_bottom = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_bottom, attr_margin_pixel);
 		attr_margin_pixel_right  = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_right, attr_margin_pixel);
 		attr_margin_pixel_left   = cco_srAnalyzer_get_margin_from_xml_attribute(xml_attr_margin_pixel_left, attr_margin_pixel);
-		tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
-				obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-				obj->srAnalyzer_date_string);
-		tmp_cstring = tmp_string->v_getCstring(tmp_string);
+		tmp_cstring = save_dir->v_getCstring(save_dir);
 		utility_mkdir(tmp_cstring);
 		free(tmp_cstring);
-		cco_safeRelease(tmp_string);
 
 		current_cell_position_x = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellWidth_list, attr_x) * scale_x + offset_x;
 		current_cell_position_y = cco_srAnalyzer_get_position_of_the_cell_withoutMarker(sheet->srMlSheet_cellHeight_list, attr_y) * scale_y + offset_y;
@@ -2362,9 +2393,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		current_cell_width_scaled  = current_cell_position_plus_colspan_x - current_cell_position_x;
 		current_cell_height_scaled = current_cell_position_plus_colspan_y - current_cell_position_y;
 
-		tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s/blockImg-%@.png",
-				obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-				obj->srAnalyzer_date_string, xml_attr_name);
+		tmp_string = cco_vString_newWithFormat("%@/blockImg-%@.png",
+				save_dir, xml_attr_name);
 		tmp_cstring = tmp_string->v_getCstring(tmp_string);
 		cco_srAnalyzer_writeImageWithPlace(obj, tmp_cstring,
 				(int) (current_cell_position_x + attr_margin_pixel_left + current_cell_width_scaled * attr_margin_left / 100.0),
@@ -2374,9 +2404,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		cco_safeRelease(tmp_string);
 		free(tmp_cstring);
 
-		tmp_string = cco_vString_newWithFormat("R%@/S%@/%s/blockImg-%@.png",
-				obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-				obj->srAnalyzer_date_string, xml_attr_name);
+		tmp_string = cco_vString_newWithFormat("%@/blockImg-%@.png",
+				save_dir_without_prefix, xml_attr_name);
 		valuekey = cco_vString_new("blockImg");
 		valuestree = (cco_redblacktree *)cco_redblacktree_get(keyval, (cco_v*) xml_attr_name);
 		if (valuestree == NULL) {
@@ -2394,6 +2423,8 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockImg(cco_srAnalyzer *obj, cco_srM
 		cco_safeRelease(xml_attr_y);
 		cco_arraylist_setCursorAtNext(xml_blockOcrs);
 	}
+	cco_safeRelease(save_dir);
+	cco_safeRelease(save_dir_without_prefix);
 	cco_safeRelease(xml_blockOcrs);
 	return result;
 }
@@ -2574,32 +2605,32 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_backupImage(cco_srAnalyzer *obj)
 	cco_srMl *srml = NULL;
 	cco_vString *tmp_string = NULL;
 	char *tmp_cstring = NULL;
+	cco_vString *save_dir = NULL;
+	cco_vString *save_dir_without_prefix = NULL;
 	do
 	{
-		tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s",
-				obj->srAnalyzer_save_prefix,
-				obj->srAnalyzer_sender,
-				obj->srAnalyzer_receiver,
-				obj->srAnalyzer_date_string);
-		tmp_cstring = tmp_string->v_getCstring(tmp_string);
+		save_dir = get_save_directory_path(obj, 1);
+		save_dir_without_prefix = get_save_directory_path(obj, 0);
+
+		tmp_cstring = save_dir->v_getCstring(save_dir);
 		utility_mkdir(tmp_cstring);
 		free(tmp_cstring);
-		cco_safeRelease(tmp_string);
 
-		tmp_string = cco_vString_newWithFormat("%@R%@/S%@/%s/image.png",
-				obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-				obj->srAnalyzer_date_string);
+		tmp_string = cco_vString_newWithFormat("%@/image.png",
+				save_dir);
 		tmp_cstring = tmp_string->v_getCstring(tmp_string);
 		cco_srAnalyzer_writeImage(obj, tmp_cstring);
 		free(tmp_cstring);
 		cco_safeRelease(tmp_string);
 
-		tmp_string = cco_vString_newWithFormat("R%@/S%@/%s/image.png",
-				obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-				obj->srAnalyzer_date_string);
+		tmp_string = cco_vString_newWithFormat("%@/image.png",
+				save_dir_without_prefix);
 		cco_safeRelease(obj->srAnalyzer_backup_image);
 		obj->srAnalyzer_backup_image = cco_get(tmp_string);
 		cco_safeRelease(tmp_string);
+
+		cco_safeRelease(save_dir);
+		cco_safeRelease(save_dir_without_prefix);
 	} while (0);
 	cco_safeRelease(srml);
 	return result;
@@ -2723,10 +2754,11 @@ void cco_srAnalyzer_outSql_sub(cco *callbackobject, cco_v *key, cco *object)
 	mysql_close(my);
 	tmp_string = cco_vString_newWithFormat(
 			"INSERT INTO response_properties (response_code, ocr_name, ocr_value, ocr_image, need_check)"
-			" VALUES('%@%@%s','%s','%s','%s',%s);\n"
+			" VALUES('%@%@%s%@','%s','%s','%s',%s);\n"
 			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_sid
 			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_uid
 			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_date_string
+			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_pid
 			, ocrName_escape, ocrValue_escape, ocrImage_escape, "TRUE");
 	cco_vString_catenate((cco_vString *)((cco_srAnalyzer *)callbackobject)->srAnalyzer_outSql, tmp_string);
 	cco_safeRelease(tmp_string);
@@ -2777,10 +2809,11 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_outSql(cco_srAnalyzer *obj)
 
 	obj->srAnalyzer_outSql = cco_vString_newWithFormat(
 			"INSERT INTO responses (response_code,date,sheet_code,candidate_code,fax_number,receiver_number,sheet_image)"
-			" VALUES('%s%s%s','%s','%s','%s','%s','%s','%@');\n"
+			" VALUES('%s%s%s%@','%s','%s','%s','%s','%s','%@');\n"
 			, sid_escape
 			, uid_escape
 			, obj->srAnalyzer_date_string
+			, obj->srAnalyzer_pid
 			, obj->srAnalyzer_date_string
 			, sid_escape
 			, uid_escape
