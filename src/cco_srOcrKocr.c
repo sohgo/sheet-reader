@@ -35,11 +35,17 @@ extern char *kocr_recognize_Image(void *, IplImage *);	/* fake declaration: Netw
 
 void *db_num;
 void *db_mbs;
+void *db_alphabet_lowercase;
+void *db_alphabet_uppercase;
+void *db_alphabet_number;
 void *db_ocrb;
 
-#define DB_FILE_NUM "cnn-num.txt"
-#define DB_FILE_MBS "cnn-mbscpn.txt"
-#define DB_FILE_OCRB "cnn-num.txt"
+#define DB_FILE_NUM "cnn-num.bin"
+#define DB_FILE_MBS "cnn-mbscpn.bin"
+#define DB_FILE_ALPHABETLOWERCASE "cnn-alphabet_lowercase.bin"
+#define DB_FILE_ALPHABETUPPERCASE "cnn-alphabet_uppercase.bin"
+#define DB_FILE_ALPHABETNUMBER "cnn-alphabet_number.bin"
+#define DB_FILE_OCRB "cnn-num.bin"
 
 #elif defined(USE_SVM)
 extern void *kocr_svm_init(char *);			/* fake declaration: CvSVM* -> void* */
@@ -201,6 +207,15 @@ CCOSROCR_STATUS cco_srOcrKocr_initialize(void *obj, char *configfile)
 		db_mbs = kocr_init(dircat(ocrdb_dir, DB_FILE_MBS));
 #endif
 
+#ifdef USE_CNN
+	if (db_alphabet_lowercase == NULL)
+		db_alphabet_lowercase = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_ALPHABETLOWERCASE));
+	if (db_alphabet_uppercase == NULL)
+		db_alphabet_uppercase = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_ALPHABETUPPERCASE));
+	if (db_alphabet_number == NULL)
+		db_alphabet_number = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_ALPHABETNUMBER));
+#endif
+
 	if (db_ocrb == NULL)
 #ifdef USE_CNN
 		db_ocrb = kocr_cnn_init(dircat(ocrdb_dir, DB_FILE_OCRB));
@@ -252,6 +267,29 @@ CCOSROCR_STATUS cco_srOcrKocr_setOption(void *obj, char *option)
 		ocr->srOcrKocr_option = strdup("mbscz");
 		ocr->srOcrKocr_db = (char *) db_mbs;
 	}
+#ifdef USE_CNN
+	else if (strcmp(option, "alphabet_lowercase") == 0)
+	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
+		ocr->srOcrKocr_option = strdup("a-z");
+		ocr->srOcrKocr_db = (char *) db_alphabet_lowercase;
+	}
+	else if (strcmp(option, "alphabet_uppercase") == 0)
+	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
+		ocr->srOcrKocr_option = strdup("A-Z");
+		ocr->srOcrKocr_db = (char *) db_alphabet_uppercase;
+	}
+	else if (strcmp(option, "alphabet_number") == 0)
+	{
+		if (ocr->srOcrKocr_option != NULL)
+			free(ocr->srOcrKocr_option);
+		ocr->srOcrKocr_option = strdup("a-zA-Z0-9");
+		ocr->srOcrKocr_db = (char *) db_alphabet_number;
+	}
+#endif
 	else if (strcmp(option, "ids") == 0)
 	{
 		if (ocr->srOcrKocr_option != NULL)
@@ -306,7 +344,7 @@ CCOSROCR_STATUS cco_srOcrKocr_getRecognizeString(void *obj, cco_vString **recogn
 			char *rc = kocr_recognize_Image((feature_db *) ocrobj->srOcrKocr_db, ocrobj->srOcrKocr_image);
 #endif
 			cco_release(*recognizedString); /* needed? */
-			if (rc) {
+			if (strcmp(ocrobj->srOcrKocr_option, "mbscz") == 0 && rc) {
 				tmp1_string = cco_vString_new(rc);
 				cco_vString_replaceWithCstring(tmp1_string, "m", "○");
 				cco_vString_replaceWithCstring(tmp1_string, "b", "×");
