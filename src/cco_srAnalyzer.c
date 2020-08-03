@@ -103,6 +103,7 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 	o->srAnalyzer_sender = cco_vString_new("");
 	o->srAnalyzer_receiver = cco_vString_new("");
 	o->srAnalyzer_save_prefix = cco_vString_new("");
+	o->srAnalyzer_output_directory = cco_vString_new("");
 	o->srAnalyzer_backup_image = cco_vString_new("");
 #ifdef KOCR
 	o->srAnalyzer_ocr_type = cco_vString_new("kocr"); /* nhocr */
@@ -155,6 +156,7 @@ void cco_srAnalyzer_baseFinalize(cco_srAnalyzer *o)
 	cco_release(o->srAnalyzer_sender);
 	cco_release(o->srAnalyzer_receiver);
 	cco_release(o->srAnalyzer_save_prefix);
+	cco_release(o->srAnalyzer_output_directory);
 	cco_release(o->srAnalyzer_backup_image);
 	cco_release(o->srAnalyzer_ocr_type);
 	cco_release(o->srAnalyzer_ocr_obj);
@@ -228,22 +230,45 @@ int cco_srAnalyzer_setOcrObj(cco_srAnalyzer *obj, cco_vString *ocr_type)
 static cco_vString *get_save_directory_path(cco_srAnalyzer *obj, int append_save_prefix)
 {
 	assert(append_save_prefix == 1 || append_save_prefix == 0);
+
+	cco_vString *save_prefix = NULL;
+	cco_vString *save_directory = NULL;
+	cco_vString *concatenated_directory = NULL;
+
+	char *output_directory_cstring = obj->srAnalyzer_output_directory->v_getCstring(obj->srAnalyzer_output_directory);
+	int is_output_directory_option_set = strcmp(output_directory_cstring, "");
+	free(output_directory_cstring);
+
 	if (append_save_prefix == 1)
 	{
-		return cco_vString_newWithFormat("%@R%@/S%@/%s%@.%@",
-			obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-			obj->srAnalyzer_date_string, obj->srAnalyzer_pid, obj->srAnalyzer_hostname);
-	}
-	else if (append_save_prefix == 0)
-	{
-		return cco_vString_newWithFormat("R%@/S%@/%s%@.%@",
-			obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-			obj->srAnalyzer_date_string, obj->srAnalyzer_pid, obj->srAnalyzer_hostname);
+		save_prefix = cco_vString_newWithFormat("%@",
+			obj->srAnalyzer_save_prefix);
 	}
 	else
 	{
-		return cco_vString_new("");
+		save_prefix = cco_vString_new("");
 	}
+
+	if (is_output_directory_option_set == 0)
+	{
+		save_directory = cco_vString_newWithFormat("R%@/S%@/%s%@.%@",
+			obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
+			obj->srAnalyzer_date_string, obj->srAnalyzer_pid,
+			obj->srAnalyzer_hostname);
+	}
+	else
+	{
+		save_directory = cco_vString_newWithFormat("%@",
+			obj->srAnalyzer_output_directory);
+	}
+
+	concatenated_directory = cco_vString_newWithFormat("%@%@",
+		save_prefix, save_directory);
+
+	cco_release(save_prefix);
+	cco_release(save_directory);
+
+	return concatenated_directory;
 }
 
 /*

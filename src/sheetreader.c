@@ -24,6 +24,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <opencv/highgui.h>
 #include <cluscore/cco_vString.h>
 #include "sheetreader.h"
@@ -86,10 +87,16 @@ int main(int argc, char *argv[])
 {
 	int result = 0;
 	int optval;
+	int longindex = 0;
 	int debug = 0;
 	char *mode = NULL;
 	char *configdir = NULL;
 	int help = 0;
+	const struct option longopts[] = {
+		/* {		*name,			has_arg,	*flag,	val }, */
+		{	"output-directory",	required_argument,	0,	1 },
+		{			0,			0,	0,	0 },
+	};
 	cco_srAnalyzer *srAnalyzer = NULL;
 	CCOSRANALYZER_STATUS analyzer_result = CCOSRANALYZER_STATUS_SUCCESS;
 	cco_vString *tmp_string = NULL;
@@ -104,11 +111,12 @@ int main(int argc, char *argv[])
 #else
 	cco_vString *ocr_string = cco_vString_new("gocr");
 #endif
+	cco_vString *output_directory_string = cco_vString_new("");
 	char sr_result[64];
 
 	do {
 		/* Checks options. */
-		while ((optval = getopt(argc, argv, "l:o:u:i:p:s:r:d:m:c:v?")) != -1) {
+		while ((optval = getopt_long(argc, argv, "l:o:u:i:p:s:r:d:m:c:v?", longopts, &longindex)) != -1) {
 			switch (optval) {
 			case 'd':
 				debug = atoi(optarg);
@@ -150,6 +158,10 @@ int main(int argc, char *argv[])
 			case 'l':	/* only used for KOCR */
 				ocrdb_dir = strdup(optarg);
 				break;
+			case 1:	/* output_directory */
+				cco_safeRelease(output_directory_string);
+				output_directory_string = cco_vString_new(optarg);
+				break;
 			}
 			optarg = NULL;
 		}
@@ -169,6 +181,10 @@ int main(int argc, char *argv[])
 		srAnalyzer->srAnalyzer_debug = debug;
 		cco_safeRelease(srAnalyzer->srAnalyzer_save_prefix);
 		srAnalyzer->srAnalyzer_save_prefix = cco_get(saveprefix_string);
+
+		cco_safeRelease(srAnalyzer->srAnalyzer_output_directory);
+		srAnalyzer->srAnalyzer_output_directory = cco_get(output_directory_string);
+
 		cco_safeRelease(srAnalyzer->srAnalyzer_sender);
 		srAnalyzer->srAnalyzer_sender = cco_get(sender_string);
 

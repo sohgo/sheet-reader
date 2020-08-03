@@ -44,6 +44,7 @@
 	cco_vString *srAnalyzer_sender;\
 	cco_vString *srAnalyzer_receiver;\
 	cco_vString *srAnalyzer_save_prefix;\
+	cco_vString *srAnalyzer_output_directory;\
 	cco_vString *srAnalyzer_backup_image;\
 	char *srAnalyzer_date_string;\
 	cco_vString *srAnalyzer_pid;\
