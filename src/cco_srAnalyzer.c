@@ -2898,11 +2898,13 @@ void cco_srAnalyzer_out_sub(cco *callbackobject, cco_v *key, cco *object)
 	cco_vString *ocrName_string;
 	cco_vString *ocrValue_string;
 	cco_vString *ocrImage_string;
+	cco_vString *ocrPreImage_string;
 	cco_vString *outPropertyCode;
 	cco_srAnalyzer *obj = (cco_srAnalyzer *)callbackobject;
 	char *outCode_cstr;
 
 	values = (cco_redblacktree *)cco_get(object);
+
 	ocrName_string = (cco_vString *)cco_get(key);
 	tmp_string = cco_vString_new("blockOcr");
 	ocrValue_string = (cco_vString *)cco_redblacktree_get(values, (cco_v*)tmp_string);
@@ -2911,6 +2913,15 @@ void cco_srAnalyzer_out_sub(cco *callbackobject, cco_v *key, cco *object)
 		ocrValue_string = cco_vString_new("");
 	}
 	cco_safeRelease(tmp_string);
+
+	tmp_string = cco_vString_new("blockPreOcr");
+	ocrPreImage_string = (cco_vString *)cco_redblacktree_get(values, (cco_v*)tmp_string);
+	if (ocrPreImage_string == NULL)
+	{
+		ocrPreImage_string = cco_vString_new("");
+	}
+	cco_safeRelease(tmp_string);
+
 	tmp_string = cco_vString_new("blockImg");
 	ocrImage_string = (cco_vString *)cco_redblacktree_get(values, (cco_v*)tmp_string);
 	if (ocrImage_string == NULL)
@@ -2932,6 +2943,7 @@ void cco_srAnalyzer_out_sub(cco *callbackobject, cco_v *key, cco *object)
 	cco_vString_replace(outPropertyCode, "#OCRNAME#", ocrName_string);
 	cco_vString_replace(outPropertyCode, "#OCRVALUE#", ocrValue_string);
 	cco_vString_replace(outPropertyCode, "#OCRIMAGE#", ocrImage_string);
+	cco_vString_replace(outPropertyCode, "#OCRPREIMAGE#", ocrPreImage_string);
 	cco_vString_replaceWithCstring(outPropertyCode, "#NEEDCHECK#", "true");
 	cco_vString_catenate(obj->srAnalyzer_outProp, outPropertyCode);
 	cco_safeRelease(outPropertyCode);
@@ -2940,6 +2952,7 @@ void cco_srAnalyzer_out_sub(cco *callbackobject, cco_v *key, cco *object)
 	cco_safeRelease(ocrName_string);
 	cco_safeRelease(ocrValue_string);
 	cco_safeRelease(ocrImage_string);
+	cco_safeRelease(ocrPreImage_string);
 	return;
 }
 
