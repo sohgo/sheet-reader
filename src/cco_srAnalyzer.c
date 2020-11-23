@@ -2225,7 +2225,7 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 					preOcrImgFileNamePrefix = cco_vString_newWithFormat("%@/preOcrImg-%@-concat.png",
 							save_dir_without_prefix, xml_attr_name);
 				} else {
-					preOcrImgFileNamePrefix = cco_vString_newWithFormat("%@/preOcrImg-%@-%d.png",
+					preOcrImgFileNamePrefix = cco_vString_newWithFormat("%@/preOcrImg-%@-0-%d.png",
 							save_dir_without_prefix, xml_attr_name,
 							index_colspan - 1);
 				}
