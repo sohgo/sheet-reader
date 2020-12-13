@@ -2292,10 +2292,10 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_ocrProcBlockOcr(cco_srAnalyzer *obj, cco_srM
 			cco_safeRelease(xml_attr_y);
 			cco_arraylist_setCursorAtNext(xml_blockOcrs);
 		}
-		cco_safeRelease(save_dir);
-		cco_safeRelease(save_dir_without_prefix);
 		cco_safeRelease(xml_blockOcrs);
 	} while (0);
+	cco_safeRelease(save_dir);
+	cco_safeRelease(save_dir_without_prefix);
 	cco_safeRelease(list_candidate_pattern);
 	if (obj->srAnalyzer_debug >= 2)
 	{
@@ -2681,9 +2681,9 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_backupImage(cco_srAnalyzer *obj)
 		obj->srAnalyzer_backup_image = cco_get(tmp_string);
 		cco_safeRelease(tmp_string);
 
-		cco_safeRelease(save_dir);
-		cco_safeRelease(save_dir_without_prefix);
 	} while (0);
+	cco_safeRelease(save_dir);
+	cco_safeRelease(save_dir_without_prefix);
 	cco_safeRelease(srml);
 	return result;
 }
