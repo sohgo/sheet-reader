@@ -86,6 +86,7 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 {
 #define PID_STRING_LEN 8
 	char pid_string[PID_STRING_LEN];
+	char hostname[HOST_NAME_MAX + 1];
 	char time_str[32];
 	time_t time_val;
 	struct tm tm_val;
@@ -116,6 +117,21 @@ void cco_srAnalyzer_baseInitialize(cco_srAnalyzer *o)
 	o->srAnalyzer_date_string = strdup(time_str);
 	snprintf(pid_string, PID_STRING_LEN, "%07d", getpid());
 	o->srAnalyzer_pid = cco_vString_newWithFormat("%s", pid_string);
+	int gethostname_ret_val = gethostname(hostname, HOST_NAME_MAX + 1);
+	if (gethostname_ret_val == 0)
+	{
+		o->srAnalyzer_hostname = cco_vString_newWithFormat("%s", hostname);
+	}
+	else if (gethostname_ret_val == -1)
+	{
+		o->srAnalyzer_hostname = cco_vString_new("");
+		perror("Failed to initialize srAnalyzer_hostname in cco_srAnalyzer_baseInitialize()");
+	}
+	else
+	{
+		o->srAnalyzer_hostname = cco_vString_new("");
+		fprintf(stderr, "something is wrong on gethostname() in %s()\n", __func__);
+	}
 	o->srAnalyzer_outSql = NULL;
 	o->srAnalyzer_outXml = NULL;
 	o->srAnalyzer_out = NULL;
@@ -149,6 +165,7 @@ void cco_srAnalyzer_baseFinalize(cco_srAnalyzer *o)
 	cco_release(o->srAnalyzer_analyzedData);
 	free(o->srAnalyzer_date_string);
 	cco_release(o->srAnalyzer_pid);
+	cco_release(o->srAnalyzer_hostname);
 	return;
 }
 
@@ -213,15 +230,15 @@ static cco_vString *get_save_directory_path(cco_srAnalyzer *obj, int append_save
 	assert(append_save_prefix == 1 || append_save_prefix == 0);
 	if (append_save_prefix == 1)
 	{
-		return cco_vString_newWithFormat("%@R%@/S%@/%s%@",
+		return cco_vString_newWithFormat("%@R%@/S%@/%s%@.%@",
 			obj->srAnalyzer_save_prefix, obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-			obj->srAnalyzer_date_string, obj->srAnalyzer_pid);
+			obj->srAnalyzer_date_string, obj->srAnalyzer_pid, obj->srAnalyzer_hostname);
 	}
 	else if (append_save_prefix == 0)
 	{
-		return cco_vString_newWithFormat("R%@/S%@/%s%@",
+		return cco_vString_newWithFormat("R%@/S%@/%s%@.%@",
 			obj->srAnalyzer_sender, obj->srAnalyzer_receiver,
-			obj->srAnalyzer_date_string, obj->srAnalyzer_pid);
+			obj->srAnalyzer_date_string, obj->srAnalyzer_pid, obj->srAnalyzer_hostname);
 	}
 	else
 	{
@@ -2764,11 +2781,12 @@ void cco_srAnalyzer_outSql_sub(cco *callbackobject, cco_v *key, cco *object)
 	mysql_close(my);
 	tmp_string = cco_vString_newWithFormat(
 			"INSERT INTO response_properties (response_code, ocr_name, ocr_value, ocr_image, need_check)"
-			" VALUES('%@%@%s%@','%s','%s','%s',%s);\n"
+			" VALUES('%@%@%s%@%@','%s','%s','%s',%s);\n"
 			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_sid
 			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_uid
 			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_date_string
 			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_pid
+			, ((cco_srAnalyzer *)callbackobject)->srAnalyzer_hostname
 			, ocrName_escape, ocrValue_escape, ocrImage_escape, "TRUE");
 	cco_vString_catenate((cco_vString *)((cco_srAnalyzer *)callbackobject)->srAnalyzer_outSql, tmp_string);
 	cco_safeRelease(tmp_string);
@@ -2819,11 +2837,12 @@ CCOSRANALYZER_STATUS cco_srAnalyzer_outSql(cco_srAnalyzer *obj)
 
 	obj->srAnalyzer_outSql = cco_vString_newWithFormat(
 			"INSERT INTO responses (response_code,date,sheet_code,candidate_code,fax_number,receiver_number,sheet_image)"
-			" VALUES('%s%s%s%@','%s','%s','%s','%s','%s','%@');\n"
+			" VALUES('%s%s%s%@%@','%s','%s','%s','%s','%s','%@');\n"
 			, sid_escape
 			, uid_escape
 			, obj->srAnalyzer_date_string
 			, obj->srAnalyzer_pid
+			, obj->srAnalyzer_hostname
 			, obj->srAnalyzer_date_string
 			, sid_escape
 			, uid_escape
