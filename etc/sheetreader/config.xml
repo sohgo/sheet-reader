@@ -15,11 +15,13 @@
 		</mysql>
 		<rails>
 			<code>
-				<![CDATA[# coding: utf-8
+				<![CDATA[
 				#!/usr/bin/ruby
+				# -*- encoding: utf-8 -*-
 				require "rubygems"
 				require "active_record"
 				require "yaml"
+				require "erb"
 				rails_prefix = ARGV[0] || "./"
 				image_prefix = ARGV[1] || "./"
 				echo_prefix = ARGV[2] || "./"
