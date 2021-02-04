@@ -2,8 +2,10 @@
 src/sheetreader
 makefile
 include/config.h
+include/stamp-h1
 config.log
 config.status
+autom4te.cache
 .cproject
 .project
 .deps
