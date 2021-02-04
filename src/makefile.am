@@ -33,6 +33,6 @@ sheetreader_LDADD = $(OCR_LIBS) $(OPENCV_LIBS) $(MYSQL_LIBS)
 sheetreader_LDFLAGS =\
 	-L$(top_srcdir)/../kocr/src
 
-INCLUDES =\
+sheetreader_CPPFLAGS =\
 	-I$(top_srcdir)/include\
 	-I$(top_srcdir)/../kocr/src
