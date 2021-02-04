@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT([SheetReader], [0.0.1], [faxocr@googlegroups.com])
-AM_INIT_AUTOMAKE([SheetReader], [0.0.1], no-define)
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/cco_srAnalyzer.h])
 AC_CONFIG_HEADER([include/config.h])
 

@@ -2741,9 +2741,18 @@ fi
 
 
 # Define the identity of the package.
- PACKAGE=SheetReader
- VERSION=0.0.1
+ PACKAGE='sheetreader'
+ VERSION='0.0.1'
 
+
+cat >>confdefs.h <<_ACEOF
+#define PACKAGE "$PACKAGE"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define VERSION "$VERSION"
+_ACEOF
 
 # Some tools Automake needs.
 
