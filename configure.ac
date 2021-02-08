@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([SheetReader], [0.0.1], [faxocr@googlegroups.com])
+AC_INIT([SheetReader], [1.1.0], [faxocr@googlegroups.com])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/cco_srAnalyzer.h])
 AC_CONFIG_HEADER([include/config.h])
